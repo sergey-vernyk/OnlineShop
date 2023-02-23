@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}List product{% endblock %}
+{% block content %}
+    <h2>{% if category %} {{category.name}} {% else %} All products {% endif %}</h2>
+    <ul class="container p-5 my-5 border">
+        {% for product in object_list %}
+            {% if product.image %}
+                <img src="{{ product.image.url }}" class="img-fluid" width="300" height="230" alt="product_image">
+            {% endif %}
+        <li class="list-group-item"><a href="{{ product.get_absolute_url }}">{{ product.manufacturer }} {{ product.name }}</a></li>
+        <li class="list-group-item">${{ product.price }}</li>
+        {% empty %}
+            No product yet.
+        {% endfor %}
+    </ul>
+{% endblock %}

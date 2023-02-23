@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{% block title %}{% endblock %}</title>
+  {% load django_bootstrap5 %}
+  {% bootstrap_css %}
+  {% bootstrap_javascript %}
+</head>
+<body>
+
+<div class="container">
+  <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{% url 'goods:product_list' %}">
+      <img src="logo.png" alt="Intershop" style="width:40px;" class="rounded-pill">
+    </a>
+    <ul class="navbar-nav">
+      {% for c in categories %}
+      <li class="nav-item">
+        <a {% if category.slug == c.slug %}
+            class="nav-link active"
+           {% else %}
+            class="nav-link"
+           {% endif %}
+           href="{{ c.get_absolute_url }}" >{{ c.name }}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+    <form class="d-flex">
+        <input class="form-control me-2" type="text" placeholder="Search">
+        <button class="btn btn-primary" type="button">Search</button>
+      </form>
+  </div>
+</nav>
+  {% block content %}
+  {% endblock %}
+</div>
+</body>
+</html>

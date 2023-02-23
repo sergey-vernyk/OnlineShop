@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Product {{ object.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ object.manufacturer }} {{ object.name }}</h1>
+
+    <img src="{{ object.image.url }}" class="img-fluid mb-5" alt="product_image" width="300" height="230">
+    <ul class="list-group list-group-flush">
+        {% for prop, value in object.properties %}
+             <div class="row justify-content-between">
+                 <div class="col-4">
+                    <li class="list-group-item list-group-item-dark">{{ prop }}</li>
+                 </div>
+                 <div class="col-4">
+                    <li class="list-group-item list-group-item-success">{{ value }}</li>
+                 </div>
+             </div>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
