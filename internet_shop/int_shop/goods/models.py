@@ -1,12 +1,24 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.urls import reverse
+from decimal import Decimal
 
 
 class Product(models.Model):
     """
     Модель товара на сайте
     """
+
+    class Rating(models.IntegerChoices):
+        ZERO_STARS = 0, '0'
+        ONE_STAR = 1, '1'
+        TWO_STARS = 2, '2'
+        THREE_STARS = 3, '3'
+        FOUR_STARS = 4, '4'
+        FIVE_STARS = 5, '5'
+
+    star = models.IntegerField(choices=Rating.choices, default=Rating.ZERO_STARS, verbose_name='Rating')
+
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True)
     manufacturer = models.ForeignKey('Manufacturer', on_delete=models.SET_NULL, related_name='products', null=True)
@@ -19,6 +31,8 @@ class Product(models.Model):
     category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='products')
     properties = models.OneToOneField(to='Property', related_name='product_properties', on_delete=models.SET_NULL,
                                       null=True)
+    rating = models.DecimalField(max_digits=2, decimal_places=1, validators=[MinValueValidator(Decimal(0.0)),
+                                                                             MaxValueValidator(Decimal(5.0))])
 
     def __str__(self):
         return self.name
@@ -70,8 +84,9 @@ class Comment(models.Model):
     Модель комментария для товара на сайте
     """
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='comments')
-    user_name = models.CharField(max_length=30)
-    body = models.TextField()
+    user_name = models.CharField(max_length=30, verbose_name='Name')
+    user_email = models.EmailField(default='', verbose_name='Email')
+    body = models.TextField(verbose_name='Review Text')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -81,20 +96,6 @@ class Comment(models.Model):
     class Meta:
         verbose_name = 'Comment'
         verbose_name_plural = 'Comments'
-
-
-class Rating(models.Model):
-    """
-    Модель для рейтинга товара
-    """
-    value = models.SmallIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(5)])
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='products')
-
-    def __str__(self):
-        return f'Product {self.product.name} Rating {self.value}'
-
-    class Meta:
-        verbose_name = 'Rating'
 
 
 class Property(models.Model):

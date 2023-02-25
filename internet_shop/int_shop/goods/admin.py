@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from goods.models import Product, Category, Manufacturer, Comment, Rating, Property
+from goods.models import Product, Category, Manufacturer, Comment, Property
 
 
 class CommentInline(admin.StackedInline):
@@ -9,11 +9,11 @@ class CommentInline(admin.StackedInline):
     """
     model = Comment
     extra = 2
-    readonly_fields = ['user_name', 'created', 'updated']
+    readonly_fields = ['user_name', 'user_email', 'created', 'updated']
     fieldsets = (
         ('Comment', {
             'classes': ('collapse',),  # сворачивание комментария
-            'fields': ('user_name', 'body', 'created', 'updated'),
+            'fields': ('user_name', 'user_email', 'body', 'created', 'updated'),
         }),
     )
 
@@ -28,13 +28,14 @@ class ProductAdmin(admin.ModelAdmin):
     """
     Товары
     """
-    list_display = ['name', 'pk', 'manufacturer', 'price', 'created', 'updated', 'available', 'properties']
+    list_display = ['name', 'pk', 'manufacturer', 'price', 'created', 'updated', 'available', 'properties', 'rating']
     list_editable = ['price', 'available']
     list_filter = ['manufacturer', 'available']
     prepopulated_fields = {'slug': ('name',)}
     search_fields = ['name']
     inlines = [CommentInline]
     save_on_top = True
+    exclude = ('star',)
 
 
 @admin.register(Category)
@@ -55,12 +56,3 @@ class ManufacturerAdmin(admin.ModelAdmin):
     list_display = ['name', 'slug']
     prepopulated_fields = {'slug': ('name',)}
     search_fields = ['name']
-
-
-@admin.register(Rating)
-class RatingAdmin(admin.ModelAdmin):
-    """
-    Рейтинг
-    """
-    list_display = ['value', 'product']
-    list_filter = ['value']

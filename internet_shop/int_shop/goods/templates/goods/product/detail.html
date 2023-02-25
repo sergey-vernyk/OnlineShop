@@ -7,6 +7,13 @@
     <h1>{{ object.manufacturer }} {{ object.name }}</h1>
 
     <img src="{{ object.image.url }}" class="img-fluid mb-5" alt="product_image" width="300" height="230">
+    <h4>Current rating: {{ object.rating }}</h4>
+    <form action="{% url 'goods:product_detail' object.pk object.slug %}" method="post">
+        {% csrf_token %}
+        {{ rating_form }}
+         <input type="submit" name="rating_sent" class="btn btn-success" value="Submit">
+    </form>
+    <h4 align="center">Product characteristics:</h4>
     <ul class="list-group list-group-flush">
         {% for prop, value in object.properties %}
              <div class="row justify-content-between">
@@ -19,5 +26,11 @@
              </div>
         {% endfor %}
     </ul>
+    <h4>Please, type the comment about product...</h4>
+    <form action="{% url 'goods:product_detail' object.pk object.slug %}" method="post">
+        {% csrf_token %}
+        {{ comment_form }}
+        <input type="submit" name="comment_sent" class="btn btn-success" value="Send">
+    </form>
 </div>
 {% endblock %}
