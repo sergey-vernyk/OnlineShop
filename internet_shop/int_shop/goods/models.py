@@ -3,6 +3,8 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.urls import reverse
 from decimal import Decimal
 
+from account.models import Profile
+
 
 class Product(models.Model):
     """
@@ -30,9 +32,10 @@ class Product(models.Model):
     updated = models.DateTimeField(auto_now=True)
     category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='products')
     properties = models.OneToOneField(to='Property', related_name='product_properties', on_delete=models.SET_NULL,
-                                      null=True)
-    rating = models.DecimalField(max_digits=2, decimal_places=1, validators=[MinValueValidator(Decimal(0.0)),
-                                                                             MaxValueValidator(Decimal(5.0))])
+                                      null=True, blank=True)
+    rating = models.DecimalField(default=0, max_digits=2, decimal_places=1, validators=[MinValueValidator(Decimal(0.0)),
+                                                                                        MaxValueValidator(
+                                                                                            Decimal(5.0))])
 
     def __str__(self):
         return self.name
@@ -43,6 +46,19 @@ class Product(models.Model):
     class Meta:
         verbose_name = 'Product'
         verbose_name_plural = 'Products'
+        ordering = ('name',)
+
+
+class Favorite(models.Model):
+    """
+    Модель товаров, добавленных в избранное определенным пользователем
+    """
+    product = models.ManyToManyField(Product)
+    profile = models.OneToOneField(Profile, on_delete=models.CASCADE, related_name='profile_favorite')
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    def __str__(self):
+        return f'Profile "{self.profile.user.username}"'
 
 
 class Category(models.Model):
@@ -86,6 +102,7 @@ class Comment(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='comments')
     user_name = models.CharField(max_length=30, verbose_name='Name')
     user_email = models.EmailField(default='', verbose_name='Email')
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='profile_comments', default='')
     body = models.TextField(verbose_name='Review Text')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

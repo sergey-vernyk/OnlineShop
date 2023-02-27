@@ -22,6 +22,8 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('goods/', include('goods.urls')),
+    # path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/', include('account.urls')),
 ]
 
 if settings.DEBUG:  # сохранение файлов по этому адресу будет происходить только в режиме разработки

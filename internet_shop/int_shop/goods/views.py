@@ -1,9 +1,11 @@
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import FormMixin
 
+from account.models import Profile
 from goods.forms import RatingSetForm, CommentProductForm
 from goods.models import Product, Category
 from django.urls import reverse
+from decimal import Decimal
 
 
 class ProductListView(ListView):
@@ -44,19 +46,28 @@ class ProductDetailView(FormMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
-        context['rating_form'] = RatingSetForm()  # добавляем форму рейтинга в контекст
+        context['rating_form'] = self.form_class  # добавляем форму рейтинга в контекст
         context['comment_form'] = CommentProductForm()  # добавляем форму комментария в контекст
+        # если пользователь аутентифицирован, то заполнить имя, почту в форме отправки комментария
+        if self.request.user.is_authenticated:
+            context['comment_form'].fields['user_name'].initial = self.request.user.first_name
+            context['comment_form'].fields['user_email'].initial = self.request.user.email
         return context
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        #  если был отправлен комментарий
+        #  если пользователь аутентифицирован на сайте и отправляет комментарий
         if 'comment_sent' in request.POST:
-            form = self.get_form(form_class=CommentProductForm)  # присвоить объект представлению
+            # присвоить объект представлению
+            form = self.get_form(form_class=CommentProductForm)
             if form.is_valid():
                 new_comment = form.save(commit=False)
-                new_comment.product = self.object  # привязка комментария текущему товару
+                new_comment.product = self.object  # привязка комментария к текущему товару
+                # получение текущего профиля пользователя сайта
+                # привязка комментария к текущему профилю
+                profile_instance = Profile.objects.get(user__id=request.user.pk)
+                new_comment.profile = profile_instance
                 new_comment.save()  # сохранение в базе
                 return self.form_valid(form)
             else:
@@ -67,8 +78,8 @@ class ProductDetailView(FormMixin, DetailView):
             if form.is_valid():
                 current_rating = self.object.rating
                 rating = form.cleaned_data.get('star')
-                if not rating:
-                    self.object.rating = 5
+                if not current_rating:
+                    self.object.rating = Decimal(rating)
                 else:  # расчет среднего рейтинга товара
                     self.object.rating = round((rating + current_rating) / 2, 1)
                 self.object.save()  # сохранение в базе

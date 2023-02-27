@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'goods.apps.GoodsConfig',
+    'account.apps.AccountConfig',
     'django_bootstrap5',
     'django_extensions'
 ]
@@ -139,3 +140,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # пути для сохранения пользовательских файлов с сайта
 MEDIA_URL = '/media/'  # файлы загружены пользователем
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')  # путь, по которому находятся эти файлы
+
+LOGIN_REDIRECT_URL = 'goods:product_list'

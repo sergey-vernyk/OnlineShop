@@ -10,27 +10,67 @@
     <h4>Current rating: {{ object.rating }}</h4>
     <form action="{% url 'goods:product_detail' object.pk object.slug %}" method="post">
         {% csrf_token %}
-        {{ rating_form }}
-         <input type="submit" name="rating_sent" class="btn btn-success" value="Submit">
+        {% for field in rating_form.visible_fields %}
+            {{ field.errors }}
+            {{ field.label_tag }}{{ field }}
+        {% endfor %}
+        <input type="submit" name="rating_sent" class="btn btn-success" value="Submit">
     </form>
     <h4 align="center">Product characteristics:</h4>
     <ul class="list-group list-group-flush">
         {% for prop, value in object.properties %}
-             <div class="row justify-content-between">
-                 <div class="col-4">
-                    <li class="list-group-item list-group-item-dark">{{ prop }}</li>
-                 </div>
-                 <div class="col-4">
-                    <li class="list-group-item list-group-item-success">{{ value }}</li>
-                 </div>
-             </div>
+        <div class="row justify-content-between">
+            <div class="col-4">
+                <li class="list-group-item list-group-item-dark">{{ prop }}</li>
+            </div>
+            <div class="col-4">
+                <li class="list-group-item list-group-item-success">{{ value }}</li>
+            </div>
+        </div>
         {% endfor %}
     </ul>
+    <!--комментарии-->
+    <div class="row d-flex justify-content-left">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-0 border" style="background-color: #f0f2f5;">
+                <div class="card-body p-4">
+                    {% with object.comments.all.count as total_comments %}
+                        <h4>Total {{ total_comments }} comment{{ total_comments|pluralize }}</h4>
+                    {% endwith %}
+                    {% for comment in object.comments.all %}
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <p>Comment #{{ forloop.counter }} by {{ comment.user_name }}</p>
+                                <p>{{ comment.body }}</p>
+                                <div class="d-flex justify-content-between">
+                                    <div class="d-flex flex-row align-items-center">
+                                        {% if comment.profile.photo %}
+                                            <img src="{{ comment.profile.photo.url }}" alt="avatar" width="25" height="25" />
+                                        {% endif %}
+                                        <p class="small mb-0 ms-2">{{ comment.user_name }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
     <h4>Please, type the comment about product...</h4>
     <form action="{% url 'goods:product_detail' object.pk object.slug %}" method="post">
         {% csrf_token %}
-        {{ comment_form }}
+        {% for field in comment_form.visible_fields %}
+            {% if not field.is_hidden %}
+                {{ field.errors }}
+                {{ field.label_tag }}{{ field }}
+            {% else %}
+                {{ field }}
+            {% endif %}
+        {% endfor %}
         <input type="submit" name="comment_sent" class="btn btn-success" value="Send">
     </form>
 </div>
+</div>
 {% endblock %}
+
