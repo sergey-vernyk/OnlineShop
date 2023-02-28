@@ -34,6 +34,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'account.apps.AccountConfig',  # должно быть на первом месте для собственного вывода шаблона logged_out.html
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,7 +43,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'goods.apps.GoodsConfig',
-    'account.apps.AccountConfig',
     'django_bootstrap5',
     'django_extensions'
 ]
@@ -142,3 +142,4 @@ MEDIA_URL = '/media/'  # файлы загружены пользователе�
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')  # путь, по которому находятся эти файлы
 
 LOGIN_REDIRECT_URL = 'goods:product_list'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # вывод всех сообщений с почты в shell (без SMTP)

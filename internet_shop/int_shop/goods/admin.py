@@ -74,13 +74,12 @@ class ProductAdmin(admin.ModelAdmin):
     save_on_top = True
     exclude = ('star',)
 
+    @admin.display(description='Image')
     def image_tag(self, obj):
         """
         Отображение изображения товара
         """
         return mark_safe(f'<img src="{obj.image.url}" width="100" height="100"/>')
-
-    image_tag.short_description = 'Image'
 
 
 @admin.register(Category)

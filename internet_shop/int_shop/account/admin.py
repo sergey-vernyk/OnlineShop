@@ -41,10 +41,11 @@ class ProfileAdmin(admin.ModelAdmin):
     """
     Профиль пользователя
     """
-    list_display = ['profile_full_name', 'date_of_birth', 'created']
+    fields = ('profile_full_name', 'user', 'date_of_birth', 'user_photo_tag', 'created')
     inlines = [FavoriteInline, CommentInline]
-    readonly_fields = ['user_photo_tag']
+    readonly_fields = ['user', 'user_photo_tag', 'created', 'profile_full_name']
 
+    @admin.display(description='Username')  # отображение названия поля в шапке админ сайта модели
     def profile_full_name(self, obj):
         """
         Добавление имени и фамилии пользователя из встроенной модели
@@ -52,13 +53,10 @@ class ProfileAdmin(admin.ModelAdmin):
         """
         return f'{obj.user.first_name} {obj.user.last_name}'
 
-    profile_full_name.short_description = 'Username'  # отображение названия поля в шапке админ сайта модели
-
+    @admin.display(description='Photo')
     def user_photo_tag(self, obj):
         """
         Фото профиля пользователя
         """
         if obj.photo:
             return mark_safe(f'<img src="{obj.photo.url}" width="100" height="100"/>')
-
-    user_photo_tag.short_description = 'Photo'
