@@ -13,6 +13,16 @@ class LoginUserView(LoginView):
     """
     form_class = LoginForm
 
+    def form_valid(self, form):
+        # если активна галочка "запомнить меня" - не выходить с системы до закрытия браузера
+        # работает не всегда корректно в некоторых браузерах
+        if form.cleaned_data.get('remember'):
+            self.request.session.set_expiry(0)
+        else:
+            self.request.session.set_expiry(1200)  # иначе выйти с системы через 20 минут
+        self.request.session.modified = True
+        return super().form_valid(form)
+
 
 class UserPasswordChangeView(PasswordChangeView):
     """

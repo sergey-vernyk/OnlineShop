@@ -10,13 +10,16 @@
             {% csrf_token %}
             {{ form.username.label_tag }} {{ form.username }}
             {{ form.password.label_tag }} {{ form.password }}
+            {{ form.remember.label_tag }} {{ form.remember }}
             {% if form.errors %}
                 <p>Your username and password didn't match. Please try again.</p>
             {% endif %}
-            <div class="row mb-4">
-                <div class="col">
-                    <button type="submit" class="btn btn-primary btn-block mt-2">Sign in</button>
-                    <a href="{% url 'password_reset' %}">Forgot password?</a>
+            <div class="row justify-content-start">
+                <div class="col-2">
+                    <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+                </div>
+                <div class="col-2">
+                    <a class="link-dark" href="{% url 'password_reset' %}">Forgot password?</a>
                 </div>
             </div>
         </div>

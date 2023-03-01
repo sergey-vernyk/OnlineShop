@@ -8,37 +8,48 @@
 </head>
 <body>
 
-<div class="container">
+<div class="container-fluid">
   <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="{% url 'goods:product_list' %}">
-      <img src="logo.png" alt="Intershop" style="width:40px;" class="rounded-pill">
-    </a>
-    <ul class="navbar-nav">
-      {% for c in categories %}
-      <li class="nav-item">
-        <a {% if category.slug == c.slug %}
-            class="nav-link active"
-           {% else %}
-            class="nav-link"
-           {% endif %}
-           href="{{ c.get_absolute_url }}" >{{ c.name }}
-        </a>
-      </li>
-      {% endfor %}
-    </ul>
-    <form class="d-flex">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="{% url 'goods:product_list' %}">
+        <img src="logo.png" alt="Intershop" style="width:40px;" class="rounded-pill">
+      </a>
+      <ul class="navbar-nav">
+        {% for c in categories %}
+        <li class="nav-item">
+          <a {% if category.slug == c.slug %}
+             class="nav-link active"
+             {% else %}
+             class="nav-link"
+             {% endif %}
+             href="{{ c.get_absolute_url }}" >{{ c.name }}
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+        {% if request.user.is_authenticated %}
+        <div class="d-flex flex-row">
+            <div class="p-2">
+                <p class="lead text-white text-decoration-underline mb-0">
+                    Hello, {{ request.user.first_name }}
+                </p>
+            </div>
+            <div class="p-2">
+                <a class="btn btn-info" role="button" href="{% url 'logout' %}">Logout</a>
+            </div>
+        </div>
+        {% else %}
+          <div class="btn-toolbar" role="toolbar">
+              <a class="btn btn-info me-2" role="button" href="{% url 'login' %}">Sign in</a>
+              <a class="btn btn-success" role="button" href="{% url 'register_user' %}">Sign up</a>
+          </div>
+        {% endif %}
+      <form class="d-flex">
         <input class="form-control me-2" type="text" placeholder="Search">
         <button class="btn btn-primary" type="button">Search</button>
       </form>
-  </div>
-  {% if request.user.is_authenticated %}
-    <a href="{% url 'logout' %}">Logout</a>
-  {% else %}
-     <a href="{% url 'login' %}">Login</a>
-  {% endif %}
-
-</nav>
+    </div>
+  </nav>
   {% block content %}
   {% endblock %}
 </div>
