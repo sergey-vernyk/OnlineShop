@@ -41,7 +41,7 @@ class ProfileAdmin(admin.ModelAdmin):
     """
     Профиль пользователя
     """
-    fields = ('profile_full_name', 'user', 'date_of_birth', 'user_photo_tag', 'created')
+    fields = ('profile_full_name', 'user', 'date_of_birth', 'gender', 'user_photo_tag', 'created', 'about')
     inlines = [FavoriteInline, CommentInline]
     readonly_fields = ['user', 'user_photo_tag', 'created', 'profile_full_name']
 

@@ -44,7 +44,10 @@ INSTALLED_APPS = [
 
     'goods.apps.GoodsConfig',
     'django_bootstrap5',
-    'django_extensions'
+    'django_extensions',
+    'orders.apps.OrdersConfig',
+    'coupons.apps.CouponsConfig',
+    'present_cards.apps.PresentCardsConfig',
 ]
 
 MIDDLEWARE = [

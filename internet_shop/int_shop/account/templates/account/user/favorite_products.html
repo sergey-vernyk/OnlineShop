@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}"{{ user.first_name }} {{ user.last_name }}" favorites {% endblock %}
+
+{% block content %}
+    <h1>Favorite products "{{ user.first_name }}"</h1>
+    <div class="d-flex flex-row">
+        <ul class="list-group">
+            {% for product in object_list %}
+                {% if product.image %}
+                    <span class="border border-dark">
+                        <img class="img-fluid m-2" src="{{ product.image.url }}" alt="product_image" width="300" height="230">
+                    </span>
+                {% endif %}
+            <div class="d-flex flex-row">
+                <div class="p-2">
+                    {{ product.manufacturer }} <a href="{{ product.get_absolute_url }}"> {{ product.name }}</a>
+                </div>
+                <div class="p-2">
+                    <a href="{% url 'goods:add_or_remove_product_favorite' action='remove' product_pk=product.id %}">Remove</a>
+                </div>
+            </div>
+            {% empty %}
+            <p class="lead">There are no product in favorite yet</p>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

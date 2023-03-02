@@ -53,7 +53,7 @@ class Favorite(models.Model):
     """
     Модель товаров, добавленных в избранное определенным пользователем
     """
-    product = models.ManyToManyField(Product)
+    product = models.ManyToManyField(Product, blank=True)
     profile = models.OneToOneField(Profile, on_delete=models.CASCADE, related_name='profile_favorite')
     created = models.DateTimeField(auto_now_add=True, db_index=True)
 

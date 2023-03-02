@@ -28,3 +28,4 @@ urlpatterns = [
 
 if settings.DEBUG:  # сохранение файлов по этому адресу будет происходить только в режиме разработки
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

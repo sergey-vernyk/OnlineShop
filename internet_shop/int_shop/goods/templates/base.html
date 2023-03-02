@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,7 +13,7 @@
   <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
     <div class="container-fluid">
       <a class="navbar-brand" href="{% url 'goods:product_list' %}">
-        <img src="logo.png" alt="Intershop" style="width:40px;" class="rounded-pill">
+        <img src="{% static 'img/main.ico' %}" alt="Intershop" style="width:40px;" class="rounded-pill">
       </a>
       <ul class="navbar-nav">
         {% for c in categories %}

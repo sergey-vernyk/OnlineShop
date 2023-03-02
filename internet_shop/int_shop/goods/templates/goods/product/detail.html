@@ -3,18 +3,30 @@
 {% block title %}Product {{ object.name }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container-fluid mt-4">
     <h1>{{ object.manufacturer }} {{ object.name }}</h1>
-
-    <img src="{{ object.image.url }}" class="img-fluid mb-5" alt="product_image" width="300" height="230">
+    <div class="d-inline-block p-2">
+        <img src="{{ object.image.url }}" class="img-fluid mb-5" alt="product_image" width="300" height="230">
+         <a class="btn btn-info" role="button"
+            href="{% if not is_in_favorite %}
+                        {% url 'goods:add_or_remove_product_favorite' action='add' product_pk=object.id %}
+                    {% elif is_in_favorite %}
+                        {% url 'goods:add_or_remove_product_favorite' action='remove' product_pk=object.id %}
+                    {% else %}
+                        {% url 'login' %}
+                    {% endif %}">   {% if is_in_favorite %}
+                                        Remove from Favorite
+                                    {% else %}
+                                        Add to Favorite
+                                    {% endif %}
+        </a>
+    </div>
     <h4>Current rating: {{ object.rating }}</h4>
     <form action="{% url 'goods:product_detail' object.pk object.slug %}" method="post">
         {% csrf_token %}
-        {% for field in rating_form.visible_fields %}
-            {{ field.errors }}
-            {{ field.label_tag }}{{ field }}
-        {% endfor %}
-        <input type="submit" name="rating_sent" class="btn btn-success" value="Submit">
+        {{ rating_form.star }}
+        {{ rating_form.star.errors }}
+        <input type="submit" name="rating_sent" class="btn btn-success mt-2" value="Submit"></div>
     </form>
     <h4 align="center">Product characteristics:</h4>
     <ul class="list-group list-group-flush">
@@ -60,15 +72,11 @@
     <h4>Please, type the comment about product...</h4>
     <form action="{% url 'goods:product_detail' object.pk object.slug %}" method="post">
         {% csrf_token %}
-        {% for field in comment_form.visible_fields %}
-            {% if not field.is_hidden %}
-                {{ field.errors }}
-                {{ field.label_tag }}{{ field }}
-            {% else %}
-                {{ field }}
-            {% endif %}
+        {% for field in comment_form %}
+            {{ field.errors }}
+            {{ field.label_tag }}{{ field }}
         {% endfor %}
-        <input type="submit" name="comment_sent" class="btn btn-success" value="Send">
+        <input type="submit" name="comment_sent" class="btn btn-success mt-2" value="Send">
     </form>
 </div>
 </div>
