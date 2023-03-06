@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'orders.apps.OrdersConfig',
     'coupons.apps.CouponsConfig',
     'present_cards.apps.PresentCardsConfig',
+    'cart.apps.CartConfig',
 ]
 
 MIDDLEWARE = [
@@ -73,7 +74,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'goods.context_processors.product_categories'  # категории товаров на любом шаблоне
+                'goods.context_processors.product_categories',  # категории товаров на любом шаблоне
+                'cart.context_processors.cart'  # корзина в любом шаблоне
 
             ],
         },
@@ -146,3 +148,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')  # путь, по которому
 
 LOGIN_REDIRECT_URL = 'goods:product_list'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # вывод всех сообщений с почты в shell (без SMTP)
+CART_SESSION_ID = 'cart'

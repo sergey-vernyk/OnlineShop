@@ -8,8 +8,8 @@ class CouponAdmin(admin.ModelAdmin):
     """
     Купоны
     """
-    list_display = ['code', 'valid_from', 'valid_to', 'discount', 'active']
-    list_filter = ['active']
+    list_display = ['code', 'category', 'valid_from', 'valid_to', 'discount', 'active']
+    list_filter = ['active', 'category']
     list_editable = ['active']
 
 

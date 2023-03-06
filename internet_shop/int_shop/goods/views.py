@@ -5,6 +5,7 @@ from django.views.generic.edit import FormMixin
 
 from account.models import Profile
 from goods.forms import RatingSetForm, CommentProductForm
+from cart.forms import CartQuantityForm
 from goods.models import Product, Category, Favorite
 from django.urls import reverse
 from decimal import Decimal
@@ -51,6 +52,7 @@ class ProductDetailView(FormMixin, DetailView):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
         context['rating_form'] = self.form_class  # добавляем форму рейтинга в контекст
         context['comment_form'] = CommentProductForm()  # добавляем форму комментария в контекст
+        context['quantity_form'] = CartQuantityForm()  # добавляем форму кол-ва товаров в контекст
         # если пользователь аутентифицирован, то заполнить имя, почту в форме отправки комментария
         if self.request.user.is_authenticated:
             context['comment_form'].fields['user_name'].initial = self.request.user.first_name

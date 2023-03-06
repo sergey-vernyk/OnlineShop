@@ -21,6 +21,16 @@
                                     {% endif %}
         </a>
     </div>
+
+    <div class="d-inline-block">
+        <form action="{% url 'cart:cart_add' object.id %}" method="post">
+            {% csrf_token %}
+            {{ quantity_form.as_p }}
+            {{ quantity_form.errors }}
+            <button type="submit" class="btn btn-info">Add to cart</button>
+        </form>
+    </div>
+    
     <h4>Current rating: {{ object.rating }}</h4>
     <form action="{% url 'goods:product_detail' object.pk object.slug %}" method="post">
         {% csrf_token %}

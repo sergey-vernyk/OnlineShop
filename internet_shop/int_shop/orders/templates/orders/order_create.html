@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Create order{% endblock %}
+
+{% block content %}
+    <h1>Checkout</h1>
+    <hr>
+    <h4>General information</h4>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in order_form %}
+            <div class="fieldWrapper">
+                {{ field.label_tag }} {{ field }}
+                {% if field.help_text %}
+                    <p class="help">{{ field.help_text|safe }}</p>
+                {% endif %}
+                <ul class="errorlist">
+                    {% for error in field.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+        <hr>
+    <h4>Delivery information</h4>
+        {% for field in delivery_form %}
+            <div class="fieldWrapper">
+                {{ field.label_tag }} {{ field }}
+                {% if field.help_text %}
+                    <p class="help">{{ field.help_text|safe }}</p>
+                {% endif %}
+                <ul class="errorlist">
+                    {% for error in field.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary mt-3">Place order</button>
+    </form>
+{% endblock %}

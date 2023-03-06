@@ -24,6 +24,9 @@ urlpatterns = [
     path('', include('goods.urls')),
     # path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/', include('account.urls')),
+    path('orders/', include('orders.urls')),
+    path('cart/', include('cart.urls')),
+    path('coupons/', include('coupons.urls')),
 ]
 
 if settings.DEBUG:  # сохранение файлов по этому адресу будет происходить только в режиме разработки

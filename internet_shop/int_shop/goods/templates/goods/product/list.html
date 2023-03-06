@@ -10,7 +10,7 @@
             <img src="{{ product.image.url }}" class="img-fluid" width="300" height="230" alt="product_image">
         </a>
             {% endif %}
-        <li class="list-group-item"><a href="{{ product.get_absolute_url }}">{{ product.manufacturer }} {{ product.name }}</a></li>
+        <li class="list-group-item"><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></li>
         <li class="list-group-item">${{ product.price }}</li>
         {% empty %}
             No product yet.
