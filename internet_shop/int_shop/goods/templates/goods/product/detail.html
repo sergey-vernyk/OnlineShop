@@ -1,12 +1,13 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Product {{ object.name }}{% endblock %}
+{% block title %}Product {{ object.name }} | OnlineShop{% endblock %}
 
 {% block content %}
 <div class="container-fluid mt-4">
-    <h1>{{ object.manufacturer }} {{ object.name }}</h1>
+    <h1>{{ object.name }}</h1>
     <div class="d-inline-block p-2">
-        <img src="{{ object.image.url }}" class="img-fluid mb-5" alt="product_image" width="300" height="230">
+        <img src="{% if object.image %}{{ object.image.url }}{% else %}{% static 'img/no_image.png' %}{% endif %}" class="img-fluid mb-5" alt="product_image" width="300" height="230">
          <a class="btn btn-info" role="button"
             href="{% if not is_in_favorite %}
                         {% url 'goods:add_or_remove_product_favorite' action='add' product_pk=object.id %}

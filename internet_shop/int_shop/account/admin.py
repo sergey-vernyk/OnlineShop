@@ -4,6 +4,22 @@ from account.models import Profile
 from goods.models import Favorite, Comment
 from django.utils.html import mark_safe
 
+from present_cards.models import PresentCard
+
+
+class PresentCardInline(admin.StackedInline):
+    model = PresentCard
+    extra = 0
+    readonly_fields = ('valid_from', 'valid_to', 'category', 'code', 'amount')
+    fieldsets = (
+        ('PresentCards', {
+            'classes': ('collapse',),
+            'fields': ('code', 'valid_from', 'valid_to',
+                       'active', 'from_name', 'from_email',
+                       'category', 'message', 'amount'),
+        }),
+    )
+
 
 class FavoriteInline(admin.StackedInline):
     """
@@ -41,9 +57,12 @@ class ProfileAdmin(admin.ModelAdmin):
     """
     Профиль пользователя
     """
-    fields = ('profile_full_name', 'user', 'date_of_birth', 'gender', 'user_photo_tag', 'created', 'about')
-    inlines = [FavoriteInline, CommentInline]
+    fields = ('profile_full_name', 'user', 'date_of_birth',
+              'gender', 'user_photo_tag', 'created',
+              'about', 'coupons')
+    inlines = [FavoriteInline, CommentInline, PresentCardInline]
     readonly_fields = ['user', 'user_photo_tag', 'created', 'profile_full_name']
+    filter_horizontal = ('coupons',)
 
     @admin.display(description='Username')  # отображение названия поля в шапке админ сайта модели
     def profile_full_name(self, obj):

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Cart detail{% endblock %}
 
@@ -17,110 +18,131 @@
     </div>
     <div class="col-lg-7">
         {% for item in cart %}
-        {% with product=item.product %}
-        <div class="card mb-3">
-            <div class="shadow p-3 bg-body rounded">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div class="d-flex flex-row align-items-center">
-                            <div>
-                                <a class="text-decoration-none" href="{{ item.product.get_absolute_url }}">
-                                    <img class="img-fluid rounded-3" src="{{ item.product.image.url }}"
-                                         alt="shopping-item"
-                                         style="width: 65px;"></a>
-                            </div>
-                            <div class="ms-3">
-                                <h5><a class="text-decoration-none" href="{{ item.product.get_absolute_url }}">
-                                    {{ item.product.name }}
-                                </a></h5>
-                            </div>
-                        </div>
-                        <div class="d-flex flex-row align-items-center">
-                            <div style="width: 140px;">
-                                <form method="post" action="{% url 'cart:cart_add' product_id=item.product.id %}">
-                                    {% csrf_token %}
-                                    <div class="d-inline">
-                                        <button class="btn btn-info btn-sm" type="submit">Update</button>
+            {% with product=item.product %}
+                <div class="card mb-3">
+                    <div class="shadow p-3 bg-body rounded">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div class="d-flex flex-row align-items-center">
+                                    <div>
+                                        <a class="text-decoration-none" href="{{ product.get_absolute_url }}">
+                                            <img class="img-fluid rounded-3" src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/no_image.png' %}{% endif %}"
+                                                 alt="shopping-item"
+                                                 style="width: 65px;"></a>
                                     </div>
-                                    <div class="d-inline">
-                                        {{ item.quantity_form.quantity }}
+                                    <div class="ms-3">
+                                        <h5><a class="text-decoration-none" href="{{ product.get_absolute_url }}">
+                                            {{ product.name }}
+                                        </a></h5>
                                     </div>
-
-                                </form>
+                                </div>
+                                <div class="d-flex flex-row align-items-center">
+                                    <div style="width: 140px;">
+                                        <form method="post" action="{% url 'cart:cart_add' product_id=product.id %}">
+                                            {% csrf_token %}
+                                            <div class="d-inline">
+                                                <button class="btn btn-info btn-sm" type="submit">Update</button>
+                                            </div>
+                                            <div class="d-inline">
+                                                {{ item.quantity_form.quantity }}
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div style="width: 100px;">
+                                        <h5 class="m-0"> ${{ item.total_price }}</h5>
+                                    </div>
+                                    <a href="{% url 'cart:cart_remove' product_id=product.id %}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
+                                        <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5
+                                        0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2
+                                         2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59
+                                          0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042
+                                           3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1
+                                            .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1
+                                             .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"/>
+                                        </svg>
+                                    </a>
+                                </div>
                             </div>
-                            <div style="width: 100px;">
-                                <h5 class="m-0"> ${{ item.total_price }}</h5>
-                            </div>
-                            <a href="{% url 'cart:cart_remove' product_id=item.product.id %}"
-                               style="color: #cecece;">Remove</a>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        {% endwith %}
+            {% endwith %}
         {% endfor %}
         {% if cart %}
-        <div class="input-group">
-            <div class="flex-row mb-3">
-                <div class="d-flex justify-content-start">
-                    <form method="post">
-                        {% csrf_token %}
-                        {{ present_card_form.code.label }}
-                        {{ present_card_form.code }}
-                        <button class="btn btn-info btn-sm" type="submit">Apply</button>
-                    </form>
-                </div>
-            </div>
-            <div class="flex-row">
-                <div class="d-flex justify-content-start">
-                    <div class="me-3">
-                        <form method="post" action="{% url 'coupons:apply_coupon' %}">
+            <div class="input-group">
+                <div class="flex-row mb-3">
+                    <div class="d-flex justify-content-start">
+                        <form method="post" action="{% url 'present_cards:apply_present_card' %}">
                             {% csrf_token %}
-                            {{ coupon_form.code.label }}
-                            {{ coupon_form.code }}
-                            {% if cart.coupon_id %}
-                                <a href="{% url 'coupons:cancel_coupon' %}" class="btn btn-info btn-sm" role="button">Cancel</a>
+                            {{ present_card_form.code.label }}
+                            {{ present_card_form.code }}
+                            {% if cart.present_card_id %}
+                                <a href="{% url 'present_cards:cancel_present_card' %}" class="btn btn-info btn-sm" role="button">Cancel</a>
                             {% else %}
                                 <button class="btn btn-info btn-sm" type="submit">Apply</button>
                             {% endif %}
                         </form>
                     </div>
                 </div>
+                <div class="flex-row">
+                    <div class="d-flex justify-content-start">
+                        <div class="me-3">
+                            <form method="post" action="{% url 'coupons:apply_coupon' %}">
+                                {% csrf_token %}
+                                {{ coupon_form.code.label }}
+                                {{ coupon_form.code }}
+                                {% if cart.coupon_id %}
+                                    <a href="{% url 'coupons:cancel_coupon' %}" class="btn btn-info btn-sm" role="button">Cancel</a>
+                                {% else %}
+                                    <button class="btn btn-info btn-sm" type="submit">Apply</button>
+                                {% endif %}
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="flex-row">
-            <div class="d-flex justify-content-end">
-                <p class="me-3">
-                    Subtotal:
-                </p>
-                <p class="mb-2">
-                    ${{ cart.get_total_price }}
-                </p>
-            </div>
-        </div>
-        {% if cart.coupon_id %}
             <div class="flex-row">
                 <div class="d-flex justify-content-end">
                     <p class="me-3">
-                        Discount:
+                        Subtotal:
                     </p>
-                    <p class="mb-2 text-success">
-                        -${{ cart.get_discount_coupon }}
+                    <p class="mb-2">
+                        ${{ cart.get_total_price }}
                     </p>
                 </div>
             </div>
-        {% endif %}
-        <div class="flex-row">
-            <div class="d-flex justify-content-end">
-                <p class="me-3">
-                    Total:
-                </p>
-                <p class="mb-2">
-                    ${{ cart.get_total_price_with_coupon }}
-                </p>
+            {% if cart.coupon_id or cart.present_card_id %}
+                <div class="flex-row">
+                    <div class="d-flex justify-content-end">
+                        <p class="me-3">
+                            Discount:
+                        </p>
+                        <p class="mb-2 text-success">
+                            -${{ cart.get_discount_coupon }}
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
+            <div class="flex-row">
+                <div class="d-flex justify-content-end">
+                    <p class="me-3">
+                        Total:
+                    </p>
+                    <p class="mb-2">
+                        {% with total=cart.get_total_price_with_discounts %}
+                            {% if total <= 0 %}
+                                $0.00
+                            {% else %}
+                                $ {{ total }}
+                            {% endif %}
+                        {% endwith %}
+                    </p>
+                </div>
             </div>
-        </div>
+            <div class="d-flex justify-content-end">
+                <a class="btn btn-success btn-sm" role="button" href="{% url 'orders:order_create' %}">Place order</a>
+            </div>
         {% endif %}
     </div>
 </div>

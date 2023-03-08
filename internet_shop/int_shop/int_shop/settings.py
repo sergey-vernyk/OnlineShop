@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'coupons.apps.CouponsConfig',
     'present_cards.apps.PresentCardsConfig',
     'cart.apps.CartConfig',
+    'payment.apps.PaymentConfig',
 ]
 
 MIDDLEWARE = [
@@ -135,7 +136,10 @@ DATETIME_FORMAT = 'd/m/y l H:i:s'  # формат времени 24 часа (д
 
 STATIC_URL = 'static/'
 # (python manage.py collectstatic - собирает все статические файлы проекта и сохраняет их по этому пути)
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+STATICFILES_DIRS = [
+    BASE_DIR / "static"
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -149,3 +153,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')  # путь, по которому
 LOGIN_REDIRECT_URL = 'goods:product_list'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # вывод всех сообщений с почты в shell (без SMTP)
 CART_SESSION_ID = 'cart'
+
+STRIPE_PUBLISHABLE_KEY = env('STRIPE_PUBLISHABLE_KEY')
+STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')

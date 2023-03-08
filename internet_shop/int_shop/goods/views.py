@@ -60,7 +60,7 @@ class ProductDetailView(FormMixin, DetailView):
             context['is_in_favorite'] = self.is_in_favorite()
         return context
 
-    def is_in_favorite(self):
+    def is_in_favorite(self) -> bool:
         """
         Возвращает true/false находится ли этот товар
         у текущего пользователя в избранном
@@ -131,7 +131,7 @@ class FavoriteListView(ListView):
 
 
 @login_required()
-def add_or_remove_product_favorite(request, product_pk, action):
+def add_or_remove_product_favorite(request, product_pk: int, action: str) -> redirect:
     """
     Добавление товара в избранное или удаление его
     """

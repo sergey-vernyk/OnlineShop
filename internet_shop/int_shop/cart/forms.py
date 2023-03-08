@@ -6,5 +6,5 @@ class CartQuantityForm(forms.Form):
     Форма для указания добавляемого кол-ва товара в корзину
     """
 
-    quantity = forms.IntegerField(min_value=0, max_value=10, step_size=1, widget=forms.NumberInput(attrs={
-        'style': 'width: 2em'}))
+    quantity = forms.IntegerField(initial=1, min_value=1, max_value=10, step_size=1, widget=forms.NumberInput(attrs={
+        'style': 'width: 3em'}))

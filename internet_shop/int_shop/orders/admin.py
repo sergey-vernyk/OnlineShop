@@ -29,10 +29,14 @@ class OrderAdmin(admin.ModelAdmin):
 
 
 @admin.register(Delivery)
-class OrderAdmin(admin.ModelAdmin):
-    list_display = ['first_name', 'last_name', 'method', 'office_number', 'delivery_date']
+class DeliveryAdmin(admin.ModelAdmin):
+    list_display = ['get_full_name', 'method', 'office_number', 'delivery_date']
     search_fields = ['last_name']
     date_hierarchy = 'delivery_date'
+
+    @admin.display(description='Name')
+    def get_full_name(self, obj):
+        return f'{obj.first_name} {obj.last_name}'
 
 
 @admin.register(OrderItem)

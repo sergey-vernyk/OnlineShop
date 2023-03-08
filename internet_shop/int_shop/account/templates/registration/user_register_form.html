@@ -8,8 +8,25 @@
     <div class="row justify-content-center">
         <form action="" method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ form.as_p }}
-            {{ form.errors }}
+            {% for field in form %}
+                <div class="fieldWrapper">
+                    {% if field.label == 'Photo' %}
+                        <div class="mb-3">
+                            {{ field.label.tag }}{{ field }}
+                        </div>
+                    {% else %}
+                        {{ field.label_tag }} {{ field }}
+                            {% if field.help_text %}
+                                <p class="help">{{ field.help_text|safe }}</p>
+                            {% endif %}
+                            <ul class="errorlist">
+                                {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                    {% endif %}
+                </div>
+            {% endfor %}
             <button type="submit" class="btn btn-primary btn-block mt-2 w-25">Register</button>
         </form>
     </div>

@@ -1,11 +1,15 @@
+from typing import Union, NoReturn
 from django.urls import reverse_lazy
-from django.views.generic import FormView
+from django.views.generic import FormView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+
+from cart.cart import Cart
 from orders.forms import OrderCreateForm, DeliveryCreateForm
 from coupons.models import Coupon
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 
+from orders.models import Order, OrderItem
 from present_cards.models import PresentCard
 
 
@@ -16,7 +20,7 @@ class OrderCreateView(LoginRequiredMixin, FormView):
     form_class = OrderCreateForm
     template_name = 'orders/order_create.html'
     form_class_delivery = DeliveryCreateForm
-    success_url = reverse_lazy('goods:product_list')  # TODO
+    success_url = reverse_lazy('orders:order_created')
 
     def get_context_data(self, **kwargs):
         context = super(OrderCreateView, self).get_context_data(**kwargs)
@@ -25,21 +29,18 @@ class OrderCreateView(LoginRequiredMixin, FormView):
         return context
 
     def post(self, request, *args, **kwargs):
+        cart = Cart(request)  # создаем объект корзины
         # получаем формы
         order_form = self.get_form()
         delivery_form = self.get_form(form_class=DeliveryCreateForm)
+
         if order_form.is_valid():
-            coupon_code = order_form.cleaned_data.get('coupon_code')
-            present_card_code = order_form.cleaned_data.get('present_card_code')
             order = order_form.save(commit=False)
-            # получаем объекты купона и подарочной карты
-            coupon = self.get_obj(coupon_code, Coupon)
-            present_card = self.get_obj(present_card_code, PresentCard)
-            # если объекты валидные - привязываем к заказу
-            if coupon:
-                order.coupon = coupon
-            if present_card:
-                order.present_card = present_card
+            # если в корзине есть валидный купон и/или подарочная карта, присваиваем к заказу
+            if cart.coupon:
+                order.coupon = cart.coupon
+            if cart.present_card:
+                order.present_card = cart.present_card
         else:
             return self.form_invalid(order_form)
 
@@ -47,21 +48,29 @@ class OrderCreateView(LoginRequiredMixin, FormView):
             delivery = delivery_form.save()
             order.delivery = delivery  # привязка доставки к заказу
             order.save()
+            self.create_order_items_from_cart(order)  # создание элементов заказа в базе
             return self.form_valid(order_form)
         else:
             return self.form_invalid(delivery_form)
 
-    def get_obj(self, code, klass):
+    def create_order_items_from_cart(self, order: Order) -> NoReturn:
         """
-        Возвращает объект купона или подарочной карты
-        в зависимости от переданного класса klass или None
+        Создание элементов заказа в базе из элементов корзины,
+        привязанных к текущему заказу
         """
-        now = timezone.now()
-        try:
-            obj = klass.objects.get(code__iexact=code,
-                                    valid_from__lte=now,
-                                    valid_to__gt=now,
-                                    active=True)
-        except ObjectDoesNotExist:
-            return None
-        return obj
+        cart = Cart(self.request)
+        for item in cart:
+            OrderItem.objects.create(order=order,
+                                     product=item['product'],
+                                     price=item['price'],
+                                     quantity=item['quantity'])
+        cart.clear()
+
+
+class OrderConfirmedView(TemplateView):
+    template_name = 'orders/order_created.html'
+    extra_context = ''
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context

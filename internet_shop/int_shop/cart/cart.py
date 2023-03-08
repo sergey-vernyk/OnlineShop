@@ -1,14 +1,41 @@
 from decimal import Decimal
+from typing import NoReturn, Generator, Union
+
 from django.conf import settings
 
 from coupons.models import Coupon
 from goods.models import Product
+from django.core.exceptions import ObjectDoesNotExist
+
+from present_cards.models import PresentCard
 
 
 class Cart:
     """
     Корзина с товарами
     """
+
+    @property
+    def coupon(self) -> Union[Coupon, None]:
+        """
+        Возвращает объект купона или None
+        """
+        try:
+            coupon = Coupon.objects.get(id=self.coupon_id)
+        except ObjectDoesNotExist:
+            return None
+        return coupon
+
+    @property
+    def present_card(self) -> Union[PresentCard, None]:
+        """
+        Возвращает объект подарочной карты или None
+        """
+        try:
+            present_card = PresentCard.objects.get(id=self.present_card_id)
+        except ObjectDoesNotExist:
+            return None
+        return present_card
 
     def __init__(self, request):
         self.session = request.session
@@ -17,8 +44,9 @@ class Cart:
             cart = self.session[settings.CART_SESSION_ID] = {}
         self.cart = cart
         self.coupon_id = self.session.get('coupon_id')
+        self.present_card_id = self.session.get('present_card_id')
 
-    def add(self, product: Product, quantity=1):
+    def add(self, product: Product, quantity: int = 1) -> NoReturn:
         """
         Метод добавления товаров в корзину
         """
@@ -31,13 +59,16 @@ class Cart:
 
         self.session.modified = True
 
-    def __len__(self):
+    def __len__(self) -> int:
         """
         Возвращает общее кол-во товаров с учетом кол-ва каждого товара
         """
         return sum(item['quantity'] for item in self.cart.values())
 
-    def __iter__(self):
+    def __iter__(self) -> Generator[dict, None, None]:
+        """
+        Перебор всех товаров из корзины
+        """
         products_ids = [pk for pk in self.cart]
         products = Product.objects.filter(id__in=products_ids)
         cart = self.cart.copy()
@@ -50,7 +81,7 @@ class Cart:
         for item in cart:
             yield cart[item]
 
-    def remove(self, product_id):
+    def remove(self, product_id: int) -> NoReturn:
         """
         Удаление информации о товаре с корзины по его id
         """
@@ -59,31 +90,46 @@ class Cart:
 
             self.session.modified = True
 
-    def get_total_price(self):
+    def clear(self) -> NoReturn:
+        """
+        Очистка корзины
+        """
+        del self.session[settings.CART_SESSION_ID]
+        self.session.modified = True
+
+    def get_total_price(self) -> Decimal:
         """
         Получение общей стоимости всех товаров с учетом их кол-ва
         """
         return sum(Decimal(item['price']) * item['quantity'] for item in self.cart.values())
 
-    def get_amount_items_in(self):
+    def get_amount_items_in(self) -> int:
         """
         Получение количества разных товаров
         """
         return len(self.cart)
 
-    def get_total_price_with_coupon(self):
+    def get_total_price_with_discounts(self) -> Decimal:
         """
-        Расчет общей суммы заказа с учетом скидок
+        Расчет общей суммы заказа с учетом скидки от купона
+        и/или вычета фиксированной суммы от подарочной карты
         """
-        if self.coupon_id:
-            coupon = Coupon.objects.get(id=self.coupon_id)
-            price_without_discount = self.get_total_price()
-            discount = price_without_discount - (price_without_discount * coupon.discount / 100)
-            return Decimal(discount).quantize(Decimal('0.01'))
-        return self.get_total_price()
+        price_without_discount = self.get_total_price()
 
-    def get_discount_coupon(self):
+        if self.coupon and self.present_card:
+            result_amount = price_without_discount - ((
+                    price_without_discount * self.coupon.discount / 100) + self.present_card.amount)
+        elif self.coupon:
+            result_amount = price_without_discount - (price_without_discount * self.coupon.discount / 100)
+        elif self.present_card:
+            result_amount = price_without_discount - self.present_card.amount
+        else:
+            result_amount = price_without_discount
+
+        return Decimal(result_amount).quantize(Decimal('0.01'))
+
+    def get_discount_coupon(self) -> Decimal:
         """
         Сумма скидки с учётом купона
         """
-        return self.get_total_price() - self.get_total_price_with_coupon()
+        return self.get_total_price() - self.get_total_price_with_discounts()

@@ -1,19 +1,25 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}List product{% endblock %}
+{% block title %}List product | OnlineShop{% endblock %}
 {% block content %}
-    <h2 class="text-center mt-3">{% if category %} {{category.name}} {% else %} All products {% endif %}</h2>
-    <ul class="container p-5 my-5 border">
-        {% for product in object_list %}
-            {% if product.image %}
-        <a href="{{ product.get_absolute_url }}">
-            <img src="{{ product.image.url }}" class="img-fluid" width="300" height="230" alt="product_image">
-        </a>
-            {% endif %}
-        <li class="list-group-item"><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></li>
-        <li class="list-group-item">${{ product.price }}</li>
-        {% empty %}
-            No product yet.
-        {% endfor %}
-    </ul>
+<main>
+    <div class="container-fluid bg-trasparent my-4 p-3" style="position: relative;">
+        <div class="row row-cols-1 row-cols-xs-2 row-cols-sm-2 row-cols-lg-4 g-2">
+            {% for product in object_list %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/no_image.png' %}{% endif %}" class="card-img-top" alt="product-image">
+                        <div class="card-body">
+                            <div class="clearfix mb-3">
+                                <a href="{{ product.get_absolute_url }}"><span class="float-start badge rounded-pill bg-primary fs-6">{{ product.name }}</span></a>
+                                <span class="float-end price-hp">${{ product.price}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</main>
 {% endblock %}

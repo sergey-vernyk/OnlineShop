@@ -45,7 +45,7 @@ class RegisterUserForm(UserCreationForm):
     date_of_birth = forms.DateField(label='Date of birth', widget=forms.DateInput(attrs={'class': 'form-control w-25'}),
                                     help_text='Format: yyyy-mm-dd')
 
-    user_photo = forms.ImageField(label='Photo', widget=forms.FileInput())
+    user_photo = forms.ImageField(label='Photo', widget=forms.FileInput(attrs={'class': 'form-control w-25'}))
 
     field_order = ('username', 'first_name', 'last_name',
                    'email', 'date_of_birth', 'password1',

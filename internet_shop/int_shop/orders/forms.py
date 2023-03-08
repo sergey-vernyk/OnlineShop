@@ -7,15 +7,12 @@ class OrderCreateForm(forms.ModelForm):
     """
     Форма для создания основной информации для заказа
     """
-    coupon_code = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control w-25'}))
-    present_card_code = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control w-25'}))
     prefix = 'order_form'
 
     class Meta:
         model = Order
         fields = ('first_name', 'last_name', 'email',
-                  'address', 'phone', 'present_card_code',
-                  'coupon_code', 'pay_method', 'recipient', 'comment', 'call_confirm')
+                  'address', 'phone', 'pay_method', 'recipient', 'comment', 'call_confirm')
 
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control w-25'}),
@@ -25,7 +22,7 @@ class OrderCreateForm(forms.ModelForm):
             'phone': forms.TextInput(attrs={'class': 'form-control w-25'}),
             'pay_method': forms.Select(attrs={'class': 'form-select w-25'}),
             'call_confirm': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'comment': forms.Textarea(attrs={'class': 'form-control w-50', 'rows': 3}),
+            'comment': forms.Textarea(attrs={'class': 'form-control w-25', 'rows': 3}),
             'recipient': forms.TextInput(attrs={'class': 'form-control w-25'}),
         }
 

@@ -2,6 +2,8 @@ from django.db import models
 
 from django.conf import settings
 
+from coupons.models import Coupon
+
 
 class Profile(models.Model):
     """
@@ -19,6 +21,7 @@ class Profile(models.Model):
     about = models.TextField(max_length=255, blank=True)
     photo = models.ImageField(upload_to='users/%Y/%m/%d/', blank=True)
     created = models.DateTimeField(auto_now_add=True)
+    coupons = models.ManyToManyField(Coupon, related_name='profile_coupons', blank=True)
 
     def __str__(self):
         return f'Profile "{self.user.username}"'

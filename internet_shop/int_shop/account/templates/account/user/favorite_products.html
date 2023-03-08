@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}"{{ user.first_name }} {{ user.last_name }}" favorites {% endblock %}
+{% block title %}"{{ user.first_name }} {{ user.last_name }}" favorites | OnlineShop {% endblock %}
 
 {% block content %}
     <h1>Favorite products "{{ user.first_name }}"</h1>
@@ -14,7 +14,7 @@
                 {% endif %}
             <div class="d-flex flex-row">
                 <div class="p-2">
-                    {{ product.manufacturer }} <a href="{{ product.get_absolute_url }}"> {{ product.name }}</a>
+                    <a href="{{ product.get_absolute_url }}"> {{ product.name }}</a>
                 </div>
                 <div class="p-2">
                     <a href="{% url 'goods:add_or_remove_product_favorite' action='remove' product_pk=product.id %}">Remove</a>
