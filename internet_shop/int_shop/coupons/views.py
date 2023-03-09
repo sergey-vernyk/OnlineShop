@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 
 from account.models import Profile
 from coupons.forms import CouponApplyForm

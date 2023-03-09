@@ -38,7 +38,7 @@ def cart_detail(request):
     # если подарочная карта была применена, отобразить ее код в форме
     if request.session.get('present_card_id'):
         present_card_code = PresentCard.objects.get(id=request.session.get('present_card_id'))
-
+    #  заполняем форму принятыми кодами купона, если они были применены
     coupon_form = CouponApplyForm(initial={'code': coupon_code.code if coupon_code else ''})
     present_card_form = PresentCardApplyForm(initial={'code': present_card_code.code if present_card_code else ''})
     return render(request, 'cart/detail.html', {'cart': cart,

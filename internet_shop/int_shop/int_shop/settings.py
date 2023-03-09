@@ -151,6 +151,7 @@ MEDIA_URL = '/media/'  # файлы загружены пользователе�
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')  # путь, по которому находятся эти файлы
 
 LOGIN_REDIRECT_URL = 'goods:product_list'
+LOGOUT_REDIRECT_URL = 'login'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # вывод всех сообщений с почты в shell (без SMTP)
 CART_SESSION_ID = 'cart'
 

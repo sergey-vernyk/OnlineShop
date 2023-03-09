@@ -1,16 +1,12 @@
-from typing import Union, NoReturn
+from django.shortcuts import reverse
+from typing import NoReturn
 from django.urls import reverse_lazy
 from django.views.generic import FormView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from cart.cart import Cart
 from orders.forms import OrderCreateForm, DeliveryCreateForm
-from coupons.models import Coupon
-from django.utils import timezone
-from django.core.exceptions import ObjectDoesNotExist
-
 from orders.models import Order, OrderItem
-from present_cards.models import PresentCard
 
 
 class OrderCreateView(LoginRequiredMixin, FormView):
@@ -48,6 +44,7 @@ class OrderCreateView(LoginRequiredMixin, FormView):
             delivery = delivery_form.save()
             order.delivery = delivery  # привязка доставки к заказу
             order.save()
+            self.request.session['order_id'] = order.pk  # добавление id заказа в сессию
             self.create_order_items_from_cart(order)  # создание элементов заказа в базе
             return self.form_valid(order_form)
         else:
@@ -69,8 +66,8 @@ class OrderCreateView(LoginRequiredMixin, FormView):
 
 class OrderConfirmedView(TemplateView):
     template_name = 'orders/order_created.html'
-    extra_context = ''
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['order_id'] = self.request.session.get('order_id')
         return context

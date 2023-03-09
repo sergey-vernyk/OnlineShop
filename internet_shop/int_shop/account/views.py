@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.contrib.auth.views import LoginView, PasswordChangeView
 from django.views.generic import CreateView
 from account.forms import LoginForm, UserPasswordChangeForm, RegisterUserForm

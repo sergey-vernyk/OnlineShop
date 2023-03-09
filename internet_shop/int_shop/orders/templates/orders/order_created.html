@@ -1,7 +1,14 @@
 {% extends 'base.html' %}
 
-{% block title %}Confirmed order{% endblock %}
+{% block title %}Successfully confirmed order{% endblock %}
 
 {% block content %}
-    <h3>Order has been confirmed</h3>
+    <h3>Order has been confirmed successfully. Order id is "{{ order_id }}"</h3>
+
+    <form action="{% url 'payment:create_checkout_session' %}" method="post">
+        <p>
+            If you want to make online payment, please click on
+            <input type="submit" value="Online payment">
+        </p>
+    </form>
 {% endblock %}

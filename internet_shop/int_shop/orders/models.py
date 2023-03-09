@@ -53,7 +53,7 @@ class Delivery(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     method = models.CharField(choices=DELIVERY_METHOD, max_length=20)
-    office_number = models.IntegerField(blank=True, null=False)
+    office_number = models.IntegerField(blank=True, null=True)
     delivery_date = models.DateField()
 
     def __str__(self):

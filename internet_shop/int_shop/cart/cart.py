@@ -92,9 +92,13 @@ class Cart:
 
     def clear(self) -> NoReturn:
         """
-        Очистка корзины
+        Очистка корзины с удалением купона и подарочной карты
         """
         del self.session[settings.CART_SESSION_ID]
+        if 'coupon_id' in self.session:
+            del self.session['coupon_id']
+        if 'present_card_id' in self.session:
+            del self.session['present_card_id']
         self.session.modified = True
 
     def get_total_price(self) -> Decimal:
@@ -117,8 +121,8 @@ class Cart:
         price_without_discount = self.get_total_price()
 
         if self.coupon and self.present_card:
-            result_amount = price_without_discount - ((
-                    price_without_discount * self.coupon.discount / 100) + self.present_card.amount)
+            result_amount = price_without_discount - (
+                        (price_without_discount * self.coupon.discount / 100) + self.present_card.amount)
         elif self.coupon:
             result_amount = price_without_discount - (price_without_discount * self.coupon.discount / 100)
         elif self.present_card:
