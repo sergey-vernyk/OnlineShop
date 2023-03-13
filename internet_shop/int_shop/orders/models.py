@@ -31,6 +31,8 @@ class Order(models.Model):
                                         null=True, blank=True)
     coupon = models.ForeignKey(Coupon, related_name='orders', on_delete=models.SET_NULL, null=True, blank=True)
     delivery = models.OneToOneField('Delivery', related_name='order', on_delete=models.SET_NULL, null=True)
+    stripe_id = models.CharField(max_length=255, blank=True)
+    is_email_was_sent = models.BooleanField(default=False)
 
     def __str__(self):
         return f'Order {self.first_name} {self.last_name}'

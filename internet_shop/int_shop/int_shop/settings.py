@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'present_cards.apps.PresentCardsConfig',
     'cart.apps.CartConfig',
     'payment.apps.PaymentConfig',
+    'easy_thumbnails',
 ]
 
 MIDDLEWARE = [
@@ -157,3 +158,14 @@ CART_SESSION_ID = 'cart'
 
 STRIPE_PUBLISHABLE_KEY = env('STRIPE_PUBLISHABLE_KEY')
 STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')
+STRIPE_WEBHOOK_SECRET = env('STRIPE_WEBHOOK_SECRET')
+
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = env('EMAIL_PORT')
+EMAIL_USE_SSL = False
+EMAIL_USE_TLS = True
+FROM_EMAIL = env('FROM_EMAIL')
+
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

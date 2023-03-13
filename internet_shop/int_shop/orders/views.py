@@ -1,12 +1,11 @@
-from django.shortcuts import reverse
 from typing import NoReturn
 from django.urls import reverse_lazy
 from django.views.generic import FormView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-
 from cart.cart import Cart
 from orders.forms import OrderCreateForm, DeliveryCreateForm
 from orders.models import Order, OrderItem
+from orders.tasks import order_created
 
 
 class OrderCreateView(LoginRequiredMixin, FormView):
@@ -15,13 +14,13 @@ class OrderCreateView(LoginRequiredMixin, FormView):
     """
     form_class = OrderCreateForm
     template_name = 'orders/order_create.html'
-    form_class_delivery = DeliveryCreateForm
+    # form_class_delivery = DeliveryCreateForm
     success_url = reverse_lazy('orders:order_created')
 
     def get_context_data(self, **kwargs):
         context = super(OrderCreateView, self).get_context_data(**kwargs)
-        context['order_form'] = self.form_class
-        context['delivery_form'] = self.form_class_delivery
+        context['delivery_form'] = DeliveryCreateForm()
+        context['form'].fields['email'].initial = self.request.user.email
         return context
 
     def post(self, request, *args, **kwargs):
@@ -44,8 +43,11 @@ class OrderCreateView(LoginRequiredMixin, FormView):
             delivery = delivery_form.save()
             order.delivery = delivery  # привязка доставки к заказу
             order.save()
-            self.request.session['order_id'] = order.pk  # добавление id заказа в сессию
             self.create_order_items_from_cart(order)  # создание элементов заказа в базе
+
+            # если сообщение о завершении заказа было отправлено на почту и доставлено
+            order_created.delay(order_id=order.pk, user_id=request.user.id)
+
             return self.form_valid(order_form)
         else:
             return self.form_invalid(delivery_form)

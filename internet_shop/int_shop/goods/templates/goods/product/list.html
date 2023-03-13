@@ -1,24 +1,38 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load thumbnail %}
 
 {% block title %}List product | OnlineShop{% endblock %}
 {% block content %}
 <main>
-    <div class="container-fluid bg-trasparent my-4 p-3" style="position: relative;">
-        <div class="row row-cols-1 row-cols-xs-2 row-cols-sm-2 row-cols-lg-4 g-2">
-            {% for product in object_list %}
-                <div class="col">
-                    <div class="card h-100 shadow-sm">
-                        <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/no_image.png' %}{% endif %}" class="card-img-top" alt="product-image">
-                        <div class="card-body">
-                            <div class="clearfix mb-3">
-                                <a href="{{ product.get_absolute_url }}"><span class="float-start badge rounded-pill bg-primary fs-6">{{ product.name }}</span></a>
-                                <span class="float-end price-hp">${{ product.price}}</span>
+    <div class="container-fluid">
+        <div class="row row-col-2">
+            <div class="col-2 border">
+                FILTERS
+            </div>
+            <div class="col-10">
+                <div class="container-fluid bg-transparent my-4 p-3" style="position: relative;">
+                    <div class="row row-cols-5">
+                        {% for product in object_list %}
+                            <div class="col position-relative">
+                                <div class="card h-100 shadow-sm">
+                                    <a href="{{ product.get_absolute_url }}"><img src="{% if product.image %}{% thumbnail product.image 200x200 %}{% else %}{% static 'img/no_image.png' %}{% endif %}"
+                                            class="card-img-top p-3 w-100" alt="product-image"></a>
+                                    <div class="card-body align-items-end d-flex justify-content-center">
+                                            <div class="text-center position-absolute top-75 start-25">
+                                                <span class="d-block">${{ product.price}}</span>
+                                                <span class="d-block">
+                                                        <a href="{{ product.get_absolute_url }}">
+                                                            <span class="badge rounded-pill bg-primary fs-6">{{ product.name }}</span>
+                                                        </a></span>
+                                            </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
-            {% endfor %}
+            </div>
         </div>
     </div>
 </main>

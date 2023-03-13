@@ -132,7 +132,7 @@ class Cart:
 
         return Decimal(result_amount).quantize(Decimal('0.01'))
 
-    def get_discount_coupon(self) -> Decimal:
+    def get_total_discount(self) -> Decimal:
         """
         Сумма скидки с учётом купона
         """
