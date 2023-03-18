@@ -1,23 +1,25 @@
 from django.conf import settings
 from django.core.mail import EmailMessage
 from celery import shared_task
+from decimal import Decimal
 
 from orders.models import Order
 
 
 @shared_task
-def order_created(order_id: int) -> str:
+def order_paid(order_id: int, total_amount: int) -> str:
     """
     Задача отправляет сообщение на электронную почту
-    пользователю, который сделал заказ
-    и заказ был успешно создан и подтвержден
+    пользователю, который успешно оплатил заказ
     """
+
     to_email = Order.objects.get(pk=order_id).email
 
-    subject = 'Order confirmed'
-    body = (f'Thanks for your order! '
-            f'Your order ID is {order_id}\n'
-            f'Our manager contact you within 10 minutes')
+    subject = 'Order paid'
+    body = (f'Thanks for your payment! '
+            f'Your payment amount is ${Decimal(str(total_amount)) / Decimal("100")}. '
+            f'Your order ID is {order_id}\n')
+
     from_email = settings.FROM_EMAIL
     to = (str(to_email),)
 

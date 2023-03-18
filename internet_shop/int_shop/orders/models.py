@@ -1,5 +1,6 @@
 from django.db import models
 
+from account.models import Profile
 from coupons.models import Coupon
 from goods.models import Product
 from present_cards.models import PresentCard
@@ -33,6 +34,7 @@ class Order(models.Model):
     delivery = models.OneToOneField('Delivery', related_name='order', on_delete=models.SET_NULL, null=True)
     stripe_id = models.CharField(max_length=255, blank=True)
     is_email_was_sent = models.BooleanField(default=False)
+    profile = models.ForeignKey(Profile, related_name='orders', on_delete=models.CASCADE, default='')
 
     def __str__(self):
         return f'Order {self.first_name} {self.last_name}'

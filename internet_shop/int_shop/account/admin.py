@@ -4,6 +4,7 @@ from account.models import Profile
 from goods.models import Favorite, Comment
 from django.utils.html import mark_safe
 
+from orders.models import Order
 from present_cards.models import PresentCard
 
 
@@ -19,6 +20,13 @@ class PresentCardInline(admin.StackedInline):
                        'category', 'message', 'amount'),
         }),
     )
+
+
+class OrdersInline(admin.StackedInline):
+    model = Order
+    extra = 1
+    fields = ('pay_method', 'is_paid', 'present_card', 'coupon', 'delivery', 'stripe_id')
+    readonly_fields = ('stripe_id',)
 
 
 class FavoriteInline(admin.StackedInline):
@@ -60,7 +68,7 @@ class ProfileAdmin(admin.ModelAdmin):
     fields = ('profile_full_name', 'user', 'date_of_birth',
               'gender', 'user_photo_tag', 'created',
               'about', 'coupons')
-    inlines = [FavoriteInline, CommentInline, PresentCardInline]
+    inlines = [FavoriteInline, CommentInline, PresentCardInline, OrdersInline]
     readonly_fields = ['user', 'user_photo_tag', 'created', 'profile_full_name']
     filter_horizontal = ('coupons',)
 

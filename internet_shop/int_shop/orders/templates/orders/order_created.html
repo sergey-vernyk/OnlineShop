@@ -3,12 +3,18 @@
 {% block title %}Successfully confirmed order{% endblock %}
 
 {% block content %}
-    <h3>Order has been confirmed successfully. Order id is "{{ order_id }}"</h3>
-
-    <form action="{% url 'payment:create_checkout_session' %}" method="post">
-        <p>
-            If you want to make online payment, please click on
-            <input type="submit" value="Online payment">
-        </p>
-    </form>
+<div class="container border shadow-sm my-3">
+    <h3 class="text-center my-4 fw-bold">Order has been confirmed successfully!</h3>
+    <p class="fs-4 text-center mb-4">Your order №{{ order_id }}. All information about your orders saved in your <a class="text-decoration-none"
+                                                                                                   href="#">profile</a>.
+    </p>
+    {% if method == 'Online' %}
+        <form method="post" action="{% url 'payment:create_checkout_session' %}">
+            <h5>
+                For payment follow the
+                <button class="button-link" type="submit">link</button>
+            </h5>
+        </form>
+    {% endif %}
+</div>
 {% endblock %}

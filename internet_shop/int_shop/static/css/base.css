@@ -5,3 +5,46 @@ body {
 .form-select option {
     font-size: 15px !important;
 }
+
+.button-link {
+  background: none!important;
+  border: none;
+  padding: 0!important;
+  /*optional*/
+  color: #069;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.buy-btn {
+    width: 100px;
+    background: linear-gradient(to bottom, white, #0066FA);
+    text-align: center;
+    color: black;
+    border-radius: 5px;
+    height: 30px;
+}
+
+.search-bar {
+    background-color: #beef00;
+}
+
+#main-list {
+    background-color: #F8F8FF;
+}
+
+.prod-card {
+    background-color: #F5FDF0;
+    height:400px;
+    width: 295px;
+}
+
+.filter-prod {
+    min-width: 235px;
+}
+
+.filter-item {
+    background-color: #E9E3E3;
+    min-width: 220px;
+
+}

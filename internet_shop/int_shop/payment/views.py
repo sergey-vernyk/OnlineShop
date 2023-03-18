@@ -3,10 +3,13 @@ import stripe
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from decimal import Decimal
+from django.http import HttpResponse
 
 from orders.models import Order
+from payment.tasks import order_paid
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
+endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
 
 
 @csrf_exempt
@@ -79,3 +82,41 @@ def payment_cancel(request):
     Представление отклонения оплаты
     """
     return render(request, 'payment/cancel.html')
+
+
+@csrf_exempt
+def webhook(request):
+    """
+    Обработка вебхука
+    """
+    event = None
+    payload = request.body
+    sig_header = request.META['HTTP_STRIPE_SIGNATURE']
+
+    try:
+        event = stripe.Webhook.construct_event(
+            payload,
+            sig_header,
+            endpoint_secret
+        )
+    except ValueError as e:
+        # невалидный payload
+        return HttpResponse(status=400)
+
+    except stripe.error.SignatureVerificationError as e:
+        # невалидная сигнатура
+        return HttpResponse(status=400)
+
+    # обработка события завершения сессии
+    if event.type == 'checkout.session.completed':
+        session = event.data.object
+        # если режим сессии оплата и статус оплачено - отправка email пользователю, что заказ был оплачен
+        if session.mode == 'payment' and session.payment_status == 'paid':
+            amount_total = session.amount_total
+            order_id = session.client_reference_id  # client_reference_id соответствует id заказа
+            order = Order.objects.get(pk=order_id)
+            order.stripe_id = session.payment_intent  # присвоение заказу id paymentIntent
+            order.save(update_fields=['stripe_id'])
+            order_paid.delay(order.pk, amount_total)  # отправка email об оплате заказа
+
+    return HttpResponse(status=200)

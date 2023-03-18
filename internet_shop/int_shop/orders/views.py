@@ -44,9 +44,9 @@ class OrderCreateView(LoginRequiredMixin, FormView):
             order.delivery = delivery  # привязка доставки к заказу
             order.save()
             self.create_order_items_from_cart(order)  # создание элементов заказа в базе
-
+            self.request.session['order_id'] = order.pk
             # если сообщение о завершении заказа было отправлено на почту и доставлено
-            order_created.delay(order_id=order.pk, user_id=request.user.id)
+            order_created.delay(order_id=order.pk)
 
             return self.form_valid(order_form)
         else:
@@ -71,5 +71,7 @@ class OrderConfirmedView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['order_id'] = self.request.session.get('order_id')
+        order = Order.objects.get(pk=self.request.session.get('order_id'))
+        context['order_id'] = order.pk
+        context['method'] = order.pay_method
         return context

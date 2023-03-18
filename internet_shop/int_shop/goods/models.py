@@ -83,8 +83,8 @@ class Manufacturer(models.Model):
     """
     Класс производителя товара
     """
-    name = models.CharField(max_length=50, unique=True)
-    slug = models.CharField(max_length=50)
+    name = models.CharField(max_length=50)
+    slug = models.CharField(max_length=50, unique=True)
     description = models.TextField()
 
     def __str__(self):
@@ -93,6 +93,7 @@ class Manufacturer(models.Model):
     class Meta:
         verbose_name = 'Manufacturer'
         verbose_name_plural = 'Manufacturers'
+        ordering = ('name',)
 
 
 class Comment(models.Model):

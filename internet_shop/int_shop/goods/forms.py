@@ -1,6 +1,6 @@
 from django import forms
 
-from goods.models import Product, Comment
+from goods.models import Product, Comment, Manufacturer
 
 
 class RatingSetForm(forms.ModelForm):
@@ -31,3 +31,21 @@ class CommentProductForm(forms.ModelForm):
                                           'rows': 3,
                                           'placeholder': 'Type your review...'}),
         }
+
+
+class FilterByPriceForm(forms.Form):
+    """
+    Форма для фильтра товаров по цене
+    """
+    price_min = forms.CharField(widget=forms.TextInput(attrs={'style': 'width:100px'}))
+    price_max = forms.CharField(widget=forms.TextInput(attrs={'style': 'width:100px'}))
+
+
+class FilterByManufacturerForm(forms.Form):
+    """
+    Форма для выбора одного или нескольких производителей
+    """
+    manufacturer = forms.ModelMultipleChoiceField(
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
+        queryset=Manufacturer.objects.all()
+    )
