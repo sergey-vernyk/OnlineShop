@@ -1,0 +1,36 @@
+<ul class="pagination">
+    <!--Если есть предыдущая страница-->
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" tabindex="-1" aria-disabled="true">Prev</a>
+        </li>
+    {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" href="">Prev</a>
+        </li>
+    {% endif %}
+    <!--Перебор все номеров существующих страниц-->
+    {% for p in page_obj.paginator.page_range %}
+        {% if page_obj.number == p %}   <!--если попалась текущая страница, отобразить её как активную-->
+            <li class="page-item active" aria-current="page">
+                <a class="page-link" href="">{{ p }}</a>
+            </li>
+        {% elif p >= page_obj.number|add:-3 and p <= page_obj.number|add:3 %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ p }}" tabindex="-1" aria-disabled="true">{{ p }}</a>
+            </li>
+        {% endif %}
+    {% endfor %}
+    <!--Если есть следующая страница-->
+    {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}" tabindex="-1" aria-disabled="true">Next</a>
+        </li>
+    {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" href="">Next</a>
+        </li>
+    {% endif %}
+</ul>
+
+

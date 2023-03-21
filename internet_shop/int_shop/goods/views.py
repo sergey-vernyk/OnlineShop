@@ -5,7 +5,8 @@ from django.views.generic.edit import FormMixin
 
 from account.models import Profile
 from goods.filters import get_max_min_price, get_products_between_max_min_price
-from goods.forms import RatingSetForm, CommentProductForm, FilterByPriceForm, FilterByManufacturerForm
+from goods.forms import RatingSetForm, CommentProductForm, FilterByPriceForm, FilterByManufacturerForm, \
+    FilterByPropertyForm
 from cart.forms import CartQuantityForm
 from goods.models import Product, Category, Favorite
 from django.urls import reverse
@@ -19,6 +20,8 @@ class ProductListView(ListView):
     """
     model = Product
     template_name = 'goods/product/list.html'
+    context_object_name = 'products'
+    paginate_by = 3
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -26,6 +29,7 @@ class ProductListView(ListView):
             context['category'] = Category.objects.get(slug=self.kwargs.get('category_slug'))
         context['filter_price'] = FilterByPriceForm()
         context['filter_manufacturers'] = FilterByManufacturerForm()
+        context['filter_property'] = FilterByPropertyForm()
 
         if 'filter_price' in self.kwargs:
             min_price = Decimal(self.kwargs.get('filter_price')[0])
@@ -35,36 +39,12 @@ class ProductListView(ListView):
 
         context['filter_price'].fields['price_min'].initial = min_price
         context['filter_price'].fields['price_max'].initial = max_price
-        context['filter_manufacturers'].fields['manufacturer'].initial = self.kwargs.get('filter_manufacturers')
         return context
 
     def get_queryset(self):
         if 'category_slug' in self.kwargs:  # если передана категория
             return super(ProductListView, self).get_queryset().filter(category__slug=self.kwargs['category_slug'])
-        if 'filter_price' in self.kwargs:
-            queryset_filter_price = get_products_between_max_min_price(*self.kwargs.get('filter_price'))
-            return queryset_filter_price
-        if 'filter_manufacturers' in self.kwargs:
-            return Product.objects.filter(manufacturer_id__in=self.kwargs.get('filter_manufacturers'))
-
         return super().get_queryset()
-
-    def get(self, request, *args, **kwargs):
-        """
-        Сохранение отфильтрованного queryset в словаре kwargs,
-        если был запрос на применения фильтра
-        """
-        if request.GET:
-            if 'price_max' and 'price_min' in request.GET:
-                price_min = request.GET.get('price_min')
-                price_max = request.GET.get('price_max')
-                self.kwargs['filter_price'] = (price_min, price_max)
-
-            if 'manufacturer' in request.GET:
-                manufacturers = request.GET.getlist('manufacturer')
-                self.kwargs['filter_manufacturers'] = manufacturers
-
-        return super().get(request, *args, **kwargs)
 
 
 class ProductDetailView(FormMixin, DetailView):
@@ -75,6 +55,7 @@ class ProductDetailView(FormMixin, DetailView):
     template_name = 'goods/product/detail.html'
     slug_url_kwarg = 'product_slug'
     pk_url_kwarg = 'product_pk'
+    context_object_name = 'product'
     form_class = RatingSetForm  # форма добавляется из FormMixin
 
     def get_success_url(self):
@@ -148,6 +129,7 @@ class FavoriteListView(ListView):
     конкретного пользователя
     """
     template_name = 'account/user/favorite_products.html'
+    context_object_name = 'favorites'
 
     def get_queryset(self):
         """
@@ -180,3 +162,57 @@ def add_or_remove_product_favorite(request, product_pk: int, action: str) -> red
         Favorite.objects.get(profile=profile).product.remove(product)
 
     return redirect(reverse('goods:user_product_favorites_list', args=(request.user.username,)))
+
+
+class FilterResultsView(ListView):
+    """
+    Отображение результатов после применения фильтра
+    """
+    model = Product
+    template_name = 'filter_result_list.html'
+    context_object_name = 'products'
+    paginate_by = 3
+
+    def get(self, request, *args, **kwargs):
+        if request.GET:
+            if 'price_max' and 'price_min' in request.GET:
+                price_min = request.GET.get('price_min')
+                price_max = request.GET.get('price_max')
+                self.kwargs['filter_price'] = (price_min, price_max)
+
+            if 'manufacturer' in request.GET:
+                manufacturers = request.GET.getlist('manufacturer')
+                self.kwargs['filter_manufacturers'] = manufacturers
+
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        min_price = None
+        max_price = None
+        manufacturers = None
+        if 'filter_price' in self.kwargs:
+            min_price = self.kwargs.get('filter_price')[0]
+            max_price = self.kwargs.get('filter_price')[1]
+        if 'filter_manufacturers' in self.kwargs:
+            manufacturers = self.kwargs.get('filter_manufacturers')
+
+        result_queryset = Product.objects.filter(price__gte=min_price,
+                                                 price__lte=max_price,
+                                                 manufacturer_id__in=manufacturers)
+        return result_queryset
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['filter_price'] = FilterByPriceForm()
+        context['filter_manufacturers'] = FilterByManufacturerForm()
+
+        if 'filter_price' in self.kwargs:
+            min_price = Decimal(self.kwargs.get('filter_price')[0])
+            max_price = Decimal(self.kwargs.get('filter_price')[1])
+        else:
+            max_price, min_price = get_max_min_price()
+
+        context['filter_price'].fields['price_min'].initial = min_price
+        context['filter_price'].fields['price_max'].initial = max_price
+        context['filter_manufacturers'].fields['manufacturer'].initial = self.kwargs.get('filter_manufacturers')
+        return context

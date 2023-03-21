@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from goods.models import Product, Category, Manufacturer, Comment, Property, Favorite
+from goods.models import Product, Category, Manufacturer, Comment, Property, Favorite, PropertyCategory
 from django.utils.html import mark_safe
 
 
@@ -21,40 +21,25 @@ class CommentInline(admin.StackedInline):
 
 @admin.register(Property)
 class PropertyAdmin(admin.ModelAdmin):
-    """
-    Свойства товаров
-    """
-    list_display = [field.name for field in Property._meta.get_fields()]
+    list_display = ['name', 'value', 'units', 'product', 'category_property']
+    ordering = ['category_property', 'product', 'name']
+    search_fields = ['product__name', 'category_property__name']
+    list_per_page = 15
+
+
+@admin.register(PropertyCategory)
+class PropertyCategoryAdmin(admin.ModelAdmin):
+    list_display = ['name']
+
+
+class PropertyInline(admin.StackedInline):
+    model = Property
+    extra = 0
+    readonly_fields = ['category_property']
     fieldsets = (
-        ('Screen', {
-            'fields': ('screen_diagonal', 'screen_resolution', 'screen_type',)
-        }),
-        ('CPU', {
-            'fields': ('cpu', 'cpu_freq', 'cpu_cores',)
-        }),
-        ('RAM', {
-            'fields': ('ram_type', 'ram_value',)
-        }),
-        ('ROM', {
-            'fields': ('rom_type', 'rom_value',)
-        }),
-        ('Graphic', {
-            'fields': ('graphics_type', 'graphics_ram_value',)
-        }),
-        ('Interfaces', {
-            'fields': ('hdmi', 'wifi_type', 'usb_type', 'bluetooth',)
-        }),
-        ('Body', {
-            'fields': ('dimensions', 'weight', 'material',)
-        }),
-        ('Camera', {
-            'fields': ('camera_main', 'camera_front',)
-        }),
-        ('Battery', {
-            'fields': ('battery_cap', 'quick_charge', 'charge_power',)
-        }),
-        ('Other', {
-            'fields': ('operation_system', 'connection', 'work_time', 'equipment', 'sensors',)
+        ('Property', {
+            'classes': ('collapse',),
+            'fields': (('name', 'value', 'units', 'category_property'),),
         }),
     )
 
@@ -64,13 +49,13 @@ class ProductAdmin(admin.ModelAdmin):
     """
     Товары
     """
-    list_display = ['name', 'pk', 'manufacturer', 'price', 'created', 'updated', 'available', 'properties', 'rating']
+    list_display = ['name', 'pk', 'manufacturer', 'price', 'created', 'updated', 'available', 'rating']
     readonly_fields = ['image_tag']
     list_editable = ['price', 'available']
     list_filter = ['manufacturer', 'available']
     prepopulated_fields = {'slug': ('name',)}
     search_fields = ['name']
-    inlines = [CommentInline]
+    inlines = [CommentInline, PropertyInline]
     save_on_top = True
     exclude = ('star',)
 
@@ -85,7 +70,7 @@ class ProductAdmin(admin.ModelAdmin):
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     """
-    Категории
+    Категории товаров
     """
     list_display = ['name', 'slug']
     prepopulated_fields = {'slug': ('name',)}

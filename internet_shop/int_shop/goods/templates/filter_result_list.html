@@ -2,7 +2,7 @@
 {% load static %}
 {% load thumbnail %}
 
-{% block title %}OnlineShop{% endblock %}
+{% block title %}Filter results | OnlineShop{% endblock %}
 {% block content %}
 <main id="main-list">
     <div class="container-fluid pt-4">
@@ -21,7 +21,7 @@
                         </div>
                         <div class="d-flex justify-content-between">
                             <span class="fs-6">{{ filter_price.price_min }}</span>
-                            <span id="counter" class="fs-6">{{ filter_price.price_max }}</span>
+                            <span class="fs-6">{{ filter_price.price_max }}</span>
                         </div>
                     </div>
 <!--                    <span class="d-grid">-->
@@ -43,18 +43,9 @@
                     </div>
                     <div class="d-inline">
 <!--                        <a role="button" class="btn btn-warning btn-sm m-2" href="{% url 'goods:product_list' %}">Reset</a>-->
-                        <button class="btn btn-warning btn-sm m-2" type="reset">Reset</button>
+                        <button class="btn btn-warning btn-sm m-2">Reset</button>
                     </div>
                 <!--По свойствам-->
-                    <span class="d-block text-decoration-underline fs-6 fst-italic my-2">Properties</span>
-                    {{ filter_property.battery.name|title }}
-                    {% for checkbox in filter_property.battery %}
-                        <div class="d-block">{{ checkbox.tag }} {{ checkbox.choice_label }}</div>
-                    {% endfor %}
-                    {{ filter_property.display.name|title }}
-                    {% for checkbox in filter_property.display %}
-                        <div class="d-block">{{ checkbox.tag }} {{ checkbox.choice_label }}</div>
-                    {% endfor %}
                 </form>
             </div>
             <div class="col border">
@@ -62,9 +53,6 @@
                     <ul class="nav nav-pills nav-justified" role="tablist">
                         <li class="nav-item">
                           <a class="nav-link active" data-bs-toggle="tab" href="#home">All</a>
-                        </li>
-                        <li class="nav-item">
-                          <a id="filters-prod" class="nav-link" data-bs-toggle="tab" href="#home">Filters</a>
                         </li>
                         <li class="nav-item">
                           <a class="nav-link" data-bs-toggle="tab" href="#home">Popular</a>
@@ -130,14 +118,11 @@
     </div>
     <!--Пагинация-->
     {% if is_paginated %}
-        <div class="row">
-            <div class="d-flex justify-content-center my-2">
-                {% include 'paginator.html' %}
-            </div>
+    <div class="row">
+        <div class="d-flex justify-content-center my-2">
+            {% include 'paginator.html' %}
         </div>
+    </div>
     {% endif %}
-    <!--Появление/исчезновение меню фильтра для главной страницы-->
-    <script src="{% static 'js/slide_filters.js' %}"></script>
-
 </main>
 {% endblock %}
