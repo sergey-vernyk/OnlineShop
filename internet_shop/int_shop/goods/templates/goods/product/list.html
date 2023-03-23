@@ -32,12 +32,15 @@
                     <!--По производителю-->
                     <span class="d-block text-decoration-underline fs-6 fst-italic my-2">Manufacturer</span>
                     <div class="d-flex justify-content-start filter-item border shadow-sm p-2">
-                        <div class="d-block">
+                        <div class="d-inline">
                             {% for checkbox in filter_manufacturers.manufacturer %}
                                 <div class="d-block">{{ checkbox.tag }} {{ checkbox.choice_label }}</div>
                             {% endfor %}
                         </div>
                     </div>
+                    <!--По свойствам-->
+                    <span class="d-block text-decoration-underline fs-6 fst-italic my-2">Properties</span>
+                    {% include 'props/mobile_phones.html' %}
                     <div class="d-inline">
                         <button class="btn btn-primary btn-sm m-2" type="submit">Apply</button>
                     </div>
@@ -45,37 +48,27 @@
 <!--                        <a role="button" class="btn btn-warning btn-sm m-2" href="{% url 'goods:product_list' %}">Reset</a>-->
                         <button class="btn btn-warning btn-sm m-2" type="reset">Reset</button>
                     </div>
-                <!--По свойствам-->
-                    <span class="d-block text-decoration-underline fs-6 fst-italic my-2">Properties</span>
-                    {{ filter_property.battery.name|title }}
-                    {% for checkbox in filter_property.battery %}
-                        <div class="d-block">{{ checkbox.tag }} {{ checkbox.choice_label }}</div>
-                    {% endfor %}
-                    {{ filter_property.display.name|title }}
-                    {% for checkbox in filter_property.display %}
-                        <div class="d-block">{{ checkbox.tag }} {{ checkbox.choice_label }}</div>
-                    {% endfor %}
                 </form>
             </div>
             <div class="col border">
+                <ul class="nav nav-pills nav-justified" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#home">All</a>
+                    </li>
+                    <li class="nav-item">
+                        <a id="filters-prod" class="nav-link" data-bs-toggle="tab" href="#home">Filters</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#home">Popular</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#menu1">New</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#menu2">Promotion</a>
+                    </li>
+                </ul>
                 <div class="row h-100">
-                    <ul class="nav nav-pills nav-justified" role="tablist">
-                        <li class="nav-item">
-                          <a class="nav-link active" data-bs-toggle="tab" href="#home">All</a>
-                        </li>
-                        <li class="nav-item">
-                          <a id="filters-prod" class="nav-link" data-bs-toggle="tab" href="#home">Filters</a>
-                        </li>
-                        <li class="nav-item">
-                          <a class="nav-link" data-bs-toggle="tab" href="#home">Popular</a>
-                        </li>
-                        <li class="nav-item">
-                          <a class="nav-link" data-bs-toggle="tab" href="#menu1">New</a>
-                        </li>
-                        <li class="nav-item">
-                          <a class="nav-link" data-bs-toggle="tab" href="#menu2">Promotion</a>
-                        </li>
-                    </ul>
                     <div class="col m-3">
                         {% for product in products %}
                             <div class="d-inline-flex m-2 border shadow-sm">

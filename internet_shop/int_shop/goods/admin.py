@@ -21,7 +21,7 @@ class CommentInline(admin.StackedInline):
 
 @admin.register(Property)
 class PropertyAdmin(admin.ModelAdmin):
-    list_display = ['name', 'value', 'units', 'product', 'category_property']
+    list_display = ['name', 'value', 'units', 'category_property', 'product']
     ordering = ['category_property', 'product', 'name']
     search_fields = ['product__name', 'category_property__name']
     list_per_page = 15
@@ -30,6 +30,8 @@ class PropertyAdmin(admin.ModelAdmin):
 @admin.register(PropertyCategory)
 class PropertyCategoryAdmin(admin.ModelAdmin):
     list_display = ['name']
+    filter_horizontal = ('product_categories',)
+    list_filter = ['product_categories']
 
 
 class PropertyInline(admin.StackedInline):

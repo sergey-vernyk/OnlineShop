@@ -49,19 +49,3 @@ class FilterByManufacturerForm(forms.Form):
         widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
         queryset=Manufacturer.objects.all()
     )
-
-
-class FilterByPropertyForm(forms.Form):
-    """
-    Форма для выбора свойств для фильтрации
-    """
-
-    battery = forms.ModelMultipleChoiceField(
-        widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
-        queryset=Property.objects.filter(category_property__name='Battery')
-    )
-
-    display = forms.ModelMultipleChoiceField(
-        widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
-        queryset=Property.objects.filter(category_property__name='Display')
-    )

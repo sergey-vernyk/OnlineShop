@@ -1,0 +1,30 @@
+<div class="filter-item rounded p-2">
+    {% for p in props_mobile %}
+        {% ifchanged %}
+            <h5 class="catPropName my-2 text-center shadow-sm border">{{ p.category_property__name }}</h5>
+        {% endifchanged %}
+
+        {% ifchanged %}
+            <div class="d-flex justify-content-start my-1">
+                <h6 class="m-2">{{ p.name }}</h6>
+            </div>
+        {% endifchanged %}
+
+        <div class="form-check p-1">
+            <div class="d-flex justify-content-start">
+                <input class="form-check-input mx-2" id="prop-input" type="checkbox" name="props"
+                       value="{{ p.category_property__pk }}, {{ p.name }}, {{ p.value }}">
+                <div class="d-flex"><label class="form-check-label" for="prop-input">{{ p.value }}</label></div>
+                <div class="d-inline ms-1">{{ p.units }}</div>
+            </div>
+        </div>
+    {% endfor %}
+    <script>
+        $(document).ready(function(){
+            $(".catPropName").click(function(){
+                console.log('Yes')
+            }
+            );
+        });
+    </script>
+</div>

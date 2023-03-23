@@ -4,14 +4,15 @@ from django.views.generic import ListView, DetailView
 from django.views.generic.edit import FormMixin
 
 from account.models import Profile
-from goods.filters import get_max_min_price, get_products_between_max_min_price
-from goods.forms import RatingSetForm, CommentProductForm, FilterByPriceForm, FilterByManufacturerForm, \
-    FilterByPropertyForm
+from goods.filters import get_max_min_price
+from goods.forms import RatingSetForm, CommentProductForm, FilterByPriceForm, FilterByManufacturerForm
 from cart.forms import CartQuantityForm
 from goods.models import Product, Category, Favorite
 from django.urls import reverse
 from decimal import Decimal
 from django.core.exceptions import ObjectDoesNotExist
+
+from goods.property_filters import get_property_for_mobile_phones
 
 
 class ProductListView(ListView):
@@ -29,7 +30,9 @@ class ProductListView(ListView):
             context['category'] = Category.objects.get(slug=self.kwargs.get('category_slug'))
         context['filter_price'] = FilterByPriceForm()
         context['filter_manufacturers'] = FilterByManufacturerForm()
-        context['filter_property'] = FilterByPropertyForm()
+
+        if 'category_slug' in self.kwargs and self.kwargs['category_slug'] == 'mobile-phones':
+            context['props_mobile'] = get_property_for_mobile_phones()
 
         if 'filter_price' in self.kwargs:
             min_price = Decimal(self.kwargs.get('filter_price')[0])
@@ -174,7 +177,7 @@ class FilterResultsView(ListView):
     paginate_by = 3
 
     def get(self, request, *args, **kwargs):
-        if request.GET:
+        if request.GET:  # если была подтверждена форма с критериями фильтров
             if 'price_max' and 'price_min' in request.GET:
                 price_min = request.GET.get('price_min')
                 price_max = request.GET.get('price_max')
@@ -184,18 +187,25 @@ class FilterResultsView(ListView):
                 manufacturers = request.GET.getlist('manufacturer')
                 self.kwargs['filter_manufacturers'] = manufacturers
 
+            if 'props' in request.GET:
+                properties = request.GET.getlist('props')
+                self.kwargs['props'] = properties
+
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        min_price = None
-        max_price = None
-        manufacturers = None
+        min_price = ''
+        max_price = ''
+        manufacturers = ''
+        properties = ''
         if 'filter_price' in self.kwargs:
             min_price = self.kwargs.get('filter_price')[0]
             max_price = self.kwargs.get('filter_price')[1]
         if 'filter_manufacturers' in self.kwargs:
             manufacturers = self.kwargs.get('filter_manufacturers')
-
+        if 'props' in self.kwargs:
+            properties = self.kwargs.get('props')  # TODO
+        # TODO
         result_queryset = Product.objects.filter(price__gte=min_price,
                                                  price__lte=max_price,
                                                  manufacturer_id__in=manufacturers)

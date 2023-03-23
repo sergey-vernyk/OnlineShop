@@ -121,6 +121,7 @@ class PropertyCategory(models.Model):
     """
 
     name = models.CharField(max_length=100)
+    product_categories = models.ManyToManyField(Category)
 
     def __str__(self):
         return self.name
@@ -138,6 +139,7 @@ class Property(models.Model):
     name = models.CharField(max_length=50)
     value = models.CharField(max_length=255)
     units = models.CharField(max_length=10, blank=True)
+    detail_description = models.TextField(max_length=255, blank=True)
     category_property = models.ForeignKey(PropertyCategory,
                                           related_name='category_properties',
                                           on_delete=models.CASCADE,
