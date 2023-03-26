@@ -2,8 +2,17 @@ from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.urls import reverse
 from decimal import Decimal
+from django.utils import timezone
 
 from account.models import Profile
+
+
+def product_image_path(instance, filename):
+    """
+    Возвращает путь сохранения изображений для каждого товара
+    """
+    now = timezone.now()
+    return f'products_{instance.name}/{now.strftime("%Y-%m-%d")}/{filename}'
 
 
 class Product(models.Model):
@@ -26,7 +35,7 @@ class Product(models.Model):
     manufacturer = models.ForeignKey('Manufacturer', on_delete=models.SET_NULL, related_name='products', null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField()
-    image = models.ImageField(upload_to='products/%Y/%m/%d', blank=True)
+    image = models.ImageField(upload_to=product_image_path, blank=True)
     available = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -137,7 +146,8 @@ class Property(models.Model):
     """
 
     name = models.CharField(max_length=50)
-    value = models.CharField(max_length=255)
+    text_value = models.CharField(max_length=255, blank=True)
+    numeric_value = models.DecimalField(max_digits=6, decimal_places=2, blank=True, default='0.00')
     units = models.CharField(max_length=10, blank=True)
     detail_description = models.TextField(max_length=255, blank=True)
     category_property = models.ForeignKey(PropertyCategory,

@@ -8,62 +8,26 @@
     <div class="container-fluid pt-4">
         <div class="row row-col-3 mb-2">
             <div class="col-sm-2 mx-1 text-center border rounded filter-prod">
-                <!--Фильтры-->
-                <span class="fs-4">Filters</span>
-                <hr>
-                <form method="get" action="{% url 'goods:filter_results' %}">
-                    <!--По цене-->
-                    <span class="d-block text-decoration-underline fs-6 fst-italic my-2">Price</span>
-                    <div class="filter-item p-2 border shadow-sm">
-                        <div class="d-flex justify-content-between">
-                            <span class="fw-bold">Min</span>
-                            <span class="fw-bold">Max</span>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <span class="fs-6">{{ filter_price.price_min }}</span>
-                            <span class="fs-6">{{ filter_price.price_max }}</span>
-                        </div>
-                    </div>
-<!--                    <span class="d-grid">-->
-<!--                        <button class="btn btn-primary btn-sm m-2" type="submit">Apply</button>-->
-<!--                    </span>-->
-<!--                </form>-->
-<!--                <form method="get" action="{% url 'goods:filter_results' %}">-->
-                    <!--По производителю-->
-                    <span class="d-block text-decoration-underline fs-6 fst-italic my-2">Manufacturer</span>
-                    <div class="d-flex justify-content-start filter-item border shadow-sm p-2">
-                        <div class="d-block">
-                            {% for checkbox in filter_manufacturers.manufacturer %}
-                                <div class="d-block">{{ checkbox.tag }} {{ checkbox.choice_label }}</div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <div class="d-inline">
-                        <button class="btn btn-primary btn-sm m-2" type="submit">Apply</button>
-                    </div>
-                    <div class="d-inline">
-<!--                        <a role="button" class="btn btn-warning btn-sm m-2" href="{% url 'goods:product_list' %}">Reset</a>-->
-                        <button class="btn btn-warning btn-sm m-2">Reset</button>
-                    </div>
-                <!--По свойствам-->
-                </form>
+                {% if category %}
+                    {% include 'filters_menu.html' %} <!--Добавление боковой панели справа с фильтрами-->
+                {% endif %}
             </div>
             <div class="col border">
+                <ul class="nav nav-pills nav-justified" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#home">All</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#home">Popular</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#menu1">New</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#menu2">Promotion</a>
+                    </li>
+                </ul>
                 <div class="row h-100">
-                    <ul class="nav nav-pills nav-justified" role="tablist">
-                        <li class="nav-item">
-                          <a class="nav-link active" data-bs-toggle="tab" href="#home">All</a>
-                        </li>
-                        <li class="nav-item">
-                          <a class="nav-link" data-bs-toggle="tab" href="#home">Popular</a>
-                        </li>
-                        <li class="nav-item">
-                          <a class="nav-link" data-bs-toggle="tab" href="#menu1">New</a>
-                        </li>
-                        <li class="nav-item">
-                          <a class="nav-link" data-bs-toggle="tab" href="#menu2">Promotion</a>
-                        </li>
-                    </ul>
                     <div class="col m-3">
                         {% for product in products %}
                             <div class="d-inline-flex m-2 border shadow-sm">
@@ -89,20 +53,20 @@
                                             {% csrf_token %}
                                             <input type="hidden" name="quantity" value="1">
                                             <button class="text-decoration-none buy-btn" type="submit">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                                 fill="currentColor" class="bi bi-basket" viewBox="0 0 16 16">
-                                                <path d="M5.757 1.071a.5.5 0 0 1 .172.686L3.383 6h9.234L10.07
-                                                 1.757a.5.5 0 1 1 .858-.514L13.783 6H15a1 1 0 0 1 1 1v1a1 1 0
-                                                  0 1-1 1v4.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 13.5V9a1
-                                                   1 0 0 1-1-1V7a1 1 0 0 1 1-1h1.217L5.07 1.243a.5.5 0 0 1 .686-.172zM2
-                                                    9v4.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V9H2zM1 7v1h14V7H1zm3
-                                                     3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 4 10zm2 0a.5.5 0 0 1
-                                                      .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 6 10zm2 0a.5.5 0 0 1 .5.5v3a.5.5
-                                                       0 0 1-1 0v-3A.5.5 0 0 1 8 10zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v
-                                                       -3a.5.5 0 0 1 .5-.5zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 1 .5-.5z">
-                                                </path>
-                                            </svg>
-                                            Buy</button>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                                     fill="currentColor" class="bi bi-basket" viewBox="0 0 16 16">
+                                                    <path d="M5.757 1.071a.5.5 0 0 1 .172.686L3.383 6h9.234L10.07
+                                                     1.757a.5.5 0 1 1 .858-.514L13.783 6H15a1 1 0 0 1 1 1v1a1 1 0
+                                                      0 1-1 1v4.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 13.5V9a1
+                                                       1 0 0 1-1-1V7a1 1 0 0 1 1-1h1.217L5.07 1.243a.5.5 0 0 1 .686-.172zM2
+                                                        9v4.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V9H2zM1 7v1h14V7H1zm3
+                                                         3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 4 10zm2 0a.5.5 0 0 1
+                                                          .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 6 10zm2 0a.5.5 0 0 1 .5.5v3a.5.5
+                                                           0 0 1-1 0v-3A.5.5 0 0 1 8 10zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v
+                                                           -3a.5.5 0 0 1 .5-.5zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 1 .5-.5z">
+                                                    </path>
+                                                </svg>
+                                                Buy</button>
                                         </form>
                                     </div>
                                 </div>
@@ -111,18 +75,18 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-1 mx-1 border ">
+            <div class="col-sm-1 mx-1 border">
                 Other block
             </div>
         </div>
     </div>
     <!--Пагинация-->
     {% if is_paginated %}
-    <div class="row">
-        <div class="d-flex justify-content-center my-2">
-            {% include 'paginator.html' %}
+        <div class="row">
+            <div class="d-flex justify-content-center my-2">
+                {% include 'paginator.html' %}
+            </div>
         </div>
-    </div>
     {% endif %}
 </main>
 {% endblock %}

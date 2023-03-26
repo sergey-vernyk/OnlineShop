@@ -21,10 +21,11 @@ class CommentInline(admin.StackedInline):
 
 @admin.register(Property)
 class PropertyAdmin(admin.ModelAdmin):
-    list_display = ['name', 'value', 'units', 'category_property', 'product']
+    list_display = ['name', 'text_value', 'numeric_value', 'units', 'category_property', 'product']
     ordering = ['category_property', 'product', 'name']
     search_fields = ['product__name', 'category_property__name']
     list_per_page = 15
+    list_filter = ['product', 'category_property']
 
 
 @admin.register(PropertyCategory)
@@ -41,7 +42,7 @@ class PropertyInline(admin.StackedInline):
     fieldsets = (
         ('Property', {
             'classes': ('collapse',),
-            'fields': (('name', 'value', 'units', 'category_property'),),
+            'fields': (('name', 'text_value', 'numeric_value', 'units', 'category_property'),),
         }),
     )
 

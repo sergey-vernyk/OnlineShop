@@ -29,7 +29,8 @@ def get_property_for_mobile_phones() -> list:
     properties = Property.objects.filter(
         category_property__id__in=properties_categories_ids,
         product__category__name__iexact='Mobile Phones').distinct().values('name',
-                                                                           'value',
+                                                                           'text_value',
+                                                                           'numeric_value',
                                                                            'units',
                                                                            'category_property__name',
                                                                            'category_property__pk')

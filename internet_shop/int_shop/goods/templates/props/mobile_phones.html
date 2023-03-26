@@ -1,10 +1,14 @@
+<!--Загрузка кастомного фильтра и тега-->
+{% load cut_fraction_part %}
+{% load check_data_in_request %}
+
 <div class="filter-item rounded p-2">
-    {% for p in props_mobile %}
-        {% ifchanged %}
+    {% for p in filter_props_mobile %}
+        {% ifchanged %}  <!--Однократное отображение названия категории свойства-->
             <h5 class="catPropName my-2 text-center shadow-sm border">{{ p.category_property__name }}</h5>
         {% endifchanged %}
 
-        {% ifchanged %}
+        {% ifchanged %}  <!--Однократное отображение имени свойства-->
             <div class="d-flex justify-content-start my-1">
                 <h6 class="m-2">{{ p.name }}</h6>
             </div>
@@ -12,9 +16,17 @@
 
         <div class="form-check p-1">
             <div class="d-flex justify-content-start">
-                <input class="form-check-input mx-2" id="prop-input" type="checkbox" name="props"
-                       value="{{ p.category_property__pk }}, {{ p.name }}, {{ p.value }}">
-                <div class="d-flex"><label class="form-check-label" for="prop-input">{{ p.value }}</label></div>
+                <!--Используется кастомный простой тег, который принимает словарь GET из запроса и значения самого checkbox'a-->
+                <!--И проверяет, какие checkbox'ы были выбраны, что бы после применения фильтра отметить эти checkbox'ы как выбранные-->
+                {% check_request request.GET p.category_property__pk p.name p.text_value p.numeric_value|cut_fraction as checked_flag %}
+
+                <input class="form-check-input mx-2" id="prop-input-{{ forloop.counter }}" {% if checked_flag %}checked{% endif %}
+                 type="checkbox" name="props" value="{{ p.category_property__pk }},{{ p.name }},{{ p.text_value }},{{ p.numeric_value|cut_fraction }}">
+                <div class="d-flex">
+                    <label class="form-check-label" for="prop-input-{{ forloop.counter }}">
+                        {% if p.text_value %} {{ p.text_value }} {% else %} {{ p.numeric_value|cut_fraction }} {% endif %}
+                    </label>
+                </div>
                 <div class="d-inline ms-1">{{ p.units }}</div>
             </div>
         </div>

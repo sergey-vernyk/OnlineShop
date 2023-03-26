@@ -11,7 +11,6 @@ from goods.models import Product, Category, Favorite
 from django.urls import reverse
 from decimal import Decimal
 from django.core.exceptions import ObjectDoesNotExist
-
 from goods.property_filters import get_property_for_mobile_phones
 
 
@@ -28,20 +27,20 @@ class ProductListView(ListView):
         context = super().get_context_data(**kwargs)
         if 'category_slug' in self.kwargs:  # если передана категория
             context['category'] = Category.objects.get(slug=self.kwargs.get('category_slug'))
-        context['filter_price'] = FilterByPriceForm()
-        context['filter_manufacturers'] = FilterByManufacturerForm()
+            context['filter_price'] = FilterByPriceForm()
+            context['filter_manufacturers'] = FilterByManufacturerForm()
 
-        if 'category_slug' in self.kwargs and self.kwargs['category_slug'] == 'mobile-phones':
-            context['props_mobile'] = get_property_for_mobile_phones()
+            if self.kwargs['category_slug'] == 'mobile-phones':
+                context['filter_props_mobile'] = get_property_for_mobile_phones()
 
-        if 'filter_price' in self.kwargs:
-            min_price = Decimal(self.kwargs.get('filter_price')[0])
-            max_price = Decimal(self.kwargs.get('filter_price')[1])
-        else:
-            max_price, min_price = get_max_min_price()
+            if 'filter_price' in self.kwargs:
+                min_price = Decimal(self.kwargs.get('filter_price')[0])
+                max_price = Decimal(self.kwargs.get('filter_price')[1])
+            else:
+                max_price, min_price = get_max_min_price()
 
-        context['filter_price'].fields['price_min'].initial = min_price
-        context['filter_price'].fields['price_max'].initial = max_price
+            context['filter_price'].fields['price_min'].initial = min_price
+            context['filter_price'].fields['price_max'].initial = max_price
         return context
 
     def get_queryset(self):
@@ -194,27 +193,41 @@ class FilterResultsView(ListView):
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        min_price = ''
-        max_price = ''
-        manufacturers = ''
-        properties = ''
+        # отбор товаров только определенной категории
+        result_queryset = Product.objects.filter(category__slug=self.kwargs['category_slug'])
+
+        # отбор товаров по цене
         if 'filter_price' in self.kwargs:
             min_price = self.kwargs.get('filter_price')[0]
             max_price = self.kwargs.get('filter_price')[1]
+            result_queryset = result_queryset.filter(price__gte=min_price, price__lte=max_price)
+        # отбор товаров по производителю
         if 'filter_manufacturers' in self.kwargs:
             manufacturers = self.kwargs.get('filter_manufacturers')
+            result_queryset = result_queryset.filter(manufacturer_id__in=manufacturers)
+        # отбор товаров по свойствам
         if 'props' in self.kwargs:
-            properties = self.kwargs.get('props')  # TODO
-        # TODO
-        result_queryset = Product.objects.filter(price__gte=min_price,
-                                                 price__lte=max_price,
-                                                 manufacturer_id__in=manufacturers)
+            properties = self.kwargs.get('props')
+            result_dict = distribute_properties_from_request(properties)
+
+            # получение в queryset только уникальных результатов
+            result_queryset = result_queryset.distinct().filter(
+                properties__category_property__id__in=result_dict['ids'],
+                properties__name__in=result_dict['names'],
+                properties__text_value__in=result_dict['text_values'],
+                properties__numeric_value__in=result_dict['numeric_values']
+            )
+
         return result_queryset
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
+        if 'category_slug' in self.kwargs:
+            context['category'] = Category.objects.get(slug=self.kwargs.get('category_slug'))
+
         context['filter_price'] = FilterByPriceForm()
         context['filter_manufacturers'] = FilterByManufacturerForm()
+        context['filter_props_mobile'] = get_property_for_mobile_phones()
 
         if 'filter_price' in self.kwargs:
             min_price = Decimal(self.kwargs.get('filter_price')[0])
@@ -226,3 +239,22 @@ class FilterResultsView(ListView):
         context['filter_price'].fields['price_max'].initial = max_price
         context['filter_manufacturers'].fields['manufacturer'].initial = self.kwargs.get('filter_manufacturers')
         return context
+
+
+def distribute_properties_from_request(properties: list) -> dict:
+    """
+    Функция собирает все принятые свойства с запроса на фильтр и
+    сохраняет в словарь, сохраняя каждый атрибут экземпляра свойства в список,
+    ключем которого есть имя каждого атрибута экземпляра свойства
+    """
+    properties_list = [p.split(',') for p in properties]
+    dict_props = {'ids': [], 'names': [], 'text_values': [], 'numeric_values': []}
+    for item in properties_list:
+        cat_ids, names, text_value_prop, numeric_value_prop = item[0], item[1], item[2], Decimal(item[3])
+
+        dict_props['ids'].append(cat_ids)
+        dict_props['names'].append(names)
+        dict_props['text_values'].append(text_value_prop)
+        dict_props['numeric_values'].append(numeric_value_prop)
+
+    return dict_props

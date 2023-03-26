@@ -1,0 +1,40 @@
+<!--Меню для выбора фильтра слева на странице списка товаров определенной категории-->
+
+<!--Фильтры-->
+<span class="fs-4">Filters</span>
+<hr>
+<form method="get" action="{% url 'goods:filter_results_list' category.slug %}">
+    <!--По цене-->
+    <span class="d-block text-decoration-underline fs-6 fst-italic my-2">Price</span>
+    <div class="filter-item p-2 border shadow-sm">
+        <div class="d-flex justify-content-between">
+            <span class="fw-bold">Min</span>
+            <span class="fw-bold">Max</span>
+        </div>
+        <div class="d-flex justify-content-between">
+            <span class="fs-6">{{ filter_price.price_min }}</span>
+            <span id="counter" class="fs-6">{{ filter_price.price_max }}</span>
+        </div>
+    </div>
+    <!--По производителю-->
+    <span class="d-block text-decoration-underline fs-6 fst-italic my-2">Manufacturer</span>
+    <div class="d-flex justify-content-start filter-item border shadow-sm p-2">
+        <div class="d-inline">
+            {% for checkbox in filter_manufacturers.manufacturer %}
+            <div class="d-block">{{ checkbox.tag }} {{ checkbox.choice_label }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    <!--По свойствам-->
+    <span class="d-block text-decoration-underline fs-6 fst-italic my-2">Properties</span>
+    <!--Если категория с мобильными телефонами-->
+    {% if category.slug == 'mobile-phones' %}
+        {% include 'props/mobile_phones.html' %}
+    {% endif %}
+    <div class="d-inline">
+        <button class="btn btn-primary btn-sm m-2" type="submit">Apply</button>
+    </div>
+    <div class="d-inline">
+        <button class="btn btn-warning btn-sm m-2" type="reset">Reset</button>
+    </div>
+</form>
