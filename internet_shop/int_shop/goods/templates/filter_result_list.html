@@ -7,70 +7,17 @@
 <main id="main-list">
     <div class="container-fluid pt-4">
         <div class="row row-col-3 mb-2">
-            <div class="col-sm-2 mx-1 text-center border rounded filter-prod">
+            <div class="col-sm-2 mx-1 text-center border shadow-sm rounded filter-prod">
                 {% if category %}
-                    {% include 'filters_menu.html' %} <!--Добавление боковой панели справа с фильтрами-->
+                    {% include 'filters_menu.html' %} <!--Добавление боковой панели слева с фильтрами-->
                 {% endif %}
             </div>
-            <div class="col border">
-                <ul class="nav nav-pills nav-justified" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active" data-bs-toggle="tab" href="#home">All</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#home">Popular</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#menu1">New</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#menu2">Promotion</a>
-                    </li>
-                </ul>
+            <div class="col border col border px-0 shadow-sm">
+               {% include 'products_navs.html' with category=category %}
                 <div class="row h-100">
                     <div class="col m-3">
                         {% for product in products %}
-                            <div class="d-inline-flex m-2 border shadow-sm">
-                                <div class="prod-card rounded">
-                                    <div class="d-flex justify-content-center mt-2 border-3 border-bottom">
-                                        <span class="fw-bold">{{ product.category }}</span>
-                                    </div>
-                                    <div class="d-flex justify-content-center mt-2">
-                                        <a href="{{ product.get_absolute_url }}">
-                                            <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/no_image_crop.png' %}{% endif %}">
-                                        </a>
-                                    </div>
-                                    <div class="d-flex justify-content-center my-2">
-                                        <a class="text-decoration-none fs-5 fw-bold"
-                                           href="{% url 'goods:product_detail' product.id product.slug %}">{{ product.name }}
-                                        </a>
-                                    </div>
-                                    <div class="d-flex justify-content-center my-2">
-                                        <span class="fs-4">${{ product.price}}</span>
-                                    </div>
-                                    <div class="d-flex justify-content-center my-2">
-                                        <form action="{% url 'cart:cart_add' product.id %}" method="post">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="quantity" value="1">
-                                            <button class="text-decoration-none buy-btn" type="submit">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                                     fill="currentColor" class="bi bi-basket" viewBox="0 0 16 16">
-                                                    <path d="M5.757 1.071a.5.5 0 0 1 .172.686L3.383 6h9.234L10.07
-                                                     1.757a.5.5 0 1 1 .858-.514L13.783 6H15a1 1 0 0 1 1 1v1a1 1 0
-                                                      0 1-1 1v4.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 13.5V9a1
-                                                       1 0 0 1-1-1V7a1 1 0 0 1 1-1h1.217L5.07 1.243a.5.5 0 0 1 .686-.172zM2
-                                                        9v4.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V9H2zM1 7v1h14V7H1zm3
-                                                         3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 4 10zm2 0a.5.5 0 0 1
-                                                          .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 6 10zm2 0a.5.5 0 0 1 .5.5v3a.5.5
-                                                           0 0 1-1 0v-3A.5.5 0 0 1 8 10zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v
-                                                           -3a.5.5 0 0 1 .5-.5zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 1 .5-.5z">
-                                                    </path>
-                                                </svg>
-                                                Buy</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
+                            {% include 'goods/product/card.html' with product=product %}
                         {% endfor %}
                     </div>
                 </div>
@@ -84,7 +31,7 @@
     {% if is_paginated %}
         <div class="row">
             <div class="d-flex justify-content-center my-2">
-                {% include 'paginator.html' %}
+                {% include 'paginator.html' with place='filter_list' %}
             </div>
         </div>
     {% endif %}

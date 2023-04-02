@@ -1,16 +1,57 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, UserCreationForm
 from django.contrib.auth import password_validation
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
+from .models import Profile
 
 
 class LoginForm(AuthenticationForm):
     """
     Форма для входа пользователя на сайт
     """
-    username = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class': 'form-control w-25 mb-4'}))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control w-25 mb-4'}))
-    remember = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'form-check-input mb-4'}),
-                                  label='Remember me', required=False)
+    username = forms.CharField(required=False, max_length=50, label='Username/Email',
+                               widget=forms.TextInput(attrs={'class': 'form-control mb-2',
+                                                             'placeholder': 'Username/Email'}))
+    password = forms.CharField(required=False, widget=forms.PasswordInput(attrs={'class': 'form-control mb-2',
+                                                                                 'placeholder': 'Password'}))
+    remember = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'form-check-input mb-2'}),
+                                  label='Remember?', required=False)
+
+    def clean_username(self):
+        """
+        Проверка существующего пользователя
+        по введенному username или email
+        """
+        cleaned_data = super().clean()
+        username_or_email = cleaned_data.get('username')
+
+        # если не было передано username или email
+        if not username_or_email:
+            raise ValidationError('Please enter a correct username')
+        if '@' in username_or_email:
+            try:
+                validate_email(username_or_email)
+            except ValidationError as ve:
+                return ve
+            else:
+                try:
+                    user = User.objects.get(email=username_or_email)
+                    return user.username
+                except ObjectDoesNotExist as oe:
+                    pass
+        else:
+            return username_or_email
+
+    def clean_password(self):
+        """
+        Исключение, если не был передан пароль
+        """
+        cleaned_data = super().clean()
+        if not cleaned_data.get('password'):
+            raise ValidationError('Please enter a correct password')
 
 
 class UserPasswordChangeForm(PasswordChangeForm):
@@ -45,8 +86,11 @@ class RegisterUserForm(UserCreationForm):
     date_of_birth = forms.DateField(label='Date of birth', widget=forms.DateInput(attrs={'class': 'form-control w-25'}),
                                     help_text='Format: yyyy-mm-dd')
 
-    user_photo = forms.ImageField(label='Photo', widget=forms.FileInput(attrs={'class': 'form-control w-25'}))
+    gender = forms.CharField(required=False, label='Gender', widget=forms.RadioSelect(choices=Profile.GENDER))
 
-    field_order = ('username', 'first_name', 'last_name',
+    user_photo = forms.ImageField(required=False, label='Photo',
+                                  widget=forms.FileInput(attrs={'class': 'form-control w-25'}))
+
+    field_order = ('username', 'first_name', 'last_name', 'gender',
                    'email', 'date_of_birth', 'password1',
                    'password2', 'user_photo')

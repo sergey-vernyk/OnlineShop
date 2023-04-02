@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+<!--Шаблон для отображения акционных товаром на сайте-->
+{% block title %}Promotion products | OnlineShop{% endblock %}
+
+{% block content %}
+<span class="d-flex justify-content-center">
+    <h3 class="cat-header">Promotional products</h3>
+</span>
+    <div class="col m-2 border shadow-sm">
+        <div class="row h-100">
+            <div class="col m-3">
+                {% for product in products %}
+                    {% include 'goods/product/card.html' with product=product %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="d-flex justify-content-center my-2">
+            {% include 'paginator.html' with place='promotion_list' %}
+        </div>
+    </div>
+{% endblock %}

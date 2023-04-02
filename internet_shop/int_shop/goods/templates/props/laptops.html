@@ -3,7 +3,7 @@
 {% load check_data_in_request %}
 
 <div class="filter-item rounded p-2">
-    {% for p in filter_props_mobile %}
+    {% for p in filter_props_laptop %}
         {% ifchanged %}  <!--Однократное отображение названия категории свойства-->
             <h5 class="catPropName my-2 text-center border">{{ p.category_property__name }}</h5>
         {% endifchanged %}

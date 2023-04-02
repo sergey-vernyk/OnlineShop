@@ -169,3 +169,6 @@ EMAIL_USE_TLS = True
 FROM_EMAIL = env('FROM_EMAIL')
 
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+#  длительность валидности ссылки для сброса пароля
+PASSWORD_RESET_TIMEOUT = 14400

@@ -1,20 +1,21 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import FormMixin
 
 from account.models import Profile
-from goods.filters import get_max_min_price
-from goods.forms import RatingSetForm, CommentProductForm, FilterByPriceForm, FilterByManufacturerForm
+from goods.forms import RatingSetForm, CommentProductForm
 from cart.forms import CartQuantityForm
+from goods.logic import distribute_properties_from_request, get_page_obj
 from goods.models import Product, Category, Favorite
 from django.urls import reverse
 from decimal import Decimal
 from django.core.exceptions import ObjectDoesNotExist
-from goods.property_filters import get_property_for_mobile_phones
+from django.utils import timezone
+from .utils import GoodsContextMixin
 
 
-class ProductListView(ListView):
+class ProductListView(ListView, GoodsContextMixin):
     """
     Список все товаров
     """
@@ -27,20 +28,8 @@ class ProductListView(ListView):
         context = super().get_context_data(**kwargs)
         if 'category_slug' in self.kwargs:  # если передана категория
             context['category'] = Category.objects.get(slug=self.kwargs.get('category_slug'))
-            context['filter_price'] = FilterByPriceForm()
-            context['filter_manufacturers'] = FilterByManufacturerForm()
+            context = self.add_to_context(context, self.kwargs)
 
-            if self.kwargs['category_slug'] == 'mobile-phones':
-                context['filter_props_mobile'] = get_property_for_mobile_phones()
-
-            if 'filter_price' in self.kwargs:
-                min_price = Decimal(self.kwargs.get('filter_price')[0])
-                max_price = Decimal(self.kwargs.get('filter_price')[1])
-            else:
-                max_price, min_price = get_max_min_price()
-
-            context['filter_price'].fields['price_min'].initial = min_price
-            context['filter_price'].fields['price_max'].initial = max_price
         return context
 
     def get_queryset(self):
@@ -166,7 +155,7 @@ def add_or_remove_product_favorite(request, product_pk: int, action: str) -> red
     return redirect(reverse('goods:user_product_favorites_list', args=(request.user.username,)))
 
 
-class FilterResultsView(ListView):
+class FilterResultsView(ListView, GoodsContextMixin):
     """
     Отображение результатов после применения фильтра
     """
@@ -225,36 +214,37 @@ class FilterResultsView(ListView):
         if 'category_slug' in self.kwargs:
             context['category'] = Category.objects.get(slug=self.kwargs.get('category_slug'))
 
-        context['filter_price'] = FilterByPriceForm()
-        context['filter_manufacturers'] = FilterByManufacturerForm()
-        context['filter_props_mobile'] = get_property_for_mobile_phones()
-
-        if 'filter_price' in self.kwargs:
-            min_price = Decimal(self.kwargs.get('filter_price')[0])
-            max_price = Decimal(self.kwargs.get('filter_price')[1])
-        else:
-            max_price, min_price = get_max_min_price()
-
-        context['filter_price'].fields['price_min'].initial = min_price
-        context['filter_price'].fields['price_max'].initial = max_price
+        context = self.add_to_context(context, self.kwargs)
         context['filter_manufacturers'].fields['manufacturer'].initial = self.kwargs.get('filter_manufacturers')
         return context
 
 
-def distribute_properties_from_request(properties: list) -> dict:
+def promotions_list(request):
     """
-    Функция собирает все принятые свойства с запроса на фильтр и
-    сохраняет в словарь, сохраняя каждый атрибут экземпляра свойства в список,
-    ключем которого есть имя каждого атрибута экземпляра свойства
+    Список товаров, которые отмечены как акционные
     """
-    properties_list = [p.split(',') for p in properties]
-    dict_props = {'ids': [], 'names': [], 'text_values': [], 'numeric_values': []}
-    for item in properties_list:
-        cat_ids, names, text_value_prop, numeric_value_prop = item[0], item[1], item[2], Decimal(item[3])
+    prom_products = Product.objects.filter(promotional=True)
+    page = request.GET.get('page')  # получаем текущую страницу из запроса
+    # пагинация списка
+    page_obj = get_page_obj(per_pages=1, page=page, queryset=prom_products)
 
-        dict_props['ids'].append(cat_ids)
-        dict_props['names'].append(names)
-        dict_props['text_values'].append(text_value_prop)
-        dict_props['numeric_values'].append(numeric_value_prop)
+    products = page_obj.object_list  # список товаров на выбранной странице
+    return render(request, 'goods/promotions.html', {'products': products,
+                                                     'page_obj': page_obj})
 
-    return dict_props
+
+def new_list(request):
+    """
+    Список товаров, которые добавлены на сайт
+    2 недели назад и считаются новыми
+    """
+    now = timezone.now()
+    diff = now - timezone.timedelta(weeks=2)
+
+    prom_products = Product.objects.filter(created__gt=diff)
+    page = request.GET.get('page')  # получаем текущую страницу из запроса
+    page_obj = get_page_obj(per_pages=1, page=page, queryset=prom_products)
+
+    products = page_obj.object_list  # список товаров на выбранной странице
+    return render(request, 'goods/new.html', {'products': products,
+                                              'page_obj': page_obj})

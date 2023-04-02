@@ -1,0 +1,21 @@
+<!--Вкладки со ссылками вверху над списком товаров-->
+<!--Все товары, фильтр по товарам, популярные товары, новые и товары со скидками-->
+<ul class="nav nav-justified justify-content-center prod-navs">
+    <li class="nav-item">
+        <a class="nav-link border rounded-end " href="{% url 'goods:product_list' %}">All</a>
+    </li>
+    {% if category %}
+        <li class="nav-item">
+            <a class="nav-link border rounded" id="filters-prod" href="#">Filter</a>
+        </li>
+    {% endif %}
+    <li class="nav-item">
+        <a class="nav-link border rounded" href="#">Popular</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link border rounded" href="{% url 'goods:new_list' %}">New</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link border rounded-start" href="{% url 'goods:promotions_list' %}">Promotion</a>
+    </li>
+</ul>

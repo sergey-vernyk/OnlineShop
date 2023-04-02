@@ -1,30 +1,76 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Log-In{% endblock %}
+{% block title %}Log-In | OnlineShop{% endblock %}
 
 {% block content %}
-<h1 class="display-3">Log-in</h1>
-<form action="{% url 'login' %}" method="post">
-    <div class="text-left mb-3">
-        <div class="form-outline mb-4">
-            {% csrf_token %}
-            {{ form.username.label_tag }} {{ form.username }}
-            {{ form.password.label_tag }} {{ form.password }}
-            {{ form.remember.label_tag }} {{ form.remember }}
-            {% if form.errors %}
-                <p>Your username and password didn't match. Please try again.</p>
-            {% endif %}
-            <div class="row justify-content-start">
-                <div class="col-2">
-                    <input type="hidden" name="next" value="{{ next }}"/>
-                    <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+<div class="container min-vh-100 d-flex justify-content-center align-items-center">
+    <div class="login-form">
+        <div class="row">
+            <h1 class="text-center mb-4 fw-bold">Log-in</h1>
+            <div class="col border-end border-2">
+                <div class="d-flex-grid">
+                    <form action="{% url 'login' %}" method="post" style="width: 350px;">
+                        {% csrf_token %}
+                        {% for field in form %}
+                            <div class="form-outline form-fields">
+                                {% if field.label == 'Remember?' %}
+                                    <span class="my-2">{{ field.label_tag }}</span> {{ field }}
+                                {% else %}
+                                    <label class="my-2" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                    {{ field }}
+                                {% endif %}
+                                <ul class="errorlist">
+                                    {% if field.errors %}
+                                        {% for error in field.errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        {% endfor %}
+                        <div class="row justify-content-between">
+                            <div class="col mt-2">
+                                <input type="hidden" name="next" value="{{ next }}"/>
+                                <button type="submit" class="btn btn-primary fs-5">Sign in</button>
+                            </div>
+                            <div class="col text-center mt-2">
+                                <a class="text-decoration-none" style="font-size: 20px;"
+                                   href="{% url 'password_reset' %}">Forgot password?</a>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-                <div class="col-2">
-                    <a class="link-dark text-decoration-none" href="{% url 'password_reset' %}">Forgot password?</a>
+            </div>
+            <div class="col">
+                <div class="social">
+                    <ul>
+                        <li class="facebook">
+                            <a href="#">Login with Facebook</a>
+                        </li>
+                        <li class="google">
+                            <a href="#">Login with Google</a>
+                        </li>
+                        <li class="twitter">
+                            <a href="#">Login with Twitter</a>
+                        </li>
+                    </ul>
                 </div>
+            </div>
+            <div class="row">
+                {% if messages %}
+                    {% for message in messages %}
+                        {% if message.tags == 'success' %}
+                            <span class="success-message">{{ message }}</span>
+                        {% elif message.tags == 'error' %}
+                            <span class="error-message">{{ message }}</span>
+                        {% endif %}
+                    {% endfor %}
+                    <a class="close" href="#">x</a>
+                {% endif %}
             </div>
         </div>
     </div>
-</form>
-
+</div>
+    <script src="{% static 'js/close_messages.js' %}"></script>
 {% endblock%}

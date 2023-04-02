@@ -37,6 +37,7 @@ class Product(models.Model):
     description = models.TextField()
     image = models.ImageField(upload_to=product_image_path, blank=True)
     available = models.BooleanField(default=True)
+    promotional = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='products')
@@ -144,8 +145,48 @@ class Property(models.Model):
     """
     Модель отдельного свойства для товара
     """
+    property_names = (sorted([
+        # Display
+        ('Colors', 'Colors'), ('Diagonal', 'Diagonal'), ('Pixel Density', 'Pixel Density'), ('Type', 'Type'),
+        ('Resolution', 'Resolution'), ('Brightness', 'Brightness'), ('Sweep frequency', 'Sweep frequency'),
+        # CPU
+        ('#Cores', '#Cores'), ('Frequency', 'Frequency'), ('Model', 'Model'), ('Threads', 'Threads'),
+        # Camera
+        ('Front', 'Front'),
+        ('Main', 'Main'),
+        # Communication
+        ('Bluetooth', 'Bluetooth'), ('NFC', 'NFC'), ('Positioning', 'Positioning'), ('Radio', 'Radio'), ('SIM', 'SIM'),
+        ('Speed', 'Speed'), ('USB', 'USB'), ('WI-FI', 'WI-FI'), ('Audio Port', 'Audio Port'), ('HDMI', 'HDMI'),
+        ('LAN', 'LAN'), ('4G', '4G'), ('5G', '5G'),
+        # Battery
+        ('Capacity', 'Capacity'), ('Charging', 'Charging'), ('Quick Charge', 'Quick Charge'), ('#Cells', '#Cells'),
+        ('Work Time', 'Work Time'),
+        # Body
+        ('Color', 'Color'), ('Dimensions', 'Dimensions'), ('Material', 'Material'), ('Weight', 'Weight'),
+        ('Opening Angle', 'Opening Angle'),
+        # Audio
+        ('Manufacturer', 'Manufacturer'),
+        ('Power', 'Power'),
+        # RAM Memory
+        ('Volume', 'Volume'),
+        ('#Slots', '#Slots'),
+        # Security
+        ('Firmware', 'Firmware'),
+        # Video
+        ('Form Factor', 'Form Factor'),
+        # Internal Memory
+        ('Card slot', 'Card slot'),
+        # Features
+        ('Sensors', 'Sensors'),
+        ('Keyboard Lightening', 'Keyboard Lightening'),
+        # Software
+        ('OS', 'OS'),
+        ('User interface', 'User interface'),
+        ('Version', 'Version'),
 
-    name = models.CharField(max_length=50)
+    ], key=lambda x: x[0]))
+
+    name = models.CharField(max_length=50, choices=property_names)
     text_value = models.CharField(max_length=255, blank=True)
     numeric_value = models.DecimalField(max_digits=6, decimal_places=2, blank=True, default='0.00')
     units = models.CharField(max_length=10, blank=True)

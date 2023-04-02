@@ -4,12 +4,12 @@ from django.db.models.query import QuerySet
 from decimal import Decimal
 
 
-def get_max_min_price() -> tuple:
+def get_max_min_price(category_slug: str) -> tuple:
     """
     Фильтр товаров по цене
     """
-    max_price = Product.objects.aggregate(max_price=Max('price'))
-    min_price = Product.objects.aggregate(min_price=Min('price'))
+    max_price = Product.objects.filter(category__slug=category_slug).aggregate(max_price=Max('price'))
+    min_price = Product.objects.filter(category__slug=category_slug).aggregate(min_price=Min('price'))
     return max_price['max_price'], min_price['min_price']
 
 

@@ -24,7 +24,7 @@
                             {% endif %}
                             <ul class="errorlist">
                                 {% for error in field.errors %}
-                                <li>{{ error }}</li>
+                                    <li>{{ error }}</li>
                                 {% endfor %}
                             </ul>
                         </div>
@@ -37,7 +37,7 @@
                             <span class="col text-end my-auto">{{ field.label_tag }}</span>
                             <span class="col">{{ field }}</span>
                             {% if field.help_text %}
-                            <p class="help">{{ field.help_text|safe }}</p>
+                                <p class="help">{{ field.help_text|safe }}</p>
                             {% endif %}
                             <ul class="errorlist">
                                 {% for error in field.errors %}

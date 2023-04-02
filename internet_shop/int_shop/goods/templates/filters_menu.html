@@ -3,7 +3,7 @@
 <!--Фильтры-->
 <span class="fs-4">Filters</span>
 <hr>
-<form method="get" action="{% url 'goods:filter_results_list' category.slug %}">
+<form method="get" action="{% url 'goods:filter_results_list' category.slug page_obj.number %}">
     <!--По цене-->
     <span class="d-block text-decoration-underline fs-6 fst-italic my-2">Price</span>
     <div class="filter-item p-2 border shadow-sm">
@@ -30,6 +30,9 @@
     <!--Если категория с мобильными телефонами-->
     {% if category.slug == 'mobile-phones' %}
         {% include 'props/mobile_phones.html' %}
+    <!--Если категория с ноутбуками-->
+    {% elif category.slug == 'laptops' %}
+        {% include 'props/laptops.html' %}
     {% endif %}
     <div class="d-inline">
         <button class="btn btn-primary btn-sm m-2" type="submit">Apply</button>

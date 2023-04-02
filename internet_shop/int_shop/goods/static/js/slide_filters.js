@@ -7,9 +7,9 @@ $(document).ready(function() {
     }
     // появление и исчезновение меню
     $("#filters-prod").click(function() {
-        $(".col-sm-2").slideDown(800);
+        $(".col-sm-2").fadeToggle(500);
     });
-    $(".nav > li > a").not("#filters-prod").click(function() {
-        $(".col-sm-2").slideUp(700);
-    });
+//    $(".nav > li > a").not("#filters-prod").click(function() {
+//        $(".col-sm-2").fadeOut(700);
+//    });
 });

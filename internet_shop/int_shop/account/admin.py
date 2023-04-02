@@ -65,6 +65,7 @@ class ProfileAdmin(admin.ModelAdmin):
     """
     Профиль пользователя
     """
+    list_display = ['user', 'gender', 'email_confirm']
     fields = ('profile_full_name', 'user', 'date_of_birth',
               'gender', 'user_photo_tag', 'created',
               'about', 'coupons')
