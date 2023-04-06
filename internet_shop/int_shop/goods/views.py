@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import FormMixin
-
+from django.conf import settings
 from account.models import Profile
 from goods.forms import RatingSetForm, CommentProductForm
 from cart.forms import CartQuantityForm
@@ -13,6 +13,12 @@ from decimal import Decimal
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from .utils import GoodsContextMixin
+import redis
+
+# инициализация Redis
+r = redis.Redis(host=settings.REDIS_HOST,
+                port=settings.REDIS_PORT,
+                db=settings.REDIS_DB)
 
 
 class ProductListView(ListView, GoodsContextMixin):
@@ -34,7 +40,7 @@ class ProductListView(ListView, GoodsContextMixin):
 
     def get_queryset(self):
         if 'category_slug' in self.kwargs:  # если передана категория
-            return super(ProductListView, self).get_queryset().filter(category__slug=self.kwargs['category_slug'])
+            return super().get_queryset().filter(category__slug=self.kwargs['category_slug'])
         return super().get_queryset()
 
 
@@ -49,6 +55,10 @@ class ProductDetailView(FormMixin, DetailView):
     context_object_name = 'product'
     form_class = RatingSetForm  # форма добавляется из FormMixin
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.object = None
+
     def get_success_url(self):
         """
         Возвращает URL для перехода после обработки валидной формы
@@ -57,10 +67,12 @@ class ProductDetailView(FormMixin, DetailView):
                                                        'product_slug': self.kwargs['product_slug']})
 
     def get_context_data(self, **kwargs):
-        context = super(ProductDetailView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['rating_form'] = self.form_class  # добавляем форму рейтинга в контекст
         context['comment_form'] = CommentProductForm()  # добавляем форму комментария в контекст
         context['quantity_form'] = CartQuantityForm()  # добавляем форму кол-ва товаров в контекст
+        # получение всех объектов Profile, которые комментировали текущий товар (оптимизация!!)
+        context['comments'] = self.object.comments.select_related('profile').order_by('-created')
         # если пользователь аутентифицирован, то заполнить имя, почту в форме отправки комментария
         if self.request.user.is_authenticated:
             context['comment_form'].fields['user_name'].initial = self.request.user.first_name
@@ -112,6 +124,17 @@ class ProductDetailView(FormMixin, DetailView):
                 return self.form_valid(form)
             else:
                 return self.form_invalid(form)
+
+    def get(self, request, *args, **kwargs):
+        """
+        Метод используется для увеличения кол-ва
+        просмотров текущего товара при переходе на
+        детальную информацию о нем
+        """
+        self.object = self.get_object()
+        # увеличение кол-ва просмотров товара на 1 при его просмотре
+        r.hincrby(f'product_id:{self.object.pk}', 'views', 1)
+        return super().get(request, *args, **kwargs)
 
 
 class FavoriteListView(ListView):
@@ -248,3 +271,52 @@ def new_list(request):
     products = page_obj.object_list  # список товаров на выбранной странице
     return render(request, 'goods/new.html', {'products': products,
                                               'page_obj': page_obj})
+
+
+def popular_list(request, category_slug: str = None):
+    """
+    Список популярных товаров из категории category_slug
+    или список таких товаров со всех категорий на сайте
+    """
+    category_name = ''
+    page = request.GET.get('page')  # получаем текущую страницу из запроса
+
+    amount_products = r.llen('products_ids')  # кол-во id товаров на сайте
+    products_ids = [int(pk) for pk in r.lrange('products_ids', 0, amount_products)]  # получение этих id
+
+    # получение всех товаров и связанных с ними категорий и сортировка их по полученных id
+    products = Product.objects.select_related('category').in_bulk(products_ids)
+    # словарь с ключами id товара и значениями кол-ва его просмотров и категории товара
+    # {pk: {category: str, views: int}}
+    products_views = {}
+    for pk, product in zip(products_ids, (products[p] for p in products_ids)):
+        products_views[pk] = {
+            'views': int(r.hget(f'product_id:{pk}', 'views') or 0),
+            'category': product.category.slug
+        }
+
+    # сортировка словаря по уменьшению кол-ва просмотров
+    products_views_sorted = {
+        pk: {'views': data['views'], 'category': data['category']}
+        for pk, data in sorted(products_views.items(), key=lambda x: x[1]['views'], reverse=True)
+    }
+
+    products_ids_sorted = [pk for pk in products_views_sorted.keys()]  # ключи отсортированных товаров
+    # словарь с отсортированными товарами по кол-ву просмотров
+    products = Product.objects.in_bulk(products_ids_sorted)
+
+    if category_slug:  # фильтр товаров по категории
+        product_list = [
+            products[pk] for pk in products_ids_sorted
+            if category_slug in products_views_sorted[pk]['category']
+        ]
+        category_name = Category.objects.get(slug=category_slug)
+    else:
+        product_list = [products[pk] for pk in products_ids_sorted]
+    # пагинация списка товаров
+    page_obj = get_page_obj(per_pages=2, page=page, queryset=product_list)
+    products = page_obj.object_list
+
+    return render(request, 'goods/popular_list.html', {'products': products,
+                                                       'page_obj': page_obj,
+                                                       'category_name': category_name})

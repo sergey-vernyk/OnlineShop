@@ -1,3 +1,5 @@
+from typing import Union
+
 from django.db.models import QuerySet
 from decimal import Decimal
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage, Page
@@ -22,7 +24,7 @@ def distribute_properties_from_request(properties: list) -> dict:
     return dict_props
 
 
-def get_page_obj(per_pages: int, page: int, queryset: QuerySet) -> Page:
+def get_page_obj(per_pages: int, page: int, queryset: Union[QuerySet, list]) -> Page:
     """
     Функция принимает кол-во товаров на одной странице,
     текущую страницу и товары, которые необходимо отобразить.

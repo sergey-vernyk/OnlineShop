@@ -57,10 +57,10 @@
         <div class="col-md-8 col-lg-6">
             <div class="card shadow-0 border" style="background-color: #f0f2f5;">
                 <div class="card-body p-4">
-                    {% with object.comments.all.count as total_comments %}
+                    {% with product.comments.all.count as total_comments %}
                         <h4>Total {{ total_comments }} comment{{ total_comments|pluralize }}</h4>
                     {% endwith %}
-                    {% for comment in object.comments.all %}
+                    {% for comment in comments %}
                         <div class="card mb-4">
                             <div class="card-body">
                                 <p>Comment #{{ forloop.counter }} by {{ comment.user_name }}</p>

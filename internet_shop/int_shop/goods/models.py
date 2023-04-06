@@ -1,3 +1,5 @@
+import redis
+from django.conf import settings
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.urls import reverse
@@ -5,6 +7,10 @@ from decimal import Decimal
 from django.utils import timezone
 
 from account.models import Profile
+
+r = redis.Redis(host=settings.REDIS_HOST,
+                port=settings.REDIS_PORT,
+                db=settings.REDIS_DB)
 
 
 def product_image_path(instance, filename):
@@ -47,6 +53,14 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        """
+        Переопределение метода, что бы добавить id созданного
+        товара в список со всеми id товаров, которые хранятся в БД Redis
+        """
+        super().save(*args, **kwargs)
+        r.lpush('products_ids', self.pk)
 
     def get_absolute_url(self):
         return reverse('goods:product_detail', args=(self.pk, self.slug))

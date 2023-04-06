@@ -30,6 +30,7 @@ SECRET_KEY = 'django-insecure-#3zoxjm74+ulis&afz#b@*15&6u1eq3t48mi1)jxwcv&r63v4!
 DEBUG = True
 
 ALLOWED_HOSTS = []
+INTERNAL_IPS = ['127.0.0.1']
 
 # Application definition
 
@@ -42,9 +43,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'goods.apps.GoodsConfig',
     'django_bootstrap5',
     'django_extensions',
+    'debug_toolbar',
+
+    'goods.apps.GoodsConfig',
     'orders.apps.OrdersConfig',
     'coupons.apps.CouponsConfig',
     'present_cards.apps.PresentCardsConfig',
@@ -61,6 +64,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'int_shop.urls'
@@ -172,3 +176,16 @@ FROM_EMAIL = env('FROM_EMAIL')
 
 #  длительность валидности ссылки для сброса пароля
 PASSWORD_RESET_TIMEOUT = 14400
+
+# конфигурация кеша на основе Redis
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379',
+    }
+}
+
+# конфигурация Redis в качестве БД
+REDIS_PORT = 6379
+REDIS_HOST = '127.0.0.1'
+REDIS_DB = 2

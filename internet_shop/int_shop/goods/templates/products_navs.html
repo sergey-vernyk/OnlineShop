@@ -10,7 +10,9 @@
         </li>
     {% endif %}
     <li class="nav-item">
-        <a class="nav-link border rounded" href="#">Popular</a>
+        <a class="nav-link border rounded"
+           href="{% if category %}{% url 'goods:popular_list_by_category' category.slug %}{% else %}{% url 'goods:popular_list' %}{% endif %}">Popular
+        </a>
     </li>
     <li class="nav-item">
         <a class="nav-link border rounded" href="{% url 'goods:new_list' %}">New</a>

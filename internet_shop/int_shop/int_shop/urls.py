@@ -29,6 +29,7 @@ urlpatterns = [
     path('coupons/', include('coupons.urls')),
     path('present_card/', include('present_cards.urls')),
     path('payment/', include('payment.urls')),
+    path('__debug__/', include('debug_toolbar.urls')),
 ]
 
 if settings.DEBUG:  # сохранение файлов по этому адресу будет происходить только в режиме разработки
