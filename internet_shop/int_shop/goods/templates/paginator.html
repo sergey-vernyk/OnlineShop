@@ -2,15 +2,17 @@
 
 <ul class="pagination my-2">
     <!--Если есть предыдущая страница-->
-        {% if page_obj.has_previous %}
-        <li class="page-item">
-            {% if place == 'prod_list' %}
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" tabindex="-1" aria-disabled="true">Prev</a>
-            {% elif place == 'filter_list' %}
-                <a class="page-link" href="{% url 'goods:filter_results_list' category.slug page_obj.previous_page_number %}{{ request|split:1 }}" tabindex="-1" aria-disabled="true">Prev</a>
-            {% elif place == 'promotion_list' or place == 'new_list' or place == 'popular_list' %}
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" tabindex="-1" aria-disabled="true">Prev</a>
-            {% endif %}
+    {% if page_obj.has_previous %}
+    <li class="page-item">
+        {% if place == 'prod_list' and not sorting %}
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" tabindex="-1" aria-disabled="true">Prev</a>
+        {% elif place == 'prod_list' and sorting %}
+            <a class="page-link" href="{% url 'goods:product_ordering' category.slug|default:'all' page_obj.previous_page_number %}{{ request|split:1 }}" tabindex="-1" aria-disabled="true">Prev</a>
+        {% elif place == 'filter_list' %}
+            <a class="page-link" href="{% url 'goods:filter_results_list' category.slug page_obj.previous_page_number %}{{ request|split:1 }}" tabindex="-1" aria-disabled="true">Prev</a>
+        {% elif place == 'promotion_list' or place == 'new_list' or place == 'popular_list' %}
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" tabindex="-1" aria-disabled="true">Prev</a>
+        {% endif %}
         </li>
     {% else %}
         <li class="page-item disabled">
@@ -25,8 +27,10 @@
             </li>
         {% elif p >= page_obj.number|add:-3 and p <= page_obj.number|add:3 %}
             <li class="page-item">
-                {% if place == 'prod_list' %}
+                {% if place == 'prod_list' and not sorting %}
                     <a class="page-link" href="?page={{ p }}" tabindex="-1" aria-disabled="true">{{ p }}</a>
+                {% elif place == 'prod_list' and sorting %}
+                    <a class="page-link" href="{% url 'goods:product_ordering' category.slug|default:'all' p %}{{ request|split:1 }}" tabindex="-1" aria-disabled="true">{{ p }}</a>
                 {% elif place == 'filter_list' %}
                     <a class="page-link" href="{% url 'goods:filter_results_list' category.slug p %}{{ request|split:1 }}" tabindex="-1" aria-disabled="true">{{ p }}</a>
                 {% elif place == 'promotion_list' or place == 'new_list' or place == 'popular_list' %}
@@ -38,8 +42,10 @@
     <!--Если есть следующая страница-->
     {% if page_obj.has_next %}
         <li class="page-item">
-            {% if place == 'prod_list' %}
+            {% if place == 'prod_list' and not sorting %}
                 <a class="page-link" href="?page={{ page_obj.next_page_number }}" tabindex="-1" aria-disabled="true">Next</a>
+            {% elif place == 'prod_list' and sorting %}
+                <a class="page-link" href="{% url 'goods:product_ordering' category.slug|default:'all' page_obj.next_page_number %}{{ request|split:1 }}" tabindex="-1" aria-disabled="true">Next</a>
             {% elif place == 'filter_list' %}
                 <a class="page-link" href="{% url 'goods:filter_results_list' category.slug page_obj.next_page_number %}{{ request|split:1 }}" tabindex="-1" aria-disabled="true">Next</a>
             {% elif place == 'promotion_list' or place == 'new_list' or place == 'popular_list' %}

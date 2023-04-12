@@ -14,8 +14,28 @@
             </div>
             <div class="col border px-0 shadow-sm">
                 {% include 'products_navs.html' with category=category %}
+                <div class="d-flex justify-content-between border-bottom pb-1 my-2">
+                    <div class="breadcrumbs">
+                        For breadcrumbs
+                    </div>
+                    <div class="sorting">
+                        <form action="{% url 'goods:product_ordering' category.slug|default:'all' page_obj.number %}"
+                              id="sorting-form" onchange="formSubmit()">
+                            <label for="sorting_id">{{ sorting_by_price.sorting.label_tag }}</label>
+                            <select name="sort" id="sorting_id" onchange="checkSelect()">
+                                <!--Перебор всех полей для сортировки-->
+                                {% for k, v in sorting_by_price.fields.sorting.choices %}
+                                    <option id="opt-{{ forloop.counter }}"
+                                            {% if selected_sort == k %}selected{% endif %}
+                                            value="{{ k }}">{{ v }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </form>
+                    </div>
+                </div>
                 <div class="row h-100">
-                    <div class="col m-3">
+                    <div id="productData" class="col m-3">
                         {% for product in products %}
                             {% include 'goods/product/card.html' with product=product %}
                         {% endfor %}
@@ -31,12 +51,12 @@
     {% if is_paginated %}
         <div class="row">
             <div class="d-flex justify-content-center my-2">
-                {% include 'paginator.html' with place='prod_list' %}
+                {% include 'paginator.html' with place='prod_list' sorting=is_sorting %}
             </div>
         </div>
     {% endif %}
     <!--Появление/исчезновение меню фильтра для главной страницы-->
     <script src="{% static 'js/slide_filters.js' %}"></script>
-
+    <script src="{% static 'js/ordering_products.js' %}"></script>
 </main>
 {% endblock %}

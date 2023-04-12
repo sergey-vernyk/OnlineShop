@@ -67,7 +67,7 @@ class ProfileAdmin(admin.ModelAdmin):
     """
     list_display = ['user', 'gender', 'email_confirm']
     fields = ('profile_full_name', 'user', 'date_of_birth',
-              'gender', 'user_photo_tag', 'created',
+              'gender', 'user_photo_tag', 'photo', 'created',
               'about', 'coupons')
     inlines = [FavoriteInline, CommentInline, PresentCardInline, OrdersInline]
     readonly_fields = ['user', 'user_photo_tag', 'created', 'profile_full_name']

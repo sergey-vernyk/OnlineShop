@@ -1,10 +1,13 @@
+import math
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import FormMixin
 from django.conf import settings
 from account.models import Profile
-from goods.forms import RatingSetForm, CommentProductForm
+from django.views.decorators.http import require_POST
+from django.http.response import JsonResponse
+from goods.forms import RatingSetForm, CommentProductForm, SortByPriceForm
 from cart.forms import CartQuantityForm
 from goods.logic import distribute_properties_from_request, get_page_obj
 from goods.models import Product, Category, Favorite
@@ -23,7 +26,7 @@ r = redis.Redis(host=settings.REDIS_HOST,
 
 class ProductListView(ListView, GoodsContextMixin):
     """
-    Список все товаров
+    Список всех товаров
     """
     model = Product
     template_name = 'goods/product/list.html'
@@ -36,6 +39,7 @@ class ProductListView(ListView, GoodsContextMixin):
             context['category'] = Category.objects.get(slug=self.kwargs.get('category_slug'))
             context = self.add_to_context(context, self.kwargs)
 
+        context['sorting_by_price'] = SortByPriceForm()
         return context
 
     def get_queryset(self):
@@ -73,6 +77,8 @@ class ProductDetailView(FormMixin, DetailView):
         context['quantity_form'] = CartQuantityForm()  # добавляем форму кол-ва товаров в контекст
         # получение всех объектов Profile, которые комментировали текущий товар (оптимизация!!)
         context['comments'] = self.object.comments.select_related('profile').order_by('-created')
+        # получение всех объектов Property, которые принадлежат текущему товару (оптимизация!!)
+        context['properties'] = self.object.properties.select_related('category_property')
         # если пользователь аутентифицирован, то заполнить имя, почту в форме отправки комментария
         if self.request.user.is_authenticated:
             context['comment_form'].fields['user_name'].initial = self.request.user.first_name
@@ -110,20 +116,20 @@ class ProductDetailView(FormMixin, DetailView):
                 return self.form_valid(form)
             else:
                 return self.form_invalid(form)
-        # если был поставлен рейтинг
-        elif 'rating_sent' in request.POST:
-            form = self.get_form(form_class=RatingSetForm)
-            if form.is_valid():
-                current_rating = self.object.rating
-                rating = form.cleaned_data.get('star')
-                if not current_rating:
-                    self.object.rating = Decimal(rating)
-                else:  # расчет среднего рейтинга товара
-                    self.object.rating = round((rating + current_rating) / 2, 1)
-                self.object.save()  # сохранение в базе
-                return self.form_valid(form)
-            else:
-                return self.form_invalid(form)
+        # # если был поставлен рейтинг
+        # elif 'rating_sent' in request.POST:
+        #     form = self.get_form(form_class=RatingSetForm)
+        #     if form.is_valid():
+        #         current_rating = self.object.rating
+        #         rating = form.cleaned_data.get('star')
+        #         if not current_rating:
+        #             self.object.rating = Decimal(rating)
+        #         else:  # расчет среднего рейтинга товара
+        #             self.object.rating = round((rating + current_rating) / 2, 1)
+        #         self.object.save()  # сохранение в базе
+        #         return self.form_valid(form)
+        #     else:
+        #         return self.form_invalid(form)
 
     def get(self, request, *args, **kwargs):
         """
@@ -273,7 +279,7 @@ def new_list(request):
                                               'page_obj': page_obj})
 
 
-def popular_list(request, category_slug: str = None):
+def popular_list(request, category_slug: str = None):  # TODO refactoring
     """
     Список популярных товаров из категории category_slug
     или список таких товаров со всех категорий на сайте
@@ -320,3 +326,61 @@ def popular_list(request, category_slug: str = None):
     return render(request, 'goods/popular_list.html', {'products': products,
                                                        'page_obj': page_obj,
                                                        'category_name': category_name})
+
+
+def product_ordering(request, category_slug: str = 'all', page: int = 1):
+    """
+    Сортировка товаров по цене, asc и desc
+    """
+    products = None
+    category = None
+    sort = None
+    sorting_by_price = SortByPriceForm()  # добавляем пустую форму на страницу после её подтверждения
+
+    if request.method == 'GET':
+        sort = request.GET.get('sort')
+
+        if sort == 'p_asc' or sort == 'p_desc':
+            if category_slug != 'all':  # если передана категория
+                category = Category.objects.get(slug=category_slug)
+                products = Product.objects.filter(category=category).order_by('price' if sort == 'p_asc' else '-price')
+            else:
+                products = Product.objects.all().order_by('price' if sort == 'p_asc' else '-price')
+        else:
+            products = Product.objects.all()
+
+    # пагинация
+    page_obj = get_page_obj(per_pages=1, page=page, queryset=products)
+    products = page_obj.object_list
+
+    return render(request, 'goods/product/list.html', {'products': products,
+                                                       'category': category,
+                                                       'sorting_by_price': sorting_by_price,
+                                                       'selected_sort': sort,
+                                                       'page_obj': page_obj,
+                                                       'is_paginated': page_obj.has_other_pages(),
+                                                       'is_sorting': True,
+                                                       })
+
+
+@require_POST
+def set_product_rating(request):
+    """
+    Функция выставляет рейтинг товара
+    при помощи запроса ajax
+    """
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+
+    if is_ajax:
+        star = Decimal(request.POST.get('star'))
+        product_id = request.POST.get('product_id')
+        product = Product.objects.get(pk=product_id)
+        current_rating = product.rating
+        if not current_rating:
+            product.rating = Decimal(star)
+        else:  # расчет среднего рейтинга товара
+            current_rating = math.ceil((star + current_rating) / 2)
+            product.rating = current_rating
+        product.save(update_fields=['rating'])  # сохранение в базе
+
+        return JsonResponse({'success': True, 'current_rating': current_rating})

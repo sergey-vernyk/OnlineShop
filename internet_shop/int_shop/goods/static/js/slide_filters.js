@@ -9,7 +9,4 @@ $(document).ready(function() {
     $("#filters-prod").click(function() {
         $(".col-sm-2").fadeToggle(500);
     });
-//    $(".nav > li > a").not("#filters-prod").click(function() {
-//        $(".col-sm-2").fadeOut(700);
-//    });
 });

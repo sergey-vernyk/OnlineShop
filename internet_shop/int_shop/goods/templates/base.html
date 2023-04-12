@@ -5,6 +5,7 @@
     <title>{% block title %}{% endblock %}</title>
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">
     <link href="{% static 'css/base.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
     {% load django_bootstrap5 %}
     {% bootstrap_css %}
@@ -14,11 +15,11 @@
 
 <div class="content">
     <nav class="navbar navbar-expand-md" id="main-navbar">
-        <div class="container-fluid">
+        <div class="container-fluid" style="min-width: 1700px; position: relative;">
             <a class="navbar-brand" href="{% url 'goods:product_list' %}">
                 <img src="{% static 'img/logo.jpg' %}" alt="Intershop" style="width:50px;" class="rounded-pill">
             </a>
-            <ul class="navbar-nav me-5">
+            <ul class="navbar-nav" style="position: absolute;left: 100px;">
                 {% for c in categories %}
                     <li class="nav-item">
                         <a {% if category.slug == c.slug %}
@@ -31,56 +32,60 @@
                     </li>
                 {% endfor %}
             </ul>
+            <!--Панель с именем пользователя и кнопками регистрации или авторизации-->
             {% if request.user.is_authenticated %}
-            <div class="d-flex align-items-center">
-                <div class="p-1">
-                    <p class="lead text-white fs-6 mb-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
-                             class="bi bi-person" viewBox="0 0 16 16">
-                            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1
-                         0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29
-                          0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z"/>
-                        </svg>
-                        Hello, {{ request.user.first_name }}
-                    </p>
+                <div class="user-panel">
+                    <div class="p-1">
+                        <p class="lead text-white fs-6 mb-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                                 class="bi bi-person" viewBox="0 0 16 16">
+                                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1
+                             0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29
+                              0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z"/>
+                            </svg>
+                            Welcome, {{ request.user.first_name }}
+                        </p>
+                    </div>
+                    <div class="p-1">
+                        <a class="btn btn-info btn-sm" role="button" href="{% url 'logout' %}">Logout</a>
+                    </div>
                 </div>
-                <div class="p-1">
-                    <a class="btn btn-info btn-sm" role="button" href="{% url 'logout' %}">Logout</a>
-                </div>
-            </div>
-            <div class="d-flex flex-column align-items-center">
-                <div class="p-1 border border-primary rounded p-2">
-                    <a class="text-decoration-none" type="button" href="{% url 'cart:cart_detail' %}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
-                             class="bi bi-basket" viewBox="0 0 16 16">
-                            <path d="M5.757 1.071a.5.5 0 0 1 .172.686L3.383 6h9.234L10.07 1.757a.5.5 0 1 1 .858-.514L13.783 6H15a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1v4.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 13.5V9a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h1.217L5.07 1.243a.5.5 0 0 1 .686-.172zM2 9v4.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V9H2zM1 7v1h14V7H1zm3 3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 4 10zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 6 10zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 8 10zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 1 .5-.5zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 1 .5-.5z"/>
-                        </svg>
+            <!--Корзина-->
+                <div class="cart-panel">
+                    <div class="cart-button">
+                        <a type="button" href="{% url 'cart:cart_detail' %}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                                 class="bi bi-basket" viewBox="0 0 16 16">
+                                <path d="M5.757 1.071a.5.5 0 0 1 .172.686L3.383 6h9.234L10.07 1.757a.5.5 0 1 1 .858-.514L13.783 6H15a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1v4.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 13.5V9a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h1.217L5.07 1.243a.5.5 0 0 1 .686-.172zM2 9v4.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V9H2zM1 7v1h14V7H1zm3 3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 4 10zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 6 10zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 8 10zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 1 .5-.5zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 1 .5-.5z"/>
+                            </svg>
+                            <span class="amount-cart">
+                                {% if cart %}
+                                    {{ cart.get_amount_items_in }}
+                                {% else %}
+                                    0
+                                {% endif %}
+                            </span>
+                        </a>
+                    </div>
+                    <div class="total-price">
                         {% if cart %}
-                            {{ cart.get_amount_items_in }}
-                        {% else %}
-                        0
+                            ${{ cart.get_total_price_with_discounts }}
                         {% endif %}
-                    </a>
-<!--                    <div class="d-inline">-->
-<!--                        Cart-->
-<!--                    </div>-->
+                    </div>
                 </div>
-                <div class="p-1">
-                    {% if cart %}
-                        ${{ cart.get_total_price_with_discounts}}
-                    {% endif %}
-                </div>
-            </div>
             {% else %}
-            <div class="btn-toolbar" role="toolbar">
-                <a class="btn btn-info btn-sm me-2" role="button" href="{% url 'login' %}">Sign in</a>
-                <a class="btn btn-success btn-sm" role="button" href="{% url 'register_user' %}">Sign up</a>
-            </div>
+                <div class="authorization" role="toolbar">
+                    <div class="register">
+                        <p>Don't have an account? &gt</p>
+                        <a id="register-button" href="{% url 'register_user' %}">Register</a>
+                    </div>
+                    <a id="login-button" role="button" href="{% url 'login' %}">Sign in</a>
+                </div>
             {% endif %}
         </div>
     </nav>
     <div class="row search-bar">
-        <div class="d-flex justify-content-center my-3">
+        <div class="d-flex justify-content-center my-3" style="position: relative;bottom: 8px;">
             <form class="d-flex" style="width: 500px">
                 <input class="form-control me-2" type="text" placeholder="Search">
                 <button class="btn btn-primary" type="button">Search</button>

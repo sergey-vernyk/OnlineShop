@@ -12,6 +12,6 @@ def cut_after_decimal_point(number: Decimal) -> str:
     а иначе возвращается значение с десятичной частью
     """
     number_parts = str(number).split('.')
-    if number_parts[1] == '00':
+    if number_parts[1] == '00' or number_parts[1] == '0':
         return number_parts[0]
     return str(number)

@@ -1,95 +1,171 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load cut_fraction_part %}
+{% load calculate_amount_dots %}
 
-{% block title %}Product {{ object.name }} | OnlineShop{% endblock %}
+{% block title %}Product {{ product.name }} | OnlineShop{% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-4">
-    <h1>{{ object.name }}</h1>
-    <div class="d-inline-block p-2">
-        <img src="{% if object.image %}{{ object.image.url }}{% else %}{% static 'img/no_image.png' %}{% endif %}" class="img-fluid mb-5" alt="product_image" width="300" height="230">
-         <a class="btn btn-info" role="button"
-            href="{% if not is_in_favorite %}
-                        {% url 'goods:add_or_remove_product_favorite' action='add' product_pk=object.id %}
-                    {% elif is_in_favorite %}
-                        {% url 'goods:add_or_remove_product_favorite' action='remove' product_pk=object.id %}
-                    {% else %}
-                        {% url 'login' %}
-                    {% endif %}">   {% if is_in_favorite %}
-                                        Remove from Favorite
-                                    {% else %}
-                                        Add to Favorite
-                                    {% endif %}
-        </a>
+    <div class="d-flex-fill bookmark-navs">
+        <ul class="nav nav-tabs nav-justified">
+            <li class="nav-item">
+                <a class="nav-link" href="#specification">Specification</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#comments">Comments</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#full-information">Full information</a>
+            </li>
+        </ul>
     </div>
-
-    <div class="d-inline-block">
-        <form action="{% url 'cart:cart_add' object.id %}" method="post">
-            {% csrf_token %}
-            {{ quantity_form.as_p }}
-            {{ quantity_form.errors }}
-            <button type="submit" class="btn btn-info">Add to cart</button>
-        </form>
-    </div>
-    
-    <h4>Current rating: {{ object.rating }}</h4>
-    <form action="{% url 'goods:product_detail' object.pk object.slug %}" method="post">
-        {% csrf_token %}
-        {{ rating_form.star }}
-        {{ rating_form.star.errors }}
-        <input type="submit" name="rating_sent" class="btn btn-success mt-2" value="Submit">
-    </form>
-    <h4 align="center">Product characteristics:</h4>
-    <ul class="list-group list-group-flush">
-        {% for property in product.properties.all %}
-            <div class="row justify-content-between">
-                <div class="col-4">
-                    <li class="list-group-item list-group-item-dark">{{ property.name }}</li>
-                </div>
-                <div class="col-4">
-                    <li class="list-group-item list-group-item-success">{{ property.value }} {{ property.units }}</li>
+    <div class="container-fluid mt-4 px-4">
+        <div class="row">
+            <div class="col-5 border-end border-2 my-3" style="min-width: 860px;">
+                <h1 class="text-center" style="font-weight: 800;">{{ product.name }}</h1>
+                <div class="product-photos">
+                    <!--Отображение двух фото в большем разрешении-->
+                    {% for photo in product.get_all_product_photos %}
+                        <img src="{% get_media_prefix %}products_{{ product.name }}/Detail_photos/{{ photo }}" width="400" height="400"/>
+                    {% endfor %}
                 </div>
             </div>
-        {% endfor %}
-    </ul>
-    <!--комментарии-->
-    <div class="row d-flex justify-content-left">
-        <div class="col-md-8 col-lg-6">
-            <div class="card shadow-0 border" style="background-color: #f0f2f5;">
-                <div class="card-body p-4">
-                    {% with product.comments.all.count as total_comments %}
-                        <h4>Total {{ total_comments }} comment{{ total_comments|pluralize }}</h4>
-                    {% endwith %}
-                    {% for comment in comments %}
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <p>Comment #{{ forloop.counter }} by {{ comment.user_name }}</p>
-                                <p>{{ comment.body }}</p>
-                                <div class="d-flex justify-content-between">
-                                    <div class="d-flex flex-row align-items-center">
-                                        {% if comment.profile.photo %}
-                                            <img src="{{ comment.profile.photo.url }}" alt="avatar" width="25" height="25" />
-                                        {% endif %}
-                                        <p class="small mb-0 ms-2">{{ comment.user_name }}</p>
+            <div class="col-2" style="min-width: 212px;">
+                <!--Добавление товара в избранное-->
+                <div class="prod-buttons">
+                    <div class="d-block m-2 p-1">
+                        <div class="add-to-favorite">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+                                <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357
+                                 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333
+                                  4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+                            </svg>
+                            <a class="add-to-favorite" role="button"
+                               href="{% if not is_in_favorite %} {% url 'goods:add_or_remove_product_favorite' action='add' product_pk=product.id %}
+                                        {% elif is_in_favorite %}
+                                            {% url 'goods:add_or_remove_product_favorite' action='remove' product_pk=product.id %}
+                                        {% else %}
+                                            {% url 'login' %}
+                                        {% endif %}">{% if is_in_favorite %} Remove from Favorite {% else %} Add to Favorite {% endif %}
+                            </a>
+                        </div>
+                    </div>
+                    <!--Форма для добавления товара в корзину-->
+                    <form class="d-block m-2 p-1" action="{% url 'cart:cart_add' product.id %}" method="post">
+                        {% csrf_token %}
+                        {{ quantity_form.quantity }}
+                        <button id="add-to-cart" type="submit">Add to cart</button>
+                    </form>
+                    <!--Рейтинг товара-->
+                    <div class="d-block m-2 p-1">
+                        <!--                <span class="d-inline">{{ product.rating }}</span>-->
+                        <form id="rating-form" class="d-block my-2" action="{% url 'goods:set_product_rating' %}"
+                              onchange="formSubmit(action, {{ product.pk }})" method="post">
+                            {% csrf_token %}
+                            <select id="star_id" onchange="checkSelect()">
+                                {% for k, v in rating_form.fields.star.choices %}
+                                    <option id="opt-star-{{ forloop.counter }}"
+                                        {% if selected_sort == k %}selected{% endif %}
+                                            value="{{ k }}">{{ v }}
+                                    </option>
+                                {% endfor %}
+                                <input type="hidden" name="rating_sent">
+                            </select>
+                        </form>
+                        <!--Отображение рейтинга в форме звезд-->
+                        <div class="d-block my-2 rating-star">
+                            {% for i in '12345'|make_list %}
+                                {% if product.rating|cut_fraction >= i %}
+                                    <span id="star-{{ i }}" class="fa fa-star checked"></span>
+                                {% else %}
+                                    <span id="star-{{ i }}" class="fa fa-star"></span>
+                                {% endif %}
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--Свойства-->
+        <h4 id="specification" align="center" class="headers-detail">Specifications</h4>
+        <div id="prod-props" class="container">
+            {% for property in properties %}
+                <table class="table mb-0">
+                    {% ifchanged %}
+                        <thead>
+                            <th scope="col" colspan="3" class="text-center">{{ property.category_property.name }}</th>
+                        </thead>
+                    {% endifchanged %}
+                    <tr>
+                        <td class="align-middle" style="width: 150px;" align="left">{{ property.name }}</td>
+                        <td class="align-middle" style="width: 700px;">
+                            {{700|amount_dots}}
+                        </td>
+                        <td class="text-center align-middle" style="width: 300px;">
+                            {% if property.detail_description %}
+                                {{ property.detail_description }}
+                            {% elif property.text_value %}
+                                {{ property.text_value }} {{ property.units }}
+                            {% elif property.numeric_value %}
+                                {{ property.numeric_value|cut_fraction }} {{ property.units }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+            {% endfor %}
+        </div>
+        <!--комментарии-->
+        <h4 id="comments" align="center" class="headers-detail">Comments</h4>
+        <div class="container-fluid">
+            <div class="row" style="min-width: 1025px;">
+                <div class="col m-2" style="min-width: 1020px; max-width: 1020px;">
+                    <div class="card">
+                        <div class="card-body shadow" style="opacity: 0.8; border: blanchedalmond solid 1px; border-radius: 10px;min-width: 980px;">
+                        {% with comments.count as total_comments %}
+                            <h5 class="count">Comments ({{ total_comments }})</h5>
+                        {% endwith %}
+                        {% for comment in comments %}
+                            <div class="comment-body">
+                                <div class="userinfo">
+                                    <div class="username">{{ comment.user_name }}</div>
+                                    <div class="userphoto">
+                                        <img src="{% if comment.profile.photo %}{{ comment.profile.photo.url }}{% else %}{% static 'img/no_user_photo.png' %}{% endif %}" />
                                     </div>
                                 </div>
+                                <span class="date">{{ comment.created|date:"l, d/m/Y" }}</span>
+                                <div class="comment-text">
+                                    <p>{{ comment.body }}</p>
+                                </div>
                             </div>
-                        </div>
-                    {% endfor %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col m-2" style="height: 350px; min-width: 500px; max-width: 1020px;">
+                <div class="post-comment">
+                    <h4 class="text-center">New comment</h4>
+                    <form id="form-comment" action="{% url 'goods:product_detail' object.pk object.slug %}" method="post">
+                        {% csrf_token %}
+                        {% for field in comment_form %}
+                            <div class="d-flex" style="align-items: center; margin-top: 20px;">
+                                <label for="{{ field.id_for_label}}">{{ field.label }}</label>
+                                {{ field }}
+                            </div>
+                            {{ field.errors }}
+                        {% endfor %}
+                        <button type="submit" name="comment_sent" class="btn btn-success">Send comment</button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
-    <h4>Please, type the comment about product...</h4>
-    <form action="{% url 'goods:product_detail' object.pk object.slug %}" method="post">
-        {% csrf_token %}
-        {% for field in comment_form %}
-            {{ field.errors }}
-            {{ field.label_tag }}{{ field }}
-        {% endfor %}
-        <input type="submit" name="comment_sent" class="btn btn-success mt-2" value="Send">
-    </form>
-</div>
-</div>
+    <div class="row d-flex justify-content-left">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-0 border" style="background-color: #f0f2f5;"></div>
+        </div>
+    </div>
+    <h4 id="full-information" align="center" class="headers-detail">Full information</h4>
+    <script src="{% static 'js/set_product_rating.js' %}"></script>
+    </div>
 {% endblock %}
-

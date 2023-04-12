@@ -1,6 +1,6 @@
 from django import forms
 
-from goods.models import Product, Comment, Manufacturer, Property, PropertyCategory
+from goods.models import Product, Comment, Manufacturer
 
 
 class RatingSetForm(forms.ModelForm):
@@ -12,7 +12,7 @@ class RatingSetForm(forms.ModelForm):
         model = Product
         fields = ('star',)
         widgets = {
-            'star': forms.Select(attrs={'class': 'form-control form-control-sm w-25'})
+            'star': forms.Select(attrs={'class': 'form-control form-control'})
         }
 
 
@@ -25,9 +25,9 @@ class CommentProductForm(forms.ModelForm):
         model = Comment
         fields = ('user_name', 'user_email', 'body')
         widgets = {
-            'user_name': forms.TextInput(attrs={'class': 'form-control w-25', 'placeholder': 'Your name'}),
-            'user_email': forms.EmailInput(attrs={'class': 'form-control w-25', 'placeholder': 'example@example.com'}),
-            'body': forms.Textarea(attrs={'class': 'form-control w-50',
+            'user_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your name'}),
+            'user_email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'example@example.com'}),
+            'body': forms.Textarea(attrs={'class': 'form-control',
                                           'rows': 3,
                                           'placeholder': 'Type your review...'}),
         }
@@ -49,3 +49,14 @@ class FilterByManufacturerForm(forms.Form):
         widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
         queryset=Manufacturer.objects.all()
     )
+
+
+class SortByPriceForm(forms.Form):
+    """
+    Форма для сортировки товаров по цене
+    """
+    sorting = forms.ChoiceField(label='Sorting', choices=(
+        ('default', 'Price: Default'),
+        ('p_asc', 'Price: Low To High'),
+        ('p_desc', 'Price: High To Low'),
+    ), widget=forms.Select(attrs={'class': 'form-select'}))

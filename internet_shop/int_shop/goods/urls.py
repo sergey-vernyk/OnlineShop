@@ -16,5 +16,7 @@ urlpatterns = [
          name='user_product_favorites_list'),
     path('goods/favorites/<str:action>/<int:product_pk>', views.add_or_remove_product_favorite,
          name='add_or_remove_product_favorite'),
+    path('goods/ordering/<slug:category_slug>/<int:page>/', views.product_ordering, name='product_ordering'),
+    path('goods/ajax/set_rating/', views.set_product_rating, name='set_product_rating'),
 
 ]

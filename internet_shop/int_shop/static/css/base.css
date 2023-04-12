@@ -1,5 +1,6 @@
 body {
   font-family: 'Source Sans Pro', sans-serif !important;
+  background-image: url("/static/img/19449741.jpg");
 }
 
 .form-select option {
@@ -27,8 +28,9 @@ body {
 }
 
 .search-bar {
-    background-color: #FAF0E6;
+    background-color: #f2f2f2;
     border: solid 1px #BDB76B;
+    height: 60px;
     margin-bottom: 10px;
     box-shadow: 2px 2px 6px 0px rgba(224,215,206,1);
 }
@@ -64,8 +66,13 @@ body {
     font-family:'Comic Sans MS';
     font-size:18px;
     line-height:1.3em;
-    background: rgb(163,120,28);
-    background: linear-gradient(0deg, rgba(163,120,28,1) 47%, rgba(253,187,45,1) 100%);
+    background: linear-gradient(0deg, rgba(51,84,175,1) 41%, rgba(45,46,253,1) 100%);
+    min-width: 85%;
+}
+
+#main-navbar ul a {
+    color: white;
+    font-weight: bold;
 }
 
 .cat-header {
@@ -183,3 +190,357 @@ body {
     text-decoration: none;
     color: #22AB1E;
 }
+
+/*Сортировка товаров*/
+.sorting {
+    padding: 5px 0px 5px 5px;
+    border-radius: 5px;
+
+}
+
+.sorting label {
+    font-weight: bold;
+    font-size: 15px;
+}
+
+#sorting_id {
+    width: 200px;
+    height: 30px;
+    padding: 2px 5px;
+}
+
+/*Таблица с характеристиками товара*/
+.table thead th {
+    font-weight: bold;
+    font-size: 25px;
+    font-family: Georgia, Garamond, serif;
+    background-color: #060AF273;
+}
+
+table tr td {
+    font-family: 'Open Sans', 'Helvetica', sans-serif;
+}
+
+/*контейнер со свойствами товара*/
+#prod-props {
+    border: 2px solid #C8BFBF;
+    padding: 0px;
+    margin: 20px auto 20px auto;
+    border-radius: 10px;
+    min-width: 1140px;
+}
+
+.headers-detail {
+    margin: 15px auto 15px auto;
+    padding: 5px;
+    border-bottom: 1px solid;
+    border-top: 1px solid;
+    font-weight: bold;
+    font-size: 35px;
+}
+
+/*Комментарии*/
+
+.count {
+    font-size: 1.5rem;
+    margin: 10px;
+    padding: 7px;
+    border-bottom: solid 1px #E1DADA;
+}
+
+.userinfo {
+	display: flex;
+    width: 140px;
+    justify-content: space-around;
+    align-items: center;
+    border: 2px solid #F2E5E5;
+    border-radius: 35px;
+}
+
+.username {
+    display: inline;
+    font-weight: bold;
+    font-size: 22px;
+    margin: 5px;
+    padding: 2px;
+}
+
+.userphoto {
+    display: inline;
+    margin: 5px;
+}
+
+.userphoto img {
+    width: 35px;
+    height: 35px;
+    margin: 5px;
+}
+
+.comment-body {
+    margin: 15px 0px 15px 0px;
+    padding: 20px;
+    border: solid 1px #DBD8D8;
+    border-radius: 8px;
+    background-color: #F7F1F1;
+}
+
+.date {
+    font-family: 'Bradley Hand';
+    font-size: 13px;
+    padding: 5px;
+    font-style: italic;
+    text-decoration: underline;
+    margin: 5px;
+    position: relative;
+    left: 780px;
+}
+
+.comment-text p {
+    position: relative;
+    font-family: 'Brush Script Std';
+    font-size: 18px;
+    margin: 0.5rem;
+    padding-top: 1rem;
+    text-indent: 1.5rem;
+    width: 760px;
+    left: 140px;
+    border-top: solid #eee3e3;
+    border-bottom: solid #eee3e3;
+    text-align: justify;
+    padding-bottom: 1rem;
+
+
+}
+
+.comment-text {
+    min-width: 500px;
+}
+
+/*Форма для написания комментария*/
+#form-comment label {
+    font-size: 20px;
+    color: #333;
+    height: 40px;
+    width: 100px;
+    margin-left: 10px;
+    text-align: left;
+    clear: both;
+    float: left;
+    margin-right: 15px;
+    align-items: center;
+}
+
+#form-comment input textarea {
+    height: 40px;
+    width: 300px;
+    border: 1px solid #000;
+    float: left;
+}
+
+.post-comment {
+    padding: 17px;
+    background-color: #fff;
+    opacity: 0.8;
+    opacity: 0.8;
+    border: solid 1px blanchedalmond;
+    border-radius: 10px;
+}
+
+
+.post-comment {
+    position: relative;
+}
+
+#form-comment button {
+    background-color: #F3B539;
+    border: #3C2B0A solid 1px;
+    position: relative;
+    right: 0px;
+    left: 0px;
+    margin-top: 20px;
+    color: black;
+}
+
+/*Вкладки вверху страницы детальной информации о товаре*/
+
+.bookmark-navs {
+    background-color: #E1DDDD;
+}
+
+.bookmark-navs li {
+    font-size: 22px;
+    box-shadow: 0px 3px 5px -3px rgba(0,0,0,0.75);
+
+}
+
+.product-photos {
+    padding: 10px;
+
+}
+
+.product-photos img {
+    padding: 5px;
+}
+
+#add-to-cart {
+    height: 32px;
+    width: 100px;
+    background-color: #63D5CA;
+    border: #53A9A1 solid 1px;
+    border-radius: 8px;
+    margin-left: 5px;
+    color: white;
+}
+
+#id_quantity {
+    border-radius: 5px;
+}
+
+#add-to-cart:hover {
+    background-color: #397D77;
+
+}
+
+.add-to-favorite {
+    display: flex;
+    justify-content: center;
+    background-color: #F37D7D;
+    height: 35px;
+    width: auto;
+    min-width: 205px;
+    align-items: center;
+    padding: 5px;
+    border: #EA6565 solid 1px;
+    border-radius: 8px;
+}
+
+.add-to-favorite:hover {
+    background-color: #CD7373;
+}
+
+.add-to-favorite a {
+    text-decoration: none;
+    color: white;;
+    border: none;
+    min-width: 166px;
+}
+
+.add-to-favorite a:hover {
+    background-color: #CD7373;
+}
+
+
+.prod-buttons {
+    position: relative;
+    top: 174px;
+    bottom: 0px;
+}
+
+#rating-form select {
+    width: 92px;
+}
+
+/*Цвет звезды текущего рейтинга*/
+.rating-star .checked {
+    color: orange;
+}
+
+/*панель пользователя на navbar*/
+
+.user-panel {
+    display: flex;
+    position: absolute;
+    right: 620px;
+    top: 0px;
+    padding: 8px;
+    margin: 5px;
+    align-items: center;
+}
+
+/* Корзина */
+.cart-panel {
+    display: flex;
+    position: absolute;
+    right: 440px;
+    bottom: -10px;
+    align-items: center;
+    margin: 5px;
+    padding: 10px;
+    min-width: 170px;
+}
+
+.cart-button {
+    position: relative;
+    padding: 7px;
+    border: solid 1px white;
+    border-radius: 5px;
+    left: 30px;
+}
+
+.cart-button a {
+    text-decoration: none;
+    color: white;
+}
+
+.cart-button a:hover {
+    color: #A9A7A7;
+}
+
+.amount-cart {
+    margin-left: 8px;
+    margin-right: 8px;
+}
+
+.total-price {
+    position: absolute;
+    color: #F2900F;
+    font-size: 1.2rem;
+    position: absolute;
+    left: 130px;
+    top: 20px;
+}
+
+.authorization {
+    position: relative;
+    bottom: 3px;
+    right: 70px;
+}
+
+.authorization #login-button {
+  border-radius: 5px;
+    text-decoration: none;
+    color: white;
+    margin: 3px;
+    padding: 4px;
+    background-color: #3BB94C;
+    display: inline-block;
+    position: relative;
+    left: 95px;
+    border: solid 1px aqua;
+}
+
+#login-button:hover {
+    background-color: #268833;
+}
+
+.register {
+    padding: 4px;
+}
+
+.register p {
+    display: inline;
+    color: #E29F9F;
+    font-size: 14px;
+}
+
+.register #register-button {
+    display: inline;
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+#register-button:hover {
+    color: #F76C6C;
+}
+

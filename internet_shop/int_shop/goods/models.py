@@ -1,3 +1,5 @@
+import os
+
 import redis
 from django.conf import settings
 from django.db import models
@@ -27,14 +29,13 @@ class Product(models.Model):
     """
 
     class Rating(models.IntegerChoices):
-        ZERO_STARS = 0, '0'
-        ONE_STAR = 1, '1'
-        TWO_STARS = 2, '2'
-        THREE_STARS = 3, '3'
-        FOUR_STARS = 4, '4'
-        FIVE_STARS = 5, '5'
+        ONE_STAR = (1, '1')
+        TWO_STARS = (2, '2')
+        THREE_STARS = (3, '3')
+        FOUR_STARS = (4, '4')
+        FIVE_STARS = (5, '5')
 
-    star = models.IntegerField(choices=Rating.choices, default=Rating.ZERO_STARS, verbose_name='Rating')
+    star = models.IntegerField(choices=Rating.choices, default=Rating.ONE_STAR, verbose_name='Rating')
 
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True)
@@ -47,12 +48,18 @@ class Product(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='products')
-    rating = models.DecimalField(default=0, max_digits=2, decimal_places=1, validators=[MinValueValidator(Decimal(0.0)),
+    rating = models.DecimalField(default=0, max_digits=2, decimal_places=1, validators=[MinValueValidator(Decimal(1.0)),
                                                                                         MaxValueValidator(
                                                                                             Decimal(5.0))])
 
     def __str__(self):
         return self.name
+
+    def get_all_product_photos(self) -> list:
+        """
+        Метод возвращает имена всех фото товара в виде списка
+        """
+        return os.listdir(os.path.join(settings.MEDIA_ROOT, f'products_{self.name}', 'Detail_photos'))
 
     def save(self, *args, **kwargs):
         """
@@ -126,7 +133,7 @@ class Comment(models.Model):
     user_name = models.CharField(max_length=30, verbose_name='Name')
     user_email = models.EmailField(default='', verbose_name='Email')
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='profile_comments', default='')
-    body = models.TextField(verbose_name='Review Text')
+    body = models.TextField(verbose_name='Comment')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -204,7 +211,7 @@ class Property(models.Model):
     text_value = models.CharField(max_length=255, blank=True)
     numeric_value = models.DecimalField(max_digits=6, decimal_places=2, blank=True, default='0.00')
     units = models.CharField(max_length=10, blank=True)
-    detail_description = models.TextField(max_length=255, blank=True)
+    detail_description = models.CharField(max_length=255, blank=True)
     category_property = models.ForeignKey(PropertyCategory,
                                           related_name='category_properties',
                                           on_delete=models.CASCADE,
