@@ -19,10 +19,12 @@
       <span class="fs-4">${{ product.price}}</span>
     </div>
     <div class="d-flex justify-content-center my-2">
-      <form action="{% url 'cart:cart_add' product.id %}" method="post">
+      <form id="add-form-{{ product.id }}" method="post">
         {% csrf_token %}
+        <input type="hidden" name="url" value="{% url 'cart:cart_add' %}">
+        <input type="hidden" name="product_id" value="{{ product.id }}">
         <input type="hidden" name="quantity" value="1">
-        <button class="text-decoration-none buy-btn" type="submit">
+        <button id="add-to-cart-{{ product.id }}" type="submit">
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
                fill="currentColor" class="bi bi-basket me-2" viewBox="0 0 16 16">
             <path d="M5.757 1.071a.5.5 0 0 1 .172.686L3.383 6h9.234L10.07

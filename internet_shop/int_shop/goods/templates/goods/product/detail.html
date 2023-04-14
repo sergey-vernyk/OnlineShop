@@ -51,14 +51,15 @@
                         </div>
                     </div>
                     <!--Форма для добавления товара в корзину-->
-                    <form class="d-block m-2 p-1" action="{% url 'cart:cart_add' product.id %}" method="post">
+                    <form id="add-form-{{ product.id }}" class="d-block m-2 p-1" method="post">
                         {% csrf_token %}
                         {{ quantity_form.quantity }}
-                        <button id="add-to-cart" type="submit">Add to cart</button>
+                        <input type="hidden" name="url" value="{% url 'cart:cart_add' %}">
+                        <input type="hidden" name="product_id" value="{{ product.id }}">
+                        <button id="add-to-cart-{{ product.id }}" type="submit">Add to cart</button>
                     </form>
                     <!--Рейтинг товара-->
                     <div class="d-block m-2 p-1">
-                        <!--                <span class="d-inline">{{ product.rating }}</span>-->
                         <form id="rating-form" class="d-block my-2" action="{% url 'goods:set_product_rating' %}"
                               onchange="formSubmit(action, {{ product.pk }})" method="post">
                             {% csrf_token %}
@@ -73,15 +74,16 @@
                             </select>
                         </form>
                         <!--Отображение рейтинга в форме звезд-->
-                        <div class="d-block my-2 rating-star">
-                            {% for i in '12345'|make_list %}
-                                {% if product.rating|cut_fraction >= i %}
-                                    <span id="star-{{ i }}" class="fa fa-star checked"></span>
-                                {% else %}
-                                    <span id="star-{{ i }}" class="fa fa-star"></span>
-                                {% endif %}
-                            {% endfor %}
-
+                        <div class="rating-star">
+                            {% with product_rating=product.rating %}
+                                {% for i in '12345'|make_list %}
+                                    {% if product_rating|cut_fraction >= i %}
+                                        <span id="star-{{ i }}" class="fa fa-star checked"></span>
+                                    {% else %}
+                                        <span id="star-{{ i }}" class="fa fa-star"></span>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endwith %}
                         </div>
                     </div>
                 </div>
@@ -167,5 +169,6 @@
     </div>
     <h4 id="full-information" align="center" class="headers-detail">Full information</h4>
     <script src="{% static 'js/set_product_rating.js' %}"></script>
+    <script src="{% static 'js/add_to_cart.js' %}"></script>
     </div>
 {% endblock %}

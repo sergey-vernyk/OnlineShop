@@ -1,6 +1,6 @@
 body {
   font-family: 'Source Sans Pro', sans-serif !important;
-  background-image: url("/static/img/19449741.jpg");
+  /*background-image: url("/static/img/19449741.jpg");*/
 }
 
 .form-select option {
@@ -17,15 +17,16 @@ body {
 }
 
 /* кнопка покупки/добавление в корзину */
-.buy-btn {
+/*.buy-btn {
     width: 100px;
+    text-decoration: none;
     background: linear-gradient(to bottom, white, #0066FA);
     text-align: center;
     font-size: 20px;
-    color: black;
+    color: #262525;
     border-radius: 5px;
     height: 40px;
-}
+}*/
 
 .search-bar {
     background-color: #f2f2f2;
@@ -382,27 +383,29 @@ table tr td {
     padding: 5px;
 }
 
-#add-to-cart {
+[id^="add-to-cart-"] {
     height: 32px;
-    width: 100px;
+    width: auto;
+    font-weight: 500;
+    font-size: 20px;
     background-color: #63D5CA;
     border: #53A9A1 solid 1px;
     border-radius: 8px;
-    margin-left: 5px;
-    color: white;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 #id_quantity {
     border-radius: 5px;
 }
 
-#add-to-cart:hover {
+[id^="add-to-cart-"]:hover {
     background-color: #397D77;
 
 }
 
 .add-to-favorite {
-    display: flex;
+    display: inline;
     justify-content: center;
     background-color: #F37D7D;
     height: 35px;
@@ -434,6 +437,7 @@ table tr td {
     position: relative;
     top: 174px;
     bottom: 0px;
+    min-width: 200px;
 }
 
 #rating-form select {
@@ -443,6 +447,8 @@ table tr td {
 /*Цвет звезды текущего рейтинга*/
 .rating-star .checked {
     color: orange;
+    display: inline-block;
+    margin: 5px 0px;
 }
 
 /*панель пользователя на navbar*/
@@ -467,6 +473,14 @@ table tr td {
     margin: 5px;
     padding: 10px;
     min-width: 170px;
+}
+
+.amount-items {
+    font-size: 21px;
+}
+
+.amount-items span {
+    font-weight: bold;
 }
 
 .cart-button {

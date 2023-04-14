@@ -1,23 +1,37 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from cart.cart import Cart
+from .cart import Cart
 from cart.forms import CartQuantityForm
 from coupons.forms import CouponApplyForm
 from coupons.models import Coupon
 from goods.models import Product
 from present_cards.forms import PresentCardApplyForm
 from present_cards.models import PresentCard
+from django.http.response import JsonResponse
+from django.views.decorators.http import require_POST
 
 
-def cart_add(request, product_id: int):
+@require_POST
+def cart_add(request):
     """
     Добавление товара в корзину
     """
-    cart = Cart(request)
-    product = get_object_or_404(Product, id=product_id)
-    form = CartQuantityForm(request.POST)
-    if form.is_valid():
-        cart.add(product, quantity=form.cleaned_data['quantity'])
-    return redirect('cart:cart_detail')
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+
+    if is_ajax:
+        product_id = request.POST.get('product_id')
+        quantity = request.POST.get('quantity')
+
+        cart = Cart(request)
+        product = get_object_or_404(Product, id=product_id)
+        form = CartQuantityForm(request.POST)
+        if form.is_valid():
+            cart.add(product, quantity=int(quantity))
+
+        return JsonResponse({'success': True,
+                             'cart_len': len(cart),
+                             'total_price': cart.get_total_price_with_discounts()})
+    else:
+        return JsonResponse({'error': 'Not ajax request'})
 
 
 def cart_detail(request):
@@ -46,10 +60,19 @@ def cart_detail(request):
                                                 'present_card_form': present_card_form})
 
 
-def cart_remove(request, product_id: int):
+def cart_remove(request):
     """
     Удаление товара с корзины
     """
-    cart = Cart(request)
-    cart.remove(product_id)
-    return redirect('cart:cart_detail')
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+
+    if is_ajax:
+        product_id = request.POST.get('product_id')
+        cart = Cart(request)
+        cart.remove(product_id)
+        return JsonResponse({'success': True,
+                             'cart_len': len(cart),
+                             'total_price': cart.get_total_price_with_discounts()})
+
+    else:
+        return JsonResponse({'error': 'Not ajax request'})

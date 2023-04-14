@@ -9,14 +9,21 @@
 
 <div class="container p-3">
     <h5 class="mb-3">
-        <a class="text-decoration-none text_body" href="{% url 'goods:product_list' %}">Continue shopping</a>
+        <a class="text-decoration-none text_body" href="{% url 'goods:product_list' %}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                 class="bi bi-arrow-left-short" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0
+                 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5z"/>
+            </svg>
+            Continue shopping
+        </a>
     </h5>
     <hr>
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="mb-1">Shopping cart</h2>
-            <p class="mb-0">
-                You have {{ cart.get_amount_items_in }} item{{ cart.get_amount_items_in|pluralize }} in your cart
+            <p class="amount-items">
+                You have <span>{{ cart.get_amount_items_in }}</span> item<span>{{cart.get_amount_items_in|pluralize }}</span> in your cart
             </p>
         </div>
     </div>
@@ -34,17 +41,20 @@
                                                  alt="shopping-item"></a>
                                     </div>
                                     <div class="ms-3">
-                                        <h5><a class="text-decoration-none" href="{{ product.get_absolute_url }}">
-                                            {{ product.name }}
-                                        </a></h5>
+                                        <h5>
+                                            <a class="text-decoration-none" href="{{ product.get_absolute_url }}">
+                                            {{ product.name }}</a>
+                                        </h5>
                                     </div>
                                 </div>
                                 <div class="d-flex flex-row align-items-center">
                                     <div style="width: 140px;">
-                                        <form method="post" action="{% url 'cart:cart_add' product_id=product.id %}">
+                                        <form id="update-form-{{ product.id }}" method="post">
                                             {% csrf_token %}
+                                            <input type="hidden" name="url" value="{% url 'cart:cart_add' %}">
+                                            <input type="hidden" name="product_id" value="{{ product.id }}">
                                             <div class="d-inline">
-                                                <button class="btn btn-info btn-sm" type="submit">Update</button>
+                                                <button id="add-to-cart-{{ product.id }}" class="btn btn-info btn-sm" type="submit">Update</button>
                                             </div>
                                             <div class="d-inline">
                                                 {{ item.quantity_form.quantity }}
@@ -54,7 +64,7 @@
                                     <div style="width: 100px;">
                                         <h5 class="m-0"> ${{ item.total_price }}</h5>
                                     </div>
-                                    <a href="{% url 'cart:cart_remove' product_id=product.id %}">
+                                    <a href="{% url 'cart:cart_remove' %}" data-pk="{{ product.id }}" class="cart-remove">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
                                         <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5
                                         0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2
@@ -149,4 +159,6 @@
         {% endif %}
     </div>
 </div>
+<script src="{% static 'js/add_to_cart.js' %}"></script>
+<script src="{% static 'js/remove_from_cart.js' %}" type="module"></script>
 {% endblock %}

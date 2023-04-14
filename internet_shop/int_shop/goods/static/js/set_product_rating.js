@@ -1,7 +1,8 @@
 $(document).ready(function() {
+    var star;
     //поиск значения выбранной оценки
     checkSelect = function() {
-        var star = $('#star_id').find(':selected').val();
+        star = $('#star_id').find(':selected').val();
     };
     //подтверждение формы при выборе оценки товара
     formSubmit = function(url, product_id) {

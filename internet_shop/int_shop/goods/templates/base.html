@@ -60,7 +60,7 @@
                             </svg>
                             <span class="amount-cart">
                                 {% if cart %}
-                                    {{ cart.get_amount_items_in }}
+                                    {{ cart|length }}
                                 {% else %}
                                     0
                                 {% endif %}
@@ -106,5 +106,6 @@
             <a class="text-white" href="https://mdbootstrap.com/">MDBootstrap.com</a>
         </div>
     </footer>
+    <script src="{% static 'js/add_to_cart.js' %}"></script>
 </body>
 </html>
