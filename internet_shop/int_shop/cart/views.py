@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404
 from .cart import Cart
 from cart.forms import CartQuantityForm
 from coupons.forms import CouponApplyForm

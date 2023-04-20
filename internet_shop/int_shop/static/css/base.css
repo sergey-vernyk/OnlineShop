@@ -1,7 +1,20 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
 body {
   font-family: 'Source Sans Pro', sans-serif !important;
   /*background-image: url("/static/img/19449741.jpg");*/
+  background-color: #EAEAEA !important;
 }
+
+/*#wrapper {
+    margin-left:auto;
+    margin-right:auto;
+    width: 1920px;
+    min-width: 1700px;
+}*/
 
 .form-select option {
     font-size: 15px !important;
@@ -33,6 +46,8 @@ body {
     border: solid 1px #BDB76B;
     height: 60px;
     margin-bottom: 10px;
+    margin-left: 0px !important;
+    margin-right: 0px !important;
     box-shadow: 2px 2px 6px 0px rgba(224,215,206,1);
 }
 
@@ -195,8 +210,6 @@ body {
 /*Сортировка товаров*/
 .sorting {
     padding: 5px 0px 5px 5px;
-    border-radius: 5px;
-
 }
 
 .sorting label {
@@ -237,7 +250,7 @@ table tr td {
     border-bottom: 1px solid;
     border-top: 1px solid;
     font-weight: bold;
-    font-size: 35px;
+    font-size: 30px;
 }
 
 /*Комментарии*/
@@ -463,6 +476,17 @@ table tr td {
     align-items: center;
 }
 
+.user-panel a:nth-child(2) {
+    text-decoration: none;
+    color: white;
+    font-weight: 650;
+    font-style: italic;
+}
+
+.user-panel a:nth-child(2):hover {
+    color: #4DCD66;
+}
+
 /* Корзина */
 .cart-panel {
     display: flex;
@@ -558,3 +582,306 @@ table tr td {
     color: #F76C6C;
 }
 
+/*Страница пользователя*/
+
+.customer-header {
+    padding: 10px;;
+    margin-bottom: 10px;
+    background-color: white;
+    border-radius: 5px;
+}
+
+.sidebar-customer {
+    padding: 0px 10px !important;
+    margin-right: 10px;
+    background-color: white;
+    width: 35% !important;
+    border-radius: 5px;
+    position: relative;
+}
+
+.content-customer {
+    padding: 0px 10px !important;
+    background-color: white;
+    width: 64.2% !important;
+    border-radius: 5px;
+}
+
+.brief-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.brief-info img {
+    margin: 5px;
+    display: inline-block;
+}
+
+.brief-info #customer-full-name {
+    display: flex;
+    align-items: center;
+    font-size: 25px;
+    margin: 0px 10px;
+}
+
+.brief-info .counts {
+    font-size: 1em;
+    font-style: italic;
+    margin-left: 5px;
+}
+
+/*Верхнее меню*/
+.often-use-menu {
+    display: flex;
+    padding: 0.5em;
+    justify-content: space-around;
+}
+
+.often-use-menu ul li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    padding: 5px;
+    font-size: 20px;
+    list-style: none;
+}
+
+.often-use-menu ul {
+    padding-left: 4px;
+    margin-bottom: 0px;
+    padding: 5px;
+}
+
+.often-use-menu a {
+    text-decoration: none;
+    color: grey;
+}
+
+/*sidebar с меню слева*/
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    padding: 20px 7px 20px 50px;
+    border-bottom: solid 1px #E1E0E0;
+    text-align: left;
+    font-size: 23px;
+}
+
+#logout {
+    font-weight: 600;
+    position: relative;
+    display: block !important;
+}
+
+#logout a {
+    color: #E18E30;
+}
+
+
+.material-icons, .material-symbols-outlined {
+    margin-right: 15px;
+}
+
+.sidebar-customer a {
+    text-decoration: none;
+    color: black;
+}
+
+.often-use-menu .counts {
+    position: relative;
+}
+
+.personal-info {
+    padding: 30px;
+    margin-top: 2.5rem;
+}
+
+.personal-info .info-row {
+    padding: 10px;
+    display: flex;
+}
+
+.info-block {
+   padding-right: 180px;
+}
+
+.personal-info .info-name {
+    font-size: 20px;
+    min-width: 13rem;
+    color: #C3B1B1;
+}
+
+.personal-info .info-value {
+    font-size: 20px;
+}
+
+.personal-info h3 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 800;
+}
+
+/*Пункт с заказами*/
+.personal-info .order-pk {
+    width: 10%;
+    font-size: 1.2em;
+    font-weight: 600;
+    width: 17%;
+}
+
+.personal-info .order-created {
+    font-size: 1em;
+    font-family: 'Montserrat', sans-serif;
+    width: 20%;
+}
+
+#order-state {
+    width: 15%;
+}
+
+#order-state .done {
+    color: green;
+    font-size: 1.2em;
+}
+
+#order-state .not-done {
+    color: red;
+    font-size: 1.2em;
+}
+
+.personal-info [id^="total-cost-"] {
+    font-size: 1.2em;
+    font-weight: 800;
+    width: 17%;
+}
+
+.personal-info [id^="items-images-"] {
+    padding: 0px 5px !important;
+    display: flex;
+}
+
+.personal-info [id^="items-images-"] div {
+    display: flex;
+    align-items: center;
+    margin-left: 7px;
+}
+
+[id^=expander-] img {
+    position: absolute;
+    right: 1.2rem;
+    bottom: 2.3rem;
+}
+
+.expander-header {
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: 1rem 2rem 1rem 1rem !important;
+    min-height: 94px;
+    min-width: 555px;
+}
+
+.product-image {
+    display: flex;
+    margin: 1.1em;
+}
+
+[id^="order-detail-"] {
+    padding: 1.1em 0 !important;
+}
+
+.add-review {
+    position: relative;
+    padding-left: 1.6rem;
+    margin: 0 2.0rem 0 0.8rem;
+}
+
+.add-review a {
+    display: flex;
+    text-decoration: none;
+    color: green;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.quantity p  {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.quantity {
+    width: 12%;
+}
+
+.product-name {
+    display: flex;
+    flex-grow: 1;
+ }
+
+.product-name a {
+    margin: 0;
+    text-decoration: none;
+    color: black;
+    font-size: 1.2rem;
+    flex-shrink: 2;
+    flex-grow: 1;
+    word-break: break-word;
+}
+
+.price {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    width: 13%;
+}
+
+.empty-orders {
+    font-size: 1.3rem;
+}
+
+/*Информация о доставке товара*/
+
+.delivery-info {
+    padding: 1.1rem 1.1rem;
+    margin: 1rem 0;
+    border-top: 1px solid #ced4da;
+    border-bottom: 1px solid #ced4da;
+}
+
+.payment-info {
+    padding: 1.1rem 1.1rem;
+    margin: 1rem 0;
+}
+
+.delivery-info .item, .payment-info .item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.1rem;
+}
+
+.item .name {
+    font-size: 1.2rem;
+    color: grey;
+    width: 35%;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.item .attr {
+    font-size: 1.2rem;
+    width: 70%;
+}
+
+.discount { color: red; }
+.total {
+    background-color:#DFDADA;
+    margin-top: 1.8rem;
+    padding: 1.3rem 0.5rem 1.3rem 0.5rem;
+    border-radius: 15px;
+}
+
+.total .attr {
+    font-size: 1.5rem;
+    font-weight: bold;
+}

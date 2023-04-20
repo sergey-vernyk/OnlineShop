@@ -143,7 +143,8 @@ STATIC_URL = 'static/'
 # (python manage.py collectstatic - собирает все статические файлы проекта и сохраняет их по этому пути)
 # STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 STATICFILES_DIRS = [
-    BASE_DIR / "static"
+    BASE_DIR / "static",
+    'node_modules', os.path.join(BASE_DIR, 'node_modules/'),
 ]
 
 # Default primary key field type

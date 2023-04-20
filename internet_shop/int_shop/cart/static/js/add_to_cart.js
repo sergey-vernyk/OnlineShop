@@ -6,7 +6,6 @@ $(document).ready(function() {
         event.preventDefault();
         event.stopPropagation();
         var data = $(`#add-form-${product_id}, #update-form-${product_id}`).serializeArray();
-        console.log(data);
         var url = getValue(data, 'url');
         var token = getValue(data, 'csrfmiddlewaretoken');
         var quantity = getValue(data, 'quantity');

@@ -1,0 +1,11 @@
+<div class="personal-info">
+  <h3>My comments</h3>
+  <ol>
+    {% for comment in comments %}
+    <li>{{ comment.product.name }}</li>
+    <li>{{ comment.body }}</li>
+    <li>{{ comment.created }}</li>
+    <li>{{ comment.updated }}</li>
+    {% endfor %}
+  </ol>
+</div>

@@ -3,6 +3,9 @@
 {% load thumbnail %}
 
 {% block title %}OnlineShop{% endblock %}
+{% block styles %}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,300,0,0" />
+{% endblock %}
 {% block content %}
 <main id="main-list">
     <div class="container-fluid pt-4">
@@ -21,7 +24,7 @@
                     <div class="sorting">
                         <form action="{% url 'goods:product_ordering' category.slug|default:'all' page_obj.number %}"
                               id="sorting-form" onchange="formSubmit()">
-                            <label for="sorting_id">{{ sorting_by_price.sorting.label_tag }}</label>
+                            <span class="material-symbols-outlined" style="margin-right: 4px; position: relative; top: 5px;">sort</span>
                             <select name="sort" id="sorting_id" onchange="checkSelect()">
                                 <!--Перебор всех полей для сортировки-->
                                 {% for k, v in sorting_by_price.fields.sorting.choices %}

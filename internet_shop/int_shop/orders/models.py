@@ -1,5 +1,5 @@
 from django.db import models
-
+from decimal import Decimal
 from account.models import Profile
 from coupons.models import Coupon
 from goods.models import Product
@@ -28,6 +28,7 @@ class Order(models.Model):
     call_confirm = models.BooleanField(default=False)
     pay_method = models.CharField(choices=METHOD_PAY, max_length=20)
     is_paid = models.BooleanField(default=False)
+    is_done = models.BooleanField(default=False)
     present_card = models.OneToOneField(PresentCard, related_name='order', on_delete=models.SET_NULL,
                                         null=True, blank=True)
     coupon = models.ForeignKey(Coupon, related_name='orders', on_delete=models.SET_NULL, null=True, blank=True)
@@ -38,6 +39,26 @@ class Order(models.Model):
 
     def __str__(self):
         return f'Order {self.first_name} {self.last_name}'
+
+    def get_total_cost(self) -> Decimal:
+        """
+        Общая сумма товаров в заказе
+        """
+        return sum(item.get_cost() for item in self.items.all())
+
+    def get_total_discount(self) -> Decimal:
+        """
+        Общая сумма скидки
+        """
+        total_cost = self.get_total_cost()
+
+        total_discount = Decimal('0')
+        if self.coupon:
+            total_discount += (total_cost * (self.coupon.discount / Decimal(100))).quantize(Decimal('0.01'))
+        if self.present_card:
+            total_discount += self.present_card.amount
+
+        return total_discount
 
     class Meta:
         ordering = ('-created',)
@@ -80,3 +101,10 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f'Order item "{self.pk}"'
+
+    def get_cost(self):
+        """
+        Подсчет суммарной стоимости единицы заказа,
+        с учетом его количества
+        """
+        return self.price * self.quantity

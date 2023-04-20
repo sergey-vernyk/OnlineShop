@@ -143,29 +143,29 @@ class ProductDetailView(FormMixin, DetailView):
         return super().get(request, *args, **kwargs)
 
 
-class FavoriteListView(ListView):
-    """
-    Представление для отображения избранных товаров
-    конкретного пользователя
-    """
-    template_name = 'account/user/favorite_products.html'
-    context_object_name = 'favorites'
-
-    def get_queryset(self):
-        """
-        Возвращает товары, которые текущий пользователь
-        добавил в избранное.
-        'username' передается в URL
-        """
-        return Profile.objects.get(user__username=self.kwargs['username']).profile_favorite.product.prefetch_related()
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        """
-        Добавляет в контекст текущего пользователя
-        """
-        context = super().get_context_data(**kwargs)
-        context['user'] = self.request.user
-        return context
+# class FavoriteListView(ListView):
+#     """
+#     Представление для отображения избранных товаров
+#     конкретного пользователя
+#     """
+#     template_name = 'account/user/favorites_info.html'
+#     context_object_name = 'favorites'
+#
+#     def get_queryset(self):
+#         """
+#         Возвращает товары, которые текущий пользователь
+#         добавил в избранное.
+#         'username' передается в URL
+#         """
+#         return Profile.objects.get(user__username=self.kwargs['username']).profile_favorite.product.prefetch_related()
+#
+#     def get_context_data(self, *, object_list=None, **kwargs):
+#         """
+#         Добавляет в контекст текущего пользователя
+#         """
+#         context = super().get_context_data(**kwargs)
+#         context['user'] = self.request.user
+#         return context
 
 
 @login_required()

@@ -1,6 +1,8 @@
 from django.contrib.auth.views import LoginView, PasswordChangeView
 from django.views.generic import CreateView
-from account.forms import LoginForm, UserPasswordChangeForm, RegisterUserForm
+
+from orders.models import OrderItem, Order
+from .forms import LoginForm, UserPasswordChangeForm, RegisterUserForm
 from django.urls import reverse_lazy
 from account.models import Profile
 from .tasks import activate_account
@@ -12,6 +14,7 @@ from .tokens import activation_account_token
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.contrib.sites.shortcuts import get_current_site
+from django.views.generic import DetailView
 
 
 class LoginUserView(LoginView):
@@ -101,3 +104,37 @@ def activate_user_account(request, uidb64, token):
     else:
         messages.error(request, 'Activation link is invalid!')
         return redirect('goods:product_list')
+
+
+class DetailUserView(DetailView):
+    """
+    Представление для отображения детальной информации
+    о пользователе: его заказы, информация, список избранных товаров и т.д.
+    """
+    model = Profile
+    context_object_name = 'customer'
+    template_name = 'account/user/detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['favorites'] = self.object.profile_favorite.product.prefetch_related()
+        # заказы и отдельные единицы для каждого заказа текущего пользователя self.object
+        context['orders'] = Order.objects.select_related('profile', 'delivery').filter(profile_id=self.object.pk)
+        context['order_items'] = {
+            order.pk: OrderItem.objects.select_related('order', 'product').filter(order_id=order.pk)
+            for order in context['orders']
+        }
+
+        context['comments'] = self.object.profile_comments.all()
+        context['coupons'] = self.object.coupons.prefetch_related()
+        context['present_cards'] = self.object.profile_cards.all()
+        context['location'] = self.kwargs.get('location')
+
+        return context
+
+    def get_object(self, queryset=None):
+        """
+        Возвращает объект пользователя по переданному
+        имени в URLconf
+        """
+        return Profile.objects.get(user__username=self.kwargs.get('customer'))

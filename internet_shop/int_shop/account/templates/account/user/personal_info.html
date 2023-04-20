@@ -1,0 +1,27 @@
+<div class="personal-info">
+    <h3>Your personal information</h3>
+    <div class="info-block">
+        <div class="info-row">
+            <span class="info-name">Full Name</span>
+            <span class="info-value">{{ customer.user.get_full_name }}</span>
+        </div>
+        <div class="info-row">
+            <span class="info-name">Gender</span>
+            {% with gender=customer.gender %}
+                {% if gender == 'M' %}
+                    <span class="info-value">Male</span>
+                {% else %}
+                    <span class="info-value">Female</span>
+                {% endif %}
+            {% endwith %}
+        </div>
+        <div class="info-row">
+            <span class="info-name">Phone number</span>
+            <span class="info-value">{{ customer.phone_number }}</span>
+        </div>
+        <div class="info-row">
+            <span class="info-name">Email</span>
+            <span class="info-value">{{ customer.email }}</span>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,157 @@
+{% load static %}
+{% load subtract %}
+{% load get_value_from_dict %}
+
+<div class="personal-info">
+    <h3>My orders</h3>
+    {% for order in orders %}
+        {% with order_items=items|get_dict_item:order.pk total_cost=order.get_total_cost|subtract:order.get_total_discount %}
+            <div id="min-max-detail-{{ order.pk }}" role="button">
+                <div class="row p-0 border rounded mb-2" style="position: relative;">
+                    <div class="expander-header">
+                        <div class="order-pk">
+                            № {{ order.pk }}
+                        </div>
+                        <div class="order-created">
+                            {{ order.created|date:"d.m.Y" }}
+                        </div>
+                        <div id="order-state">
+                            {% if order.is_done %}
+                                <div class="done">Done</div>
+                            {% else %}
+                                <div class="not-done">Not done</div>
+                            {% endif %}
+                        </div>
+                        <div id="total-cost-{{ order.pk }}">
+                            $ {{ total_cost }}
+                        </div>
+                        <!--Изображения товаров (не более 2-х)-->
+                        <div id="items-images-{{ order.pk }}">
+                            {% with count_items=order_items.count %}
+                                {% for item in order_items %}
+                                    <div style="margin-right: 7px;">
+                                        {% if forloop.counter > 2 %}
+                                            +{{ count_items|add:-2 }}
+                                        {% else %}
+                                            <img src="{{ item.product.image.url }}" width="60" height="60" alt="product-image">
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            {% endwith %}
+                        </div>
+                        <div id="expander-{{ order.pk }}">
+                            <img src="{% static 'bootstrap-icons/icons/chevron-down.svg' %}"/>
+                        </div>
+                    </div>
+                    <!--Информация о каждом товаре из заказа-->
+                    <div id="order-detail-{{ order.pk }}">
+                        <div class="d-block">
+                            {% for item in order_items %}
+                                <div class="d-flex" style="align-items: center;">
+                                    <div class="product-image">
+                                        {% if item.product.image %}
+                                            <a target="_blank" href="{{ item.product.get_absolute_url }}">
+                                                <img src="{{ item.product.image.url }}" width="100" height="100">
+                                            </a>
+                                        {% else %}
+                                            <img src="{% static 'img/no_image_crop.png' %}"/>
+                                        {% endif %}
+                                    </div>
+                                    <div class="product-name">
+                                        <a href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a>
+                                    </div>
+                                    <div class="add-review">
+                                        <div class="material-symbols-outlined"
+                                             style="margin: 0; position: absolute; top: 7px; right: 115px;">chat
+                                        </div>
+                                        <a target="_blank"
+                                           href="{{ item.product.get_absolute_url|add:'#comments' }}">Add review</a>
+                                    </div>
+                                    <div class="quantity">
+                                        <p>{{ item.quantity }} pcs.</p>
+                                    </div>
+                                    <div class="price">
+                                        ${{ item.price }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <!--Информация о доставке-->
+                        <div class="delivery-info">
+                            <p style="font-weight: bold;">Delivery</p>
+                            <div class="item">
+                                <div class="name">
+                                    Delivery date
+                                </div>
+                                <div class="attr">
+                                    {{ order.delivery.delivery_date|date:"d.m.Y" }}
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="name">
+                                    Delivery method
+                                </div>
+                                <div class="attr">
+                                    {{ order.delivery.method }}
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="name">
+                                    Delivery address
+                                </div>
+                                <div class="attr">
+                                    {{ order.address }}
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="name">
+                                    Recipient
+                                </div>
+                                <div class="attr">
+                                    {{ order.recipient}}
+                                    <span style="font-weight: 700;">{{ order.phone }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="payment-info">
+                            <p style="font-weight: bold;">Payment</p>
+                            <div class="item">
+                                <div class="name">
+                                    Pay method
+                                </div>
+                                <div class="attr">
+                                    {{ order.pay_method }}
+                                </div>
+                            </div>
+                            {% with total_discount=order.get_total_discount %}
+                                {% if total_discount %}
+                                    <div class="item">
+                                        <div class="name">
+                                            Discount
+                                        </div>
+                                        <div class="attr discount">
+                                            -$ {{ total_discount }}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
+                            <div class="item total">
+                                <div class="name">
+                                    <span style="font-weight: bold;">Total</span>
+                                </div>
+                                <div class="attr">
+                                    $ {{ total_cost }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    {% endwith %}
+    {% empty %}
+    <p class="empty-orders">
+        There are no orders yet...
+        <span class="material-symbols-outlined">sentiment_dissatisfied</span>
+    </p>
+    {% endfor %}
+</div>

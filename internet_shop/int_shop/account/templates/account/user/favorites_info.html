@@ -1,0 +1,11 @@
+<div class="personal-info">
+  <h3>My favorite products</h3>
+  <ol>
+    {% for product in favorites %}
+    <li>{{ product.name }}</li>
+    <li>{{ product.price }}</li>
+    <li>{{ product.image }}</li>
+    <li>{{ product.rating }}</li>
+    {% endfor %}
+  </ol>
+</div>

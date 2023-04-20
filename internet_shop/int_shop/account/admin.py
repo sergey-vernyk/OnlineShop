@@ -24,9 +24,9 @@ class PresentCardInline(admin.StackedInline):
 
 class OrdersInline(admin.StackedInline):
     model = Order
-    extra = 1
-    fields = ('pay_method', 'is_paid', 'present_card', 'coupon', 'delivery', 'stripe_id')
-    readonly_fields = ('stripe_id',)
+    extra = 0
+    fields = ('pay_method', 'is_paid', 'present_card', 'coupon', 'delivery', 'stripe_id', 'created', 'updated')
+    readonly_fields = ('stripe_id', 'created', 'updated')
 
 
 class FavoriteInline(admin.StackedInline):
@@ -67,7 +67,7 @@ class ProfileAdmin(admin.ModelAdmin):
     """
     list_display = ['user', 'gender', 'email_confirm']
     fields = ('profile_full_name', 'user', 'date_of_birth',
-              'gender', 'user_photo_tag', 'photo', 'created',
+              'user_photo_tag', 'photo', 'phone_number', 'created',
               'about', 'coupons')
     inlines = [FavoriteInline, CommentInline, PresentCardInline, OrdersInline]
     readonly_fields = ['user', 'user_photo_tag', 'created', 'profile_full_name']

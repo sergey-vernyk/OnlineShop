@@ -10,7 +10,7 @@ class OrderAdmin(admin.ModelAdmin):
             'fields': ('first_name', 'last_name', 'email', 'address', 'phone')
         }),
         ('Payment', {
-            'fields': ('pay_method', 'is_paid', 'stripe_id')
+            'fields': ('pay_method', 'is_paid', 'is_done', 'stripe_id')
         }),
         ('Discounts', {
             'fields': ('present_card', 'coupon')
@@ -27,7 +27,7 @@ class OrderAdmin(admin.ModelAdmin):
     def get_full_name(self, obj):
         return f'{obj.first_name} {obj.last_name}'
 
-    list_display = ['get_full_name', 'is_paid', 'is_email_was_sent']
+    list_display = ['id', 'get_full_name', 'is_paid', 'is_done', 'is_email_was_sent']
     readonly_fields = ['created', 'updated', 'is_email_was_sent']
     search_fields = ['last_name', 'phone']
     date_hierarchy = 'created'
@@ -47,4 +47,4 @@ class DeliveryAdmin(admin.ModelAdmin):
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ['order', 'product', 'price', 'quantity']
+    list_display = ['pk', 'order', 'product', 'price', 'quantity']

@@ -20,6 +20,7 @@ class Profile(models.Model):
     gender = models.CharField(choices=GENDER, max_length=6, blank=True)
     about = models.TextField(max_length=255, blank=True)
     photo = models.ImageField(upload_to='users/%Y/%m/%d/', blank=True)
+    phone_number = models.CharField(max_length=15, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     email_confirm = models.BooleanField(default=False)
     coupons = models.ManyToManyField(Coupon, related_name='profile_coupons', blank=True)

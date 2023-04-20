@@ -1,0 +1,12 @@
+<div class="personal-info">
+  <h3>My coupons</h3>
+  <ol>
+    {% for coupon in coupons %}
+      <li>{{ coupon.code }}</li>
+      <li>{{ coupon.valid_from }}</li>
+      <li>{{ coupon.valid_to }}</li>
+      <li>{{ coupon.discount }}</li>
+      <li>{{ coupon.category }}</li>
+    {% endfor %}
+  </ol>
+</div>

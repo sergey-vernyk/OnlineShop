@@ -1,0 +1,11 @@
+<div class="personal-info">
+  <h3>My present cards</h3>
+  <ol>
+    {% for card in present_cards %}
+      <li>{{ card.code }}</li>
+      <li>{{ card.valid_from }}</li>
+      <li>{{ card.valid_to }}</li>
+      <li>{{ card.amount }}</li>
+    {% endfor %}
+  </ol>
+</div>

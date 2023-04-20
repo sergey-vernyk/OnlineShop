@@ -2,8 +2,10 @@ from typing import NoReturn
 from django.urls import reverse_lazy
 from django.views.generic import FormView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+
+from account.models import Profile
 from cart.cart import Cart
-from orders.forms import OrderCreateForm, DeliveryCreateForm
+from .forms import OrderCreateForm, DeliveryCreateForm
 from orders.models import Order, OrderItem
 from orders.tasks import order_created
 
@@ -14,13 +16,14 @@ class OrderCreateView(LoginRequiredMixin, FormView):
     """
     form_class = OrderCreateForm
     template_name = 'orders/order_create.html'
-    # form_class_delivery = DeliveryCreateForm
     success_url = reverse_lazy('orders:order_created')
 
     def get_context_data(self, **kwargs):
         context = super(OrderCreateView, self).get_context_data(**kwargs)
         context['delivery_form'] = DeliveryCreateForm()
         context['form'].fields['email'].initial = self.request.user.email
+        context['form'].fields['first_name'].initial = self.request.user.first_name
+        context['form'].fields['last_name'].initial = self.request.user.last_name
         return context
 
     def post(self, request, *args, **kwargs):
@@ -42,6 +45,7 @@ class OrderCreateView(LoginRequiredMixin, FormView):
         if delivery_form.is_valid():
             delivery = delivery_form.save()
             order.delivery = delivery  # привязка доставки к заказу
+            order.profile = Profile.objects.get(user__id=self.request.user.pk)
             order.save()
             self.create_order_items_from_cart(order)  # создание элементов заказа в базе
             self.request.session['order_id'] = order.pk

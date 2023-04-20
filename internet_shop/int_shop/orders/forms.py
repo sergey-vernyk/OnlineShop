@@ -1,6 +1,6 @@
 from django import forms
 
-from orders.models import Order, Delivery
+from .models import Delivery, Order
 
 
 class OrderCreateForm(forms.ModelForm):
