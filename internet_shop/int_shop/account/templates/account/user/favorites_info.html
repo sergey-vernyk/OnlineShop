@@ -1,11 +1,63 @@
+{% load static %}
+{% load cut_fraction_part %}
+
 <div class="personal-info">
-  <h3>My favorite products</h3>
-  <ol>
-    {% for product in favorites %}
-    <li>{{ product.name }}</li>
-    <li>{{ product.price }}</li>
-    <li>{{ product.image }}</li>
-    <li>{{ product.rating }}</li>
-    {% endfor %}
-  </ol>
+  <h3>Favorite products</h3>
+  {% for product in favorites %}
+    <div id="fav-prod-{{ product.id }}" class="row border rounded p-2 mt-2 position-relative">
+      <div class="col-3 d-flex align-items-center justify-content-center">
+        <a href="{{ product.get_absolute_url }}">
+          <img src="{{ product.image.url }}" alt="product-image" width="100" height="100">
+        </a>
+      </div>
+      <div class="col-9 pe-5">
+        <div class="d-block">
+          <p class="attr">
+            <a class="text-decoration-none link-dark" href="{{ product.get_absolute_url }}">{{ product.name }}</a>
+          </p>
+        </div>
+        <div class="attr mb-3">
+          <div class="rating-star d-inline mb-3">
+            {% with product_rating=product.rating %}
+              {% for i in '12345'|make_list %}
+                {% if product_rating|cut_fraction >= i %}
+                  <span id="star-{{ i }}" class="fa fa-star checked"></span>
+                {% else %}
+                  <span id="star-{{ i }}" class="fa fa-star"></span>
+                {% endif %}
+              {% endfor %}
+            {% endwith %}
+          </div>
+          <div class="d-inline ms-5 position-relative">
+            <a class="text-decoration-none link-dark fw-bold" href="{{ product.get_absolute_url|add:'#comments' }}">
+              <span class="material-symbols-outlined" style="position: absolute;right: 3px;top: 5px;">chat</span>
+              {{ product.comments.all.count }}
+            </a>
+          </div>
+        </div>
+        <div class="d-inline position-relative">
+          <form class="d-inline" id="add-form-{{ product.id }}">
+            {% csrf_token %}
+            <p class="fs-4 fw-bold d-inline me-3">$ {{ product.price }}</p>
+            <span id="add-to-cart-{{ product.id }}"
+                  class="material-symbols-outlined p-1 border rounded bg-info"
+                  style="position: absolute;top: -9px;cursor: pointer;">shopping_cart
+              </span>
+            <input type="hidden" name="quantity" value="1">
+            <input type="hidden" name="url" value="{% url 'cart:cart_add' %}">
+          </form>
+        </div>
+        <span id="remove-fav-{{ product.id }}" data-action="remove"
+              data-url="{% url 'goods:add_or_remove_product_favorite' %}"
+              class="material-symbols-outlined p-2"
+              style="position: absolute;top: 5%;left: 93%; cursor: pointer;">delete
+          </span>
+      </div>
+    </div>
+  {% empty %}
+    <div class="empty-customer-content">
+          <h4 class="d-inline">There are no favorite products yet</h4>
+          <span class="material-symbols-outlined">sentiment_dissatisfied</span>
+    </div>
+  {% endfor %}
 </div>

@@ -18,7 +18,7 @@ class OrderCreateForm(forms.ModelForm):
     class Meta:
         model = Order
         fields = ('first_name', 'last_name', 'email',
-                  'address', 'phone', 'pay_method', 'recipient', 'comment', 'call_confirm')
+                  'address', 'phone', 'pay_method', 'comment', 'call_confirm')
 
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -29,7 +29,6 @@ class OrderCreateForm(forms.ModelForm):
             'pay_method': forms.Select(attrs={'class': 'form-select'}),
             'call_confirm': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'comment': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Any comment...'}),
-            'recipient': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Name Surname'}),
         }
 
 

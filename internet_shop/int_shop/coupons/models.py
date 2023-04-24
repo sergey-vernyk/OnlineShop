@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils import timezone
 
 
 class Coupon(models.Model):
@@ -16,6 +17,14 @@ class Coupon(models.Model):
 
     def __str__(self):
         return f'Coupon "{self.code}"'
+
+    @property
+    def is_valid(self) -> bool:
+        """
+        Возврат состояния купона
+        """
+        now = timezone.now()
+        return self.valid_from <= now <= self.valid_to
 
 
 class Category(models.Model):

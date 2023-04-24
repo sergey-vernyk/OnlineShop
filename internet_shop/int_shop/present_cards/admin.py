@@ -13,7 +13,7 @@ class PresentCardAdmin(admin.ModelAdmin):
             'fields': ('from_name', 'from_email', 'to_name', 'to_email')
         }),
         ('Additional info', {
-            'fields': ('category', 'message', 'amount', 'active')
+            'fields': ('category', 'message', 'amount', 'active', 'profile')
         })
     )
 

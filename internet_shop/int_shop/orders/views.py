@@ -28,6 +28,7 @@ class OrderCreateView(LoginRequiredMixin, FormView):
 
     def post(self, request, *args, **kwargs):
         cart = Cart(request)  # создаем объект корзины
+        profile = Profile.objects.get(user=self.request.user)
         # получаем формы
         order_form = self.get_form()
         delivery_form = self.get_form(form_class=DeliveryCreateForm)
@@ -37,21 +38,24 @@ class OrderCreateView(LoginRequiredMixin, FormView):
             # если в корзине есть валидный купон и/или подарочная карта, присваиваем к заказу
             if cart.coupon:
                 order.coupon = cart.coupon
+                profile.coupons.add(cart.coupon)  # добавляем купон в профиль
             if cart.present_card:
                 order.present_card = cart.present_card
+                cart.present_card.profile = profile  # добавляем карту в профиль и сохраняем ее
+                cart.present_card.save(update_fields=['profile'])
         else:
             return self.form_invalid(order_form)
 
         if delivery_form.is_valid():
             delivery = delivery_form.save()
-            order.delivery = delivery  # привязка доставки к заказу
-            order.profile = Profile.objects.get(user__id=self.request.user.pk)
+            # привязка доставки и профиля к заказу
+            order.delivery = delivery
+            order.profile = profile
             order.save()
             self.create_order_items_from_cart(order)  # создание элементов заказа в базе
             self.request.session['order_id'] = order.pk
-            # если сообщение о завершении заказа было отправлено на почту и доставлено
+            # отправка сообщения о завершении заказа на почту
             order_created.delay(order_id=order.pk)
-
             return self.form_valid(order_form)
         else:
             return self.form_invalid(delivery_form)

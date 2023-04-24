@@ -3,7 +3,9 @@
     padding: 0;
 }
 
-body {
+body, html {
+  max-width: 100%;
+  overflow-x: hidden;
   font-family: 'Source Sans Pro', sans-serif !important;
   /*background-image: url("/static/img/19449741.jpg");*/
   background-color: #EAEAEA !important;
@@ -510,8 +512,6 @@ table tr td {
 .cart-button {
     position: relative;
     padding: 7px;
-    border: solid 1px white;
-    border-radius: 5px;
     left: 30px;
 }
 
@@ -521,7 +521,7 @@ table tr td {
 }
 
 .cart-button a:hover {
-    color: #A9A7A7;
+    color: #F7CB39;
 }
 
 .amount-cart {
@@ -605,6 +605,7 @@ table tr td {
     background-color: white;
     width: 64.2% !important;
     border-radius: 5px;
+    position: relative;
 }
 
 .brief-info {
@@ -666,6 +667,7 @@ table tr td {
     border-bottom: solid 1px #E1E0E0;
     text-align: left;
     font-size: 23px;
+    font-family: 'Exo 2', sans-serif;
 }
 
 #logout {
@@ -704,6 +706,9 @@ table tr td {
 
 .info-block {
    padding-right: 180px;
+   padding-right: 180px;
+   border: 1px solid gainsboro;
+   border-radius: 10px;
 }
 
 .personal-info .info-name {
@@ -728,6 +733,10 @@ table tr td {
     font-size: 1.2em;
     font-weight: 600;
     width: 17%;
+}
+
+.highlighted-element {
+   box-shadow: 1px 1px 10px 0px rgba(36,183,26,1);
 }
 
 .personal-info .order-created {
@@ -770,7 +779,8 @@ table tr td {
 [id^=expander-] img {
     position: absolute;
     right: 1.2rem;
-    bottom: 2.3rem;
+    bottom: 2.0rem;
+    padding: 5px;
 }
 
 .expander-header {
@@ -836,8 +846,13 @@ table tr td {
     width: 13%;
 }
 
-.empty-orders {
-    font-size: 1.3rem;
+.empty-customer-content {
+    font-size: 1.2rem;
+    position: absolute;
+    font-size: 1.2rem;
+    position: absolute;
+    top: 50%;
+    left: 21%;
 }
 
 /*Информация о доставке товара*/
@@ -860,7 +875,7 @@ table tr td {
     margin-bottom: 1.1rem;
 }
 
-.item .name {
+.name {
     font-size: 1.2rem;
     color: grey;
     width: 35%;
@@ -868,12 +883,13 @@ table tr td {
     flex-shrink: 0;
 }
 
-.item .attr {
+.attr {
     font-size: 1.2rem;
     width: 70%;
 }
 
 .discount { color: red; }
+
 .total {
     background-color:#DFDADA;
     margin-top: 1.8rem;
@@ -884,4 +900,101 @@ table tr td {
 .total .attr {
     font-size: 1.5rem;
     font-weight: bold;
+}
+
+/*Купоны*/
+.coupon-category, .card-category {
+    display: flex;
+}
+
+.discount-value {
+    color: #59D850;
+    font-weight: 600;
+}
+
+.coupon-code {
+    display: block;
+    text-align: center;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+    font-size: 1.5rem;
+    font-family: 'Yanone Kaffeesatz', sans-serif;
+}
+
+.coupon-validation, .card-validation { display: flex; }
+
+.coupon-discount, .card-discount { display: flex; }
+
+.attr-coupons {
+    display: inline-block;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.1rem;
+    width: 40%;
+    font-weight: 500;
+}
+
+.value-coupons {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+}
+
+.valid-code { color: green; }
+
+.invalid-code { color: red; }
+
+.check-position {
+    position: absolute;
+    right: -17px;
+    top: 0;
+}
+
+.go-order {
+    padding: 3px;
+    height: 35px;
+    background-color: #7FDC79;
+    width: auto;
+    border-radius: 8px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+[id^=coupon-] {
+    width: auto;
+    height: 34px;
+    margin-right: 7px;
+}
+
+/*Подарочные карты*/
+.card-code {
+    display: block;
+    text-align: center;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+    font-size: 1.5rem;
+    font-family: 'Rubik', sans-serif;
+}
+
+.addit-info-card {
+    display: flex;
+    margin-bottom: 0.8rem;
+    font-family: 'Nunito', sans-serif;
+}
+
+.attr-card-addit {
+    width: 25%;
+}
+
+.value-card-addit {
+    width: 75%;
+}
+
+.card-message {
+    text-align: justify;
+    font-weight: 600;
+    padding: 10px;
+    border-top: 1px solid #D3D7D2;
+    border-bottom: 1px solid #D3D7D2;
 }

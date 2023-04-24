@@ -17,11 +17,12 @@ $(document).ready(function() {
         if(last === 'chevron-down.svg') {
             addrParts[indexLast] = 'chevron-up.svg';
             $(`#total-cost-${order_id}, #items-images-${order_id}`).hide();
-            $('.expander-header').css('border-bottom', '1px solid #ced4da');
+            $(`#expander-${order_id}`).parent().css('border-bottom', '1px solid #ced4da');
         } else {
             addrParts[indexLast] = 'chevron-down.svg';
             $(`#total-cost-${order_id}, #items-images-${order_id}`).show();
-            $('.expander-header').css('border-bottom', '0px solid #ced4da');
+            $(`#expander-${order_id}`).parent().css('border-bottom', '0px solid #ced4da');
+
         }
 
         var src = addrParts.join('/'); //создание нового адреса

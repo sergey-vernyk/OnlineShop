@@ -3,7 +3,7 @@
 {% load cut_fraction_part %}
 {% load calculate_amount_dots %}
 
-{% block title %}Product {{ product.name }} | OnlineShop{% endblock %}
+{% block title %} {{ product.name }} | OnlineShop{% endblock %}
 
 {% block content %}
     <div class="d-flex-fill bookmark-navs">
@@ -38,7 +38,7 @@
                     {% endwith %}
                 </div>
             </div>
-            <div class="col-2" style="min-width: 212px;">
+            <div class="col-2" style="min-width: 260px;">
                 <!--Добавление товара в избранное-->
                 <div class="prod-buttons">
                     <div class="d-block m-2 p-1">
@@ -48,13 +48,9 @@
                                  3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333
                                   4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
                             </svg>
-                            <a class="add-to-favorite" role="button"
-                               href="{% if not is_in_favorite %} {% url 'goods:add_or_remove_product_favorite' action='add' product_pk=product.id %}
-                                        {% elif is_in_favorite %}
-                                            {% url 'goods:add_or_remove_product_favorite' action='remove' product_pk=product.id %}
-                                        {% else %}
-                                            {% url 'login' %}
-                                        {% endif %}">{% if is_in_favorite %} Remove from Favorite {% else %} Add to Favorite {% endif %}
+                            <a id="add-rem-fav" role="button"
+                               data-url="{% url 'goods:add_or_remove_product_favorite' %}"
+                               data-pk="{{ product.id }}" >{% if is_in_favorite %}Remove from Favorite{% else %}Add to Favorite{% endif %}
                             </a>
                         </div>
                     </div>
@@ -158,7 +154,7 @@
                     <form id="form-comment" action="{% url 'goods:product_detail' object.pk object.slug %}" method="post">
                         {% csrf_token %}
                         {% for field in comment_form %}
-                            <div class="d-flex" style="align-items: center; margin-top: 20px;">
+                            <div class="d-flex" style="align-items: start; margin-top: 20px;">
                                 <label for="{{ field.id_for_label}}">{{ field.label }}</label>
                                 {{ field }}
                             </div>
@@ -178,5 +174,6 @@
     <h4 id="full-information" align="center" class="headers-detail">Full information</h4>
     <script src="{% static 'js/set_product_rating.js' %}"></script>
     <script src="{% static 'js/add_to_cart.js' %}"></script>
+    <script src="{% static 'js/add_remove_favorite.js' %}" type="module"></script>
     </div>
 {% endblock %}

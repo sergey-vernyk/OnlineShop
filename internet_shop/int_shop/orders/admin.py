@@ -16,7 +16,7 @@ class OrderAdmin(admin.ModelAdmin):
             'fields': ('present_card', 'coupon')
         }),
         ('Delivery', {
-            'fields': ('delivery', 'recipient')
+            'fields': ('delivery',)
         }),
         ('Other', {
             'fields': ('comment', 'call_confirm', 'created', 'updated', 'is_email_was_sent')

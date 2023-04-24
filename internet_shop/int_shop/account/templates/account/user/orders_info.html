@@ -95,6 +95,18 @@
                                     {{ order.delivery.method }}
                                 </div>
                             </div>
+                                {% with delivery_method=order.delivery.method %}
+                                    {% if order.delivery.method == 'Post office' %}
+                                    <div class="item">
+                                        <div class="name">
+                                            Post office №
+                                        </div>
+                                        <div class="attr">
+                                            {{ order.delivery.office_number }}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                {% endwith %}
                             <div class="item">
                                 <div class="name">
                                     Delivery address
@@ -108,7 +120,7 @@
                                     Recipient
                                 </div>
                                 <div class="attr">
-                                    {{ order.recipient}}
+                                    {{ order.first_name }} {{ order.last_name }}
                                     <span style="font-weight: 700;">{{ order.phone }}</span>
                                 </div>
                             </div>
@@ -123,6 +135,28 @@
                                     {{ order.pay_method }}
                                 </div>
                             </div>
+                            {% with coupon=order.coupon present_card=order.present_card %}
+                                {% if coupon %}
+                                    <div class="item">
+                                        <div class="name">
+                                            Coupon
+                                        </div>
+                                        <div class="attr">
+                                            "{{ coupon.code }}" (-{{ coupon.discount }}%)
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                {% if present_card %}
+                                    <div class="item">
+                                        <div class="name">
+                                            Present card
+                                        </div>
+                                        <div class="attr">
+                                            "{{ present_card.code }}" (-${{ present_card.amount }})
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
                             {% with total_discount=order.get_total_discount %}
                                 {% if total_discount %}
                                     <div class="item">
@@ -149,9 +183,9 @@
             </div>
     {% endwith %}
     {% empty %}
-    <p class="empty-orders">
-        There are no orders yet...
-        <span class="material-symbols-outlined">sentiment_dissatisfied</span>
-    </p>
+        <div class="empty-customer-content">
+            <div class="d-inline">There are no orders yet</div>
+            <span class="material-symbols-outlined">sentiment_dissatisfied</span>
+        </div>
     {% endfor %}
 </div>

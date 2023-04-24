@@ -15,6 +15,7 @@ from django.shortcuts import redirect
 from django.contrib import messages
 from django.contrib.sites.shortcuts import get_current_site
 from django.views.generic import DetailView
+from django.db.models import QuerySet
 
 
 class LoginUserView(LoginView):
@@ -118,6 +119,7 @@ class DetailUserView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['favorites'] = self.object.profile_favorite.product.prefetch_related()
+
         # заказы и отдельные единицы для каждого заказа текущего пользователя self.object
         context['orders'] = Order.objects.select_related('profile', 'delivery').filter(profile_id=self.object.pk)
         context['order_items'] = {
@@ -125,8 +127,11 @@ class DetailUserView(DetailView):
             for order in context['orders']
         }
 
+        coupons = self.object.coupons.prefetch_related().order_by('pk')
+        # установка заказов для каждого купона self.object и возврат обновленного queryset coupons
+        context['coupons'] = self._set_orders_for_coupon(context['orders'], coupons)
+
         context['comments'] = self.object.profile_comments.all()
-        context['coupons'] = self.object.coupons.prefetch_related()
         context['present_cards'] = self.object.profile_cards.all()
         context['location'] = self.kwargs.get('location')
 
@@ -138,3 +143,21 @@ class DetailUserView(DetailView):
         имени в URLconf
         """
         return Profile.objects.get(user__username=self.kwargs.get('customer'))
+
+    def _set_orders_for_coupon(self, orders: QuerySet, coupons: QuerySet) -> QuerySet:
+        """
+        Метод устанавливает в каждом купоне профиля список заказов,
+        в которых был применен этот купон и возвращает обновленный queryset coupons
+        """
+
+        orders_for_coupon = {}  # словарь типа {купон: [заказ_1, заказ_2]}
+        for order in orders.order_by('coupon_id'):
+            orders_for_coupon.setdefault(order.coupon, []).append(order)
+
+        for coupon in coupons:
+            for c, o in orders_for_coupon.items():
+                # если существует купон под заказ и купоны одинаковы
+                if c and c == coupon:
+                    coupon.choices = o
+
+        return coupons

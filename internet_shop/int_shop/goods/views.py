@@ -17,6 +17,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from .utils import GoodsContextMixin
 import redis
+from common.decorators import ajax_required
 
 # инициализация Redis
 r = redis.Redis(host=settings.REDIS_HOST,
@@ -116,20 +117,6 @@ class ProductDetailView(FormMixin, DetailView):
                 return self.form_valid(form)
             else:
                 return self.form_invalid(form)
-        # # если был поставлен рейтинг
-        # elif 'rating_sent' in request.POST:
-        #     form = self.get_form(form_class=RatingSetForm)
-        #     if form.is_valid():
-        #         current_rating = self.object.rating
-        #         rating = form.cleaned_data.get('star')
-        #         if not current_rating:
-        #             self.object.rating = Decimal(rating)
-        #         else:  # расчет среднего рейтинга товара
-        #             self.object.rating = round((rating + current_rating) / 2, 1)
-        #         self.object.save()  # сохранение в базе
-        #         return self.form_valid(form)
-        #     else:
-        #         return self.form_invalid(form)
 
     def get(self, request, *args, **kwargs):
         """
@@ -143,37 +130,17 @@ class ProductDetailView(FormMixin, DetailView):
         return super().get(request, *args, **kwargs)
 
 
-# class FavoriteListView(ListView):
-#     """
-#     Представление для отображения избранных товаров
-#     конкретного пользователя
-#     """
-#     template_name = 'account/user/favorites_info.html'
-#     context_object_name = 'favorites'
-#
-#     def get_queryset(self):
-#         """
-#         Возвращает товары, которые текущий пользователь
-#         добавил в избранное.
-#         'username' передается в URL
-#         """
-#         return Profile.objects.get(user__username=self.kwargs['username']).profile_favorite.product.prefetch_related()
-#
-#     def get_context_data(self, *, object_list=None, **kwargs):
-#         """
-#         Добавляет в контекст текущего пользователя
-#         """
-#         context = super().get_context_data(**kwargs)
-#         context['user'] = self.request.user
-#         return context
-
-
-@login_required()
-def add_or_remove_product_favorite(request, product_pk: int, action: str) -> redirect:
+@login_required
+@require_POST
+@ajax_required
+def add_or_remove_product_favorite(request) -> JsonResponse:
     """
     Добавление товара в избранное или удаление его
     """
-    product = Product.objects.get(pk=product_pk)
+    product_id = request.POST.get('product_id')
+    action = request.POST.get('action')
+
+    product = Product.objects.get(pk=product_id)
     profile = Profile.objects.get(user=request.user)
 
     if action == 'add':
@@ -181,7 +148,11 @@ def add_or_remove_product_favorite(request, product_pk: int, action: str) -> red
     elif action == 'remove':
         Favorite.objects.get(profile=profile).product.remove(product)
 
-    return redirect(reverse('goods:user_product_favorites_list', args=(request.user.username,)))
+    # кол-во товаров в избранном для текущего profile
+    amount_prods = Favorite.objects.get(profile=profile).product.prefetch_related().count()
+
+    return JsonResponse({'success': True,
+                         'amount_prods': amount_prods})
 
 
 class FilterResultsView(ListView, GoodsContextMixin):
@@ -364,23 +335,22 @@ def product_ordering(request, category_slug: str = 'all', page: int = 1):
 
 
 @require_POST
-def set_product_rating(request):
+@ajax_required
+def set_product_rating(request) -> JsonResponse:
     """
     Функция выставляет рейтинг товара
     при помощи запроса ajax
     """
-    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+    star = Decimal(request.POST.get('star'))
+    product_id = request.POST.get('product_id')
+    product = Product.objects.get(pk=product_id)
+    current_rating = product.rating
+    if not current_rating:
+        product.rating = Decimal(star)
+    else:  # расчет среднего рейтинга товара
+        current_rating = math.ceil((star + current_rating) / 2)
+        product.rating = current_rating
+    product.save(update_fields=['rating'])  # сохранение в базе
 
-    if is_ajax:
-        star = Decimal(request.POST.get('star'))
-        product_id = request.POST.get('product_id')
-        product = Product.objects.get(pk=product_id)
-        current_rating = product.rating
-        if not current_rating:
-            product.rating = Decimal(star)
-        else:  # расчет среднего рейтинга товара
-            current_rating = math.ceil((star + current_rating) / 2)
-            product.rating = current_rating
-        product.save(update_fields=['rating'])  # сохранение в базе
-
-        return JsonResponse({'success': True, 'current_rating': current_rating})
+    return JsonResponse({'success': True,
+                         'current_rating': current_rating})

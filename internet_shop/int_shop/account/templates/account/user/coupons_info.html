@@ -1,12 +1,47 @@
 <div class="personal-info">
-  <h3>My coupons</h3>
-  <ol>
+  <h3>Coupons</h3>
+  <div class="d-block">
     {% for coupon in coupons %}
-      <li>{{ coupon.code }}</li>
-      <li>{{ coupon.valid_from }}</li>
-      <li>{{ coupon.valid_to }}</li>
-      <li>{{ coupon.discount }}</li>
-      <li>{{ coupon.category }}</li>
+      <div class="d-block border rounded p-3 mb-2">
+        <div class="position-relative">
+          <span class="coupon-code">"{{ coupon.code }}"</span>
+          {% if coupon.is_valid %}
+            <span class="material-symbols-outlined check-position valid-code">check_circle</span>
+          {% else %}
+            <span class="material-symbols-outlined check-position invalid-code">close</span>
+          {% endif %}
+        </div>
+        <div class="coupon-category">
+          <span class="attr-coupons">Category</span>
+          <span class="value-coupons">{{ coupon.category }}</span>
+        </div>
+        <div class="coupon-validation">
+          <span class="attr-coupons">Valid from</span>
+          <span class="value-coupons">{{ coupon.valid_from|date:"d.m.Y H:i" }}</span>
+        </div>
+        <div class="coupon-validation">
+          <span class="attr-coupons">Valid to</span>
+          <span class="value-coupons">{{ coupon.valid_to|date:"d.m.Y H:i" }}</span>
+        </div>
+        <div class="coupon-discount">
+          <span class="attr-coupons">Discount</span>
+          <span class="value-coupons discount-value">{{ coupon.discount }}%</span>
+        </div>
+        <!--Форма с выбором заказов для текущего купона-->
+        <form>
+          <label class="attr-coupons mt-3" for="coupon-{{ coupon.id }}">Orders</label>
+          <select id="coupon-{{ coupon.id }}">
+            {% for order in coupon.choices %}
+              <option>№ {{ order.pk }} - {{ order.created|date:"d.m.Y" }}</option>
+            {% endfor %}
+          </select>
+          <button class="go-order" data-url="{% url 'customer_detail' request.user.username 'orders' %}">Go to order</button>
+        </form>
+      </div>
+    {% empty %}
+      <div class="empty-customer-content">
+          <h4 class="d-inline">Your coupons will be here after purchases</h4>
+      </div>
     {% endfor %}
-  </ol>
+  </div>
 </div>

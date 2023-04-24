@@ -6,6 +6,10 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"/>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@1,300&display=swap" rel="stylesheet">
 {% endblock %}
 {% block content %}
     <div class="container my-4" style="min-width: 960px;">
@@ -43,7 +47,7 @@
                         </li>
                         <li>
                             <span class="counts">
-                                <a href="{% url 'goods:user_product_favorites_list' customer.user.username %}">
+                                <a href="{% url 'customer_detail' request.user.username 'favorites' %}">
                                              {{ favorites.count }}
                                 </a>
                             </span>
@@ -60,35 +64,37 @@
             </div>
         </div>
         <div class="row pb-2" style="flex-wrap: nowrap;">
-            <div class="sidebar-customer">
-                <div class="sidebar-item">
-                    <span class="material-symbols-outlined">person</span><a href="{% url 'customer_detail' request.user.username 'about' %}"><span>Personal info</span></a>
-                </div>
-                <div class="sidebar-item">
-                    <span class="material-symbols-outlined">shopping_cart</span><a href="{% url 'customer_detail' request.user.username 'orders' %}"><span>Orders</span></a>
-                </div>
-                <div class="sidebar-item">
-                    <span class="material-symbols-outlined">favorite</span><a href="{% url 'customer_detail' request.user.username 'favorites' %}"><span>Favorites</span></a>
-                </div>
-                <div class="sidebar-item">
-                    <span class="material-icons">card_giftcard</span><a href="{% url 'customer_detail' request.user.username 'coupons' %}"><span>Coupons</span></a>
-                </div>
-                <div class="sidebar-item">
-                    <span class="material-icons">card_giftcard</span><a href="{% url 'customer_detail' request.user.username 'present_cards' %}"><span>Present cards</span></a>
-                </div>
-                <div class="sidebar-item">
-                    <span class="material-symbols-outlined">chat_bubble</span><a href="{% url 'customer_detail' request.user.username 'comments' %}"><span>Comments</span></a>
-                </div>
-                <div class="sidebar-item">
-                    <span class="material-symbols-outlined">visibility</span><a href="{% url 'customer_detail' request.user.username 'watched' %}"><span>Watched products</span></a>
-                </div>
-                <div id="logout" class="sidebar-item">
-                    <div style="display: flex;justify-content: end;align-items: center;">
-                        <span class="material-symbols-outlined">logout</span>
-                        <a href="{% url 'logout' %}">Logout</a>
+            {% with username=request.user.username %}
+                <div class="sidebar-customer">
+                    <div class="sidebar-item">
+                        <span class="material-symbols-outlined">person</span><a href="{% url 'customer_detail' username 'about' %}"><span>Personal info</span></a>
+                    </div>
+                    <div class="sidebar-item">
+                        <span class="material-symbols-outlined">shopping_cart</span><a href="{% url 'customer_detail' username 'orders' %}"><span>Orders</span></a>
+                    </div>
+                    <div class="sidebar-item">
+                        <span class="material-symbols-outlined">favorite</span><a href="{% url 'customer_detail' username 'favorites' %}"><span>Favorites</span></a>
+                    </div>
+                    <div class="sidebar-item">
+                        <span class="material-icons">card_giftcard</span><a href="{% url 'customer_detail' username 'coupons' %}"><span>Coupons</span></a>
+                    </div>
+                    <div class="sidebar-item">
+                        <span class="material-icons">card_giftcard</span><a href="{% url 'customer_detail' username 'present_cards' %}"><span>Present cards</span></a>
+                    </div>
+                    <div class="sidebar-item">
+                        <span class="material-symbols-outlined">chat_bubble</span><a href="{% url 'customer_detail' username 'comments' %}"><span>Comments</span></a>
+                    </div>
+                    <div class="sidebar-item">
+                        <span class="material-symbols-outlined">visibility</span><a href="{% url 'customer_detail' username 'watched' %}"><span>Watched products</span></a>
+                    </div>
+                    <div id="logout" class="sidebar-item">
+                        <div style="display: flex;justify-content: end;align-items: center;">
+                            <span class="material-symbols-outlined">logout</span>
+                            <a href="{% url 'logout' %}">Logout</a>
+                        </div>
                     </div>
                 </div>
-            </div>
+            {% endwith %}
             <div class="content-customer">
                 {% if location == 'about' %}
                     {% include 'account/user/personal_info.html' with customer=customer %}
@@ -107,4 +113,7 @@
         </div>
     </div>
 <script src="{% static 'js/min_max_order_detail.js' %}"></script>
+<script src="{% static 'js/add_remove_favorite.js' %}" type="module"></script>
+<script src="{% static 'js/go_to_choose_order.js' %}"></script>
+<script src="{% static 'js/highlight_order.js' %}"></script>
 {% endblock %}

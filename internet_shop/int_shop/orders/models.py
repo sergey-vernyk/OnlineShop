@@ -23,7 +23,6 @@ class Order(models.Model):
     phone = models.CharField(max_length=20)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    recipient = models.CharField(max_length=100, blank=True)
     comment = models.TextField(max_length=100, blank=True)
     call_confirm = models.BooleanField(default=False)
     pay_method = models.CharField(choices=METHOD_PAY, max_length=20)
@@ -38,7 +37,7 @@ class Order(models.Model):
     profile = models.ForeignKey(Profile, related_name='orders', on_delete=models.CASCADE, default='')
 
     def __str__(self):
-        return f'Order {self.first_name} {self.last_name}'
+        return f'id: {self.pk} - {self.first_name} {self.last_name}'
 
     def get_total_cost(self) -> Decimal:
         """
