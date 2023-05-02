@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-#3zoxjm74+ulis&afz#b@*15&6u1eq3t48mi1)jxwcv&r63v4!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['onlineshopproj.com', '127.0.0.1', 'localhost']
 INTERNAL_IPS = ['127.0.0.1']
 
 # Application definition
@@ -46,6 +46,9 @@ INSTALLED_APPS = [
     'django_bootstrap5',
     'django_extensions',
     'debug_toolbar',
+    'easy_thumbnails',
+    'django.contrib.postgres',
+    'social_django',
 
     'goods.apps.GoodsConfig',
     'orders.apps.OrdersConfig',
@@ -53,7 +56,6 @@ INSTALLED_APPS = [
     'present_cards.apps.PresentCardsConfig',
     'cart.apps.CartConfig',
     'payment.apps.PaymentConfig',
-    'easy_thumbnails',
 ]
 
 MIDDLEWARE = [
@@ -83,6 +85,9 @@ TEMPLATES = [
 
                 'goods.context_processors.product_categories',  # категории товаров на любом шаблоне
                 'cart.context_processors.cart',  # корзина в любом шаблоне
+                'goods.context_processors.search_form',  # строка поиска в любом шаблоне
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -190,3 +195,40 @@ CACHES = {
 REDIS_PORT = 6379
 REDIS_HOST = '127.0.0.1'
 REDIS_DB = 2
+
+# Модели аутентификации пользователей
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',  # встроенная модель
+    'social_core.backends.facebook.FacebookOAuth2',  # авторизация на сайте при помощи Facebook
+    'social_core.backends.twitter.TwitterOAuth',  # авторизация на сайте при помощи Twitter
+    'social_core.backends.google.GoogleOAuth2',  # авторизация на сайте при помощи Google
+)
+
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.auth_allowed',
+    'social_core.pipeline.social_auth.social_user',
+    'social_core.pipeline.user.get_username',
+    'account.utils.create_user',  # переопределение метода для замены "." в username
+    'account.views.save_social_user_to_profile',  # сохранение пользователя в Profile при входе через соц.сеть
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+)
+
+# Facebook
+SOCIAL_AUTH_FACEBOOK_KEY = env('SOCIAL_AUTH_FACEBOOK_KEY')
+SOCIAL_AUTH_FACEBOOK_SECRET = env('SOCIAL_AUTH_FACEBOOK_SECRET')
+SOCIAL_AUTH_FACEBOOK_SCOPE = ['email', 'user_gender', 'user_birthday']  # дополнительные разрешения для авторизации
+
+# передача дополнительных параметров с facebook аккаунта
+SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
+    'fields': 'id, name, first_name, last_name, birthday, email, gender, picture.width(80).height(80)',
+}
+
+# Google
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['https://www.googleapis.com/auth/user.gender.read',
+                                   'https://www.googleapis.com/auth/user.birthday.read']

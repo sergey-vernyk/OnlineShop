@@ -1,6 +1,9 @@
+import redis as redis
 from django.contrib.auth.views import LoginView, PasswordChangeView
 from django.views.generic import CreateView
+from django.conf import settings
 
+from goods.models import Product, Favorite
 from orders.models import OrderItem, Order
 from .forms import LoginForm, UserPasswordChangeForm, RegisterUserForm
 from django.urls import reverse_lazy
@@ -16,6 +19,15 @@ from django.contrib import messages
 from django.contrib.sites.shortcuts import get_current_site
 from django.views.generic import DetailView
 from django.db.models import QuerySet
+from datetime import datetime
+from django.core import files
+from .utils import get_image_from_url
+import requests
+
+# инициализация Redis
+r = redis.Redis(host=settings.REDIS_HOST,
+                port=settings.REDIS_PORT,
+                db=settings.REDIS_DB)
 
 
 class LoginUserView(LoginView):
@@ -51,6 +63,10 @@ class UserRegisterView(CreateView):
     template_name = 'registration/user_register_form.html'
     success_url = reverse_lazy('login')
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.object = None
+
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         if form.is_valid():
@@ -75,6 +91,7 @@ class UserRegisterView(CreateView):
                                    date_of_birth=date_of_birth,
                                    photo=user_photo,
                                    gender=form.cleaned_data.get('gender'))
+            messages.success(request, 'Thank for your registration. Now you can login your account')
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
@@ -131,8 +148,11 @@ class DetailUserView(DetailView):
         # установка заказов для каждого купона self.object и возврат обновленного queryset coupons
         context['coupons'] = self._set_orders_for_coupon(context['orders'], coupons)
 
-        context['comments'] = self.object.profile_comments.all()
+        context['comments'] = self.object.profile_comments.select_related('product').order_by('updated', 'created')
         context['present_cards'] = self.object.profile_cards.all()
+        # товары, просмотренные пользователем self.object
+        products_ids = (int(pk) for pk in r.smembers(f'profile_id:{self.object.pk}'))
+        context['watched'] = Product.objects.filter(pk__in=products_ids)
         context['location'] = self.kwargs.get('location')
 
         return context
@@ -156,8 +176,64 @@ class DetailUserView(DetailView):
 
         for coupon in coupons:
             for c, o in orders_for_coupon.items():
-                # если существует купон под заказ и купоны одинаковы
+                # если существует купон для заказа и купоны одинаковы
                 if c and c == coupon:
                     coupon.choices = o
 
         return coupons
+
+
+def save_social_user_to_profile(backend, user, response, *args, **kwargs):
+    if backend.name == 'facebook':
+        # если профиль еще не был создан
+        if kwargs.get('is_new'):
+            date_of_birth = response.get('birthday')
+            gender = response.get('gender')[0].upper()
+            photo_url = response.get('picture')['data']['url']
+            photo_name = f'fb_{response.get("id")}_photo.jpeg'
+
+            bytes_inst = get_image_from_url(photo_url)  # получение фото в байт-формате
+
+            profile = Profile.objects.create(user_id=user.pk,
+                                             gender=gender,
+                                             date_of_birth=datetime.strptime(date_of_birth, '%m/%d/%Y'))
+
+            profile.photo.save(photo_name, files.File(bytes_inst))  # сохранение фото для профиля
+
+            Favorite.objects.create(profile=profile)  # создание объекта избранного для нового профиля
+
+    elif backend.name == 'google-oauth2':
+        if kwargs.get('is_new'):
+            photo_url = response.get('picture')
+            token_type = response.get('token_type')
+            access_token = response.get('access_token')
+
+            bytes_inst = get_image_from_url(photo_url)  # получение фото в байт-формате
+
+            # headers для запроса api
+            headers = {
+                "Authorization": f"{token_type} {access_token}",
+                "Accept": "application/json"
+            }
+
+            # получение информации пользователя с api (пол и дата рождения)
+            user_info = requests.get(
+                url=('https://people.googleapis.com/v1/people/'
+                     'me?personFields=genders%2Cbirthdays&key=AIzaSyDGwpM8rcsPoUZMMplrsU1BTGq-90wZbik'),
+                headers=headers)
+
+            json_info = user_info.json()
+
+            gender = json_info['genders'][0]['formattedValue']
+            date_of_birth = json_info['birthdays'][0]['date']
+            account_id = json_info['resourceName'].split('/')[1]
+            photo_name = f'google_{account_id}_photo.jpeg'
+
+            profile = Profile.objects.create(user_id=user.pk,
+                                             gender=gender[0],
+                                             date_of_birth=datetime.strptime(
+                                                 '/'.join(str(date_of_birth[k]) for k in date_of_birth), '%Y/%m/%d')
+                                             )
+            profile.photo.save(photo_name, files.File(bytes_inst))  # сохранение фото для профиля
+
+            Favorite.objects.create(profile=profile)  # создание объекта избранного для нового профиля

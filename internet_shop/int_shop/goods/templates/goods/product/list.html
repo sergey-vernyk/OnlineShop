@@ -41,12 +41,13 @@
                     <div id="productData" class="col m-3">
                         {% for product in products %}
                             {% include 'goods/product/card.html' with product=product %}
+                        {% empty %}
+                            <div class="d-flex justify-content-center">
+                                <h4>There are no results for your query <b>"{{ request.GET.query }}"</b></h4>
+                            </div>
                         {% endfor %}
                     </div>
                 </div>
-            </div>
-            <div class="col-sm-1 mx-1 border">
-                Other block
             </div>
         </div>
     </div>

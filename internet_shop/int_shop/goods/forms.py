@@ -60,3 +60,12 @@ class SortByPriceForm(forms.Form):
         ('p_asc', 'Price: Low To High'),
         ('p_desc', 'Price: High To Low'),
     ), widget=forms.Select(attrs={'class': 'form-select'}))
+
+
+class SearchForm(forms.Form):
+    """
+    Форма для поиска товаров на сайте
+    """
+    query = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'What find?'}))
+
+

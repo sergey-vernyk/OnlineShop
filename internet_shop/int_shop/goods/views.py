@@ -1,13 +1,14 @@
-import math
+from math import ceil
+import redis
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
+from django.shortcuts import render
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import FormMixin
 from django.conf import settings
 from account.models import Profile
 from django.views.decorators.http import require_POST
 from django.http.response import JsonResponse
-from goods.forms import RatingSetForm, CommentProductForm, SortByPriceForm
+from goods.forms import RatingSetForm, CommentProductForm, SortByPriceForm, SearchForm
 from cart.forms import CartQuantityForm
 from goods.logic import distribute_properties_from_request, get_page_obj
 from goods.models import Product, Category, Favorite
@@ -16,8 +17,9 @@ from decimal import Decimal
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from .utils import GoodsContextMixin
-import redis
 from common.decorators import ajax_required
+from django.contrib.postgres.search import TrigramSimilarity
+from django.db.models import Q
 
 # инициализация Redis
 r = redis.Redis(host=settings.REDIS_HOST,
@@ -41,12 +43,51 @@ class ProductListView(ListView, GoodsContextMixin):
             context = self.add_to_context(context, self.kwargs)
 
         context['sorting_by_price'] = SortByPriceForm()
+        context['search_form'] = SearchForm(initial={'query': self.request.GET.get('query')})
         return context
 
     def get_queryset(self):
-        if 'category_slug' in self.kwargs:  # если передана категория
+        if ('category_slug' and 'search_result') in self.kwargs:  # если передана категория и был поиск
+            return self.kwargs.get('search_result')
+        if 'category_slug' in self.kwargs:
             return super().get_queryset().filter(category__slug=self.kwargs['category_slug'])
+
         return super().get_queryset()
+
+    def get(self, request, *args, **kwargs):
+        """
+        Метод используется для поиска по сайту
+        и для обычной загрузки главной страницы сайта
+        """
+        query = request.GET.get('query')
+        category_slug = self.kwargs.get('category_slug')
+
+        # если был запрос на поиск
+        if 'query' in request.GET:
+            result = self._get_query_results(query, category_slug)
+            self.kwargs['search_result'] = [product for product in result.values()]
+
+        return super().get(request, *args, **kwargs)
+
+    @staticmethod
+    def _get_query_results(query: str, category_slug: str = None) -> dict:
+        """
+        Метод для получения результатов поиска.
+        query - текст запроса
+        """
+        if category_slug:
+            q = Q(category__slug=category_slug, similarity__gte=0.3)
+        else:
+            q = Q(similarity__gte=0.3)
+
+        products = Product.objects.annotate(
+            similarity=TrigramSimilarity('name', query), ).filter(q).order_by('-similarity')
+
+        product_ids = [product.pk for product in products]
+        # кол-во просмотров найденных товаров и сортировка их id по уменьшению просмотров
+        product_views = [int(r.hget(f'product_id:{pk}', 'views')) for pk in product_ids]
+        sorted_ids_by_views = [pk for pk, views in sorted(zip(product_ids, product_views), key=lambda x: -x[1])]
+        return products.in_bulk(sorted_ids_by_views)
 
 
 class ProductDetailView(FormMixin, DetailView):
@@ -127,6 +168,8 @@ class ProductDetailView(FormMixin, DetailView):
         self.object = self.get_object()
         # увеличение кол-ва просмотров товара на 1 при его просмотре
         r.hincrby(f'product_id:{self.object.pk}', 'views', 1)
+        # добавление товара в множество просмотренных товаров пользователем с profile_id
+        r.sadd(f'profile_id:{Profile.objects.get(user=self.request.user).pk}', self.object.pk)
         return super().get(request, *args, **kwargs)
 
 
@@ -258,8 +301,7 @@ def popular_list(request, category_slug: str = None):  # TODO refactoring
     category_name = ''
     page = request.GET.get('page')  # получаем текущую страницу из запроса
 
-    amount_products = r.llen('products_ids')  # кол-во id товаров на сайте
-    products_ids = [int(pk) for pk in r.lrange('products_ids', 0, amount_products)]  # получение этих id
+    products_ids = [int(pk) for pk in r.smembers('products_ids')]  # id всех товаров на сайте
 
     # получение всех товаров и связанных с ними категорий и сортировка их по полученных id
     products = Product.objects.select_related('category').in_bulk(products_ids)
@@ -291,7 +333,7 @@ def popular_list(request, category_slug: str = None):  # TODO refactoring
     else:
         product_list = [products[pk] for pk in products_ids_sorted]
     # пагинация списка товаров
-    page_obj = get_page_obj(per_pages=2, page=page, queryset=product_list)
+    page_obj = get_page_obj(per_pages=2, page=page, queryset=product_list[:10])
     products = page_obj.object_list
 
     return render(request, 'goods/popular_list.html', {'products': products,
@@ -348,7 +390,7 @@ def set_product_rating(request) -> JsonResponse:
     if not current_rating:
         product.rating = Decimal(star)
     else:  # расчет среднего рейтинга товара
-        current_rating = math.ceil((star + current_rating) / 2)
+        current_rating = ceil((star + current_rating) / 2)
         product.rating = current_rating
     product.save(update_fields=['rating'])  # сохранение в базе
 

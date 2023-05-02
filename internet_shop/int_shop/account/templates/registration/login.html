@@ -2,61 +2,69 @@
 {% load static %}
 
 {% block title %}Log-In | OnlineShop{% endblock %}
-
+{% block style %}
+    <link href="https://fonts.googleapis.com/css2?family=Bitter:ital@1&display=swap" rel="stylesheet">
+{% endblock %}
 {% block content %}
-<div class="container min-vh-100 d-flex justify-content-center align-items-center">
+<div class="container">
     <div class="login-form">
+        <h2 class="text-center pb-2 border-bottom fw-bold">Log-in</h2>
         <div class="row">
-            <h1 class="text-center mb-4 fw-bold">Log-in</h1>
-            <div class="col border-end border-2">
-                <div class="d-flex-grid">
-                    <form action="{% url 'login' %}" method="post" style="width: 350px;">
-                        {% csrf_token %}
-                        {% for field in form %}
-                            <div class="form-outline form-fields">
-                                {% if field.label == 'Remember?' %}
-                                    <span class="my-2">{{ field.label_tag }}</span> {{ field }}
-                                {% else %}
-                                    <label class="my-2" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            <div class="simple-auth">
+                <form action="{% url 'login' %}" method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="auth-form-fields">
+                            <label class="auth-label"
+                                   for="{{ field.id_for_label }}">{{ field.label }}
+                                    {% if field.field.required %}<span class="required-field">*</span>{% endif %}
+                            </label>
+                            {% if field.label == 'Remember?' %}
+                                <div class="check-auth-field">
                                     {{ field }}
+                                </div>
+                            {% else %}
+                                <div class="auth-field">
+                                    {{ field }}
+                                </div>
+                            {% endif %}
+                            <ul class="errorlist">
+                                {% if field.errors %}
+                                    {% for error in field.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
                                 {% endif %}
-                                <ul class="errorlist">
-                                    {% if field.errors %}
-                                        {% for error in field.errors %}
-                                            <li>{{ error }}</li>
-                                        {% endfor %}
-                                    {% endif %}
-                                </ul>
-                            </div>
-                        {% endfor %}
-                        <div class="row justify-content-between">
-                            <div class="col mt-2">
-                                <input type="hidden" name="next" value="{{ next }}"/>
-                                <button type="submit" class="btn btn-primary fs-5">Sign in</button>
-                            </div>
-                            <div class="col text-center mt-2">
-                                <a class="text-decoration-none" style="font-size: 20px;"
-                                   href="{% url 'password_reset' %}">Forgot password?</a>
-                            </div>
+                            </ul>
                         </div>
-                    </form>
-                </div>
+                    {% endfor %}
+                    <div class="login-buttons">
+                        <div class="addit-links">
+                            <a class="forgot-pass-link" href="{% url 'password_reset' %}">Forgot password?</a>
+                            <a class="reg-link" href="{% url 'register_user' %}">Not registered?</a>
+                        </div>
+                        <input type="hidden" name="next" value="{{ next }}"/>
+                        <button type="submit" class="log-button">Sign in</button>
+                    </div>
+                </form>
             </div>
-            <div class="col">
                 <div class="social">
+                    <h4>Social login</h4>
                     <ul>
                         <li class="facebook">
-                            <a href="#">Login with Facebook</a>
+                            <a href="{% url 'social:begin' 'facebook' %}">Login with Facebook</a>
                         </li>
                         <li class="google">
-                            <a href="#">Login with Google</a>
+                            <a href="{% url 'social:begin' 'google-oauth2' %}">Login with Google</a>
+                            <form method="post" action="{% url 'social:disconnect' 'google-oauth2' %}">
+                                {% csrf_token %}
+                                <button type="submit">Disconnect Google</button>
+                            </form>
                         </li>
                         <li class="twitter">
                             <a href="#">Login with Twitter</a>
                         </li>
                     </ul>
                 </div>
-            </div>
             <div class="row">
                 {% if messages %}
                     {% for message in messages %}
@@ -71,6 +79,6 @@
             </div>
         </div>
     </div>
-</div>
+    </div>
     <script src="{% static 'js/close_messages.js' %}"></script>
 {% endblock%}

@@ -44,7 +44,7 @@
                         </div>
                     </div>
                     <!--Информация о каждом товаре из заказа-->
-                    <div id="order-detail-{{ order.pk }}">
+                    <div id="order-detail-{{ order.pk }}" style="display: none;">
                         <div class="d-block">
                             {% for item in order_items %}
                                 <div class="d-flex" style="align-items: center;">
@@ -184,8 +184,7 @@
     {% endwith %}
     {% empty %}
         <div class="empty-customer-content">
-            <div class="d-inline">There are no orders yet</div>
-            <span class="material-symbols-outlined">sentiment_dissatisfied</span>
+            <h4 class="d-inline">There are no orders yet</h4>
         </div>
     {% endfor %}
 </div>

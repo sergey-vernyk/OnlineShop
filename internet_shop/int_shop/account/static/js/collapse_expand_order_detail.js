@@ -1,5 +1,4 @@
 $(document).ready(function() {
-    $('[id^=order-detail]').hide();
     $('[id^=expander]').click(function(){
         var order_id = this.id.slice(9); //достаем id заказа из нажатой кнопки
         var currentAttr = $(this).find('img').attr('src'); //получение значения пути к иконке

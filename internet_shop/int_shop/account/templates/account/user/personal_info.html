@@ -16,12 +16,20 @@
             {% endwith %}
         </div>
         <div class="info-row">
+            <span class="info-name">Date of Birth</span>
+            <span class="info-value">{{ customer.date_of_birth|date:"d F Y" }}</span>
+        </div>
+        <div class="info-row">
             <span class="info-name">Phone number</span>
             <span class="info-value">{{ customer.phone_number }}</span>
         </div>
         <div class="info-row">
             <span class="info-name">Email</span>
             <span class="info-value">{{ customer.email }}</span>
+        </div>
+        <div class="info-row">
+            <span class="info-name">About</span>
+            <span class="info-value">{{ customer.about|default:'No info...' }}</span>
         </div>
     </div>
 </div>

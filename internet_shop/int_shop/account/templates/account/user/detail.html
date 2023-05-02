@@ -10,13 +10,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Rubik&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@1,300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond&display=swap" rel="stylesheet">
 {% endblock %}
 {% block content %}
     <div class="container my-4" style="min-width: 960px;">
         <div class="row customer-header">
             <div class="brief-info">
                 <div style="display: flex; align-items: center;">
-                    <img src="{{ customer.photo.url }}" width="80" height="80">
+                    {% if customer.photo %}
+                        <img src="{{ customer.photo.url }}" width="80" height="80" alt="user-photo">
+                    {% else %}
+                        <img src="{% static 'img/no_user_photo.png' %}" width="80" height="80" alt="user-photo">
+                    {% endif %}
                     <span id="customer-full-name">
                         <span class="material-symbols-outlined" style="margin-right: 5px;">
                             person</span>{{ customer.user.get_full_name }}
@@ -108,12 +113,15 @@
                     {% include 'account/user/favorites_info.html' with favorites=favorites %}
                 {% elif location == 'present_cards' %}
                     {% include 'account/user/present_cards_info.html' with present_cards=present_cards %}
+                {% elif location == 'watched' %}
+                    {% include 'account/user/watched_info.html' with watched_products=watched favorites=favorites %}
                 {% endif %}
             </div>
         </div>
     </div>
-<script src="{% static 'js/min_max_order_detail.js' %}"></script>
+<script src="{% static 'js/collapse_expand_order_detail.js' %}"></script>
 <script src="{% static 'js/add_remove_favorite.js' %}" type="module"></script>
 <script src="{% static 'js/go_to_choose_order.js' %}"></script>
 <script src="{% static 'js/highlight_order.js' %}"></script>
+<script src="{% static 'js/collapse_expand_comment.js' %}"></script>
 {% endblock %}

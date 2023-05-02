@@ -1,0 +1,55 @@
+{% load static %}
+{% load cut_fraction_part %}
+
+<div class="personal-info">
+  <h3>Watched products</h3>
+  <div class="d-flex" style="flex-wrap: wrap;">
+    {% for product in watched_products %}
+      <div class="product-card-watched">
+        <div class="image-product-watched">
+          {% if product.image %}
+            <img src="{{ product.image.url }}" width="80" height="80">
+          {% else %}
+            <img src="{% static 'img/no_image_crop.png' %}" width="80" height="80">
+          {% endif %}
+        </div>
+        <div class="prod-name-watched">
+          <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
+        </div>
+        <div class="prod-rating-watched rating-star">
+          {% with product_rating=product.rating %}
+              {% for i in '12345'|make_list %}
+                {% if product_rating|cut_fraction >= i %}
+                  <span id="star-{{ i }}" class="fa fa-star checked"></span>
+                {% else %}
+                  <span id="star-{{ i }}" class="fa fa-star"></span>
+                {% endif %}
+              {% endfor %}
+            {% endwith %}
+        </div>
+        <div class="prod-price-watched">
+          ${{ product.price }}
+        </div>
+        <div class="prod-fav-watched">
+          {% if product in favorites %}
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+            </svg>
+          {% else %}
+          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+            <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641
+             2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542
+              6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717
+               2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12
+                3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+          </svg>
+          {% endif %}
+        </div>
+      </div>
+    {% empty %}
+      <div class="empty-customer-content">
+          <h4>You are not watched products yet</h4>
+      </div>
+    {% endfor %}
+  </div>
+</div>

@@ -67,7 +67,7 @@ class Product(models.Model):
         товара в список со всеми id товаров, которые хранятся в БД Redis
         """
         super().save(*args, **kwargs)
-        r.lpush('products_ids', self.pk)
+        r.sadd('products_ids', self.pk)
 
     def get_absolute_url(self):
         return reverse('goods:product_detail', args=(self.pk, self.slug))

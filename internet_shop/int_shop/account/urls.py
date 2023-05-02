@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 from django.contrib.auth import views as auth_views
 
@@ -16,5 +16,6 @@ urlpatterns = [
     path('register_user/', views.UserRegisterView.as_view(), name='register_user'),
     path('send_activate_email/<uidb64>/<token>', views.activate_user_account, name='activate_account'),
     path('<slug:customer>/<str:location>/', views.DetailUserView.as_view(), name='customer_detail'),
+    path('social_auth/', include('social_django.urls', namespace='social')),
 
 ]

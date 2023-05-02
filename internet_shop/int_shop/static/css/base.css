@@ -57,6 +57,10 @@ body, html {
     background-color: #F8F8FF;
 }
 
+#productData {
+    min-height: 300px;
+}
+
 .prod-card {
     background-color: #F5FDF0;
     height:400px;
@@ -78,18 +82,17 @@ body, html {
 }
 
 #main-navbar {
-    color:#996600;
     width:100%;
     height:80px;
     font-family:'Comic Sans MS';
     font-size:18px;
     line-height:1.3em;
-    background: linear-gradient(0deg, rgba(51,84,175,1) 41%, rgba(45,46,253,1) 100%);
+    background: rgba(51,84,175,1);
     min-width: 85%;
 }
 
 #main-navbar ul a {
-    color: white;
+    //color: white;
     font-weight: bold;
 }
 
@@ -115,18 +118,18 @@ body, html {
 
 
 /*errors*/
+
 .errorlist {
     color: #F07D7D;
-    font-size: 18px;
+    font-size: 15px;
     padding-left: 0px;
 }
 
 .errorlist li {
     list-style-type: none;
-    }
-
-.errorlist {
-    margin-bottom: 0px;
+    margin-top: 8px;
+    display: block;
+    text-align: end;
 }
 
 #error-form {
@@ -136,21 +139,56 @@ body, html {
     font-size: 17px;
 }
 
-/*login form*/
+/*Форма входа в систему*/
+
 .login-form {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 900px;
+    display: block;
+    position: relative;
+    margin: 100px auto;
+    width: 800px;
     min-width: 700px;
-    height: 500px;
-    border: 1px solid #FFFAF0;
     border-radius: 10px;
-    padding: 15px;
-    background-color: #FFFAF0;
-    box-shadow: 2px 3px 7px 4px #AFACA5;
+    padding: 15px 15px 50px 15px;
+    background-color: #eff4f9;
+    border: 1px solid #ced4da;
 }
 
+.simple-auth {
+    width: 60% !important;
+    display: block;
+    padding: 10px;
+    padding-right: 10px;
+    padding-left: 10px;
+    margin-left: 10px !important;
+    margin-right: 10px !important;
+    border: 1px solid #adb5bd;
+    border-radius: 10px;
+}
+
+.simple-auth .auth-form-fields {
+    display: block;
+    position: relative;
+    margin: 20px auto;
+}
+
+.check-auth-field {
+    display: inline-block;
+    margin-left: 50px;
+}
+
+.simple-auth .auth-field {
+    position: relative;
+    float: right;
+    width: 250px;
+    padding-left: 10px;
+    border-radius: 5px;
+    margin-left: 10px;
+}
+
+.simple-auth .auth-label {
+    display: inline-block;
+    font-family: 'Merriweather', serif;
+}
 
 .login-form .form-fields {
 	width: 350px;
@@ -158,11 +196,60 @@ body, html {
 	margin-bottom: 20px;
 }
 
+.login-buttons {
+    display: flex;
+    width: 250px;
+    justify-content: space-between;
+    float: right;
+}
+
+.log-button {
+    display: block;
+    background-color: #568EED;
+    padding: 5px 10px;
+    color: white;
+    border-radius: 8px;
+    border: 1px solid #1F18EC;
+    width: 100px;
+    height: 40px;
+    align-self: center;
+}
+
+.addit-links {
+    display: inline-block;
+    position: relative;
+}
+
+.forgot-pass-link {
+    display: block;
+    text-decoration: none;
+    color: #A68C8C;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: 'Bitter', serif;
+}
+
+.reg-link {
+    display: block;
+    text-decoration: none;
+    color: #A68C8C;
+    font-size: 1rem;
+    font-family: 'Bitter', serif;
+}
+
+.reg-link:hover, .forgot-pass-link:hover {
+    color: red;
+    text-decoration: underline;
+}
+
+
 /*Вход в систему через соц. сети*/
 .social {
-	position: relative;
-	top: 45px;
-	left: 70px;
+    display: flex;
+    flex-direction: column;
+	width: 37% !important;
+	justify-content: center;
+    align-items: center;
 }
 
 .social li {
@@ -177,6 +264,82 @@ body, html {
 
 .social a {
     text-decoration: none;
+}
+
+/*Форма регистрации*/
+.register-form {
+    display: block;
+    position: relative;
+    margin: 50px auto 80px auto;
+    padding: 15px;
+    border: 1px solid #ced4da;
+    border-radius: 10px;
+    background-color: #eff4f9;
+}
+
+.required-field { color: red; }
+
+#reg-form{ padding: 10px; }
+
+.register-form .reg-form-fields {
+    display: block;
+    margin: 20px auto;
+    position: relative;
+}
+
+.reg-form-fields .reg-field {
+    position: relative;
+    float: right;
+    width: 250px;
+    padding-left: 10px;
+    border-radius: 5px;
+    margin-left: 10px;
+}
+
+.reg-form-fields #id_about {
+    min-height: 95px;
+}
+
+.reg-photo { padding-left: 0px !important; }
+
+.reg-form-fields .reg-label {
+    display: inline-block;
+    font-family: 'Merriweather', serif;
+}
+
+.reg-button {
+    display: inline-block;
+    background-color: #568EED;
+    position: absolute;
+    bottom: 20px;
+    left: 15px;
+    padding: 5px 10px;
+    color: white;
+    border-radius: 8px;
+    border: 1px solid #1F18EC;
+}
+
+.radio-gender {
+    display: inline;
+    font-family: 'Merriweather', serif;
+}
+
+.gender-choice {
+    display: block;
+    float: right;
+    margin-right: 100px;
+}
+
+.radio-gender:nth-child(1) { margin-right: 15px; }
+
+.help {
+    font-style: italic;
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px;
+    width: 160px;
+    position: relative;
+    margin: 5px 0;
+    color: darkgray;
 }
 
 /*messages framework*/
@@ -422,18 +585,18 @@ table tr td {
 .add-to-favorite {
     display: inline;
     justify-content: center;
-    background-color: #F37D7D;
+    background-color: #97C4F0;
     height: 35px;
     width: auto;
     min-width: 205px;
     align-items: center;
     padding: 5px;
-    border: #EA6565 solid 1px;
+    border: #6F7173 solid 1px;
     border-radius: 8px;
 }
 
 .add-to-favorite:hover {
-    background-color: #CD7373;
+    background-color: #5E7FD9;
 }
 
 .add-to-favorite a {
@@ -444,7 +607,11 @@ table tr td {
 }
 
 .add-to-favorite a:hover {
-    background-color: #CD7373;
+    background-color: #5E7FD9;
+}
+
+.add-to-favorite svg {
+    fill: red;
 }
 
 
@@ -469,13 +636,11 @@ table tr td {
 /*панель пользователя на navbar*/
 
 .user-panel {
-    display: flex;
-    position: absolute;
-    right: 620px;
-    top: 0px;
+    display: inline;
+    position: relative;
     padding: 8px;
-    margin: 5px;
-    align-items: center;
+    margin: 0 10px;
+    min-width: 108px;
 }
 
 .user-panel a:nth-child(2) {
@@ -492,13 +657,12 @@ table tr td {
 /* Корзина */
 .cart-panel {
     display: flex;
-    position: absolute;
-    right: 440px;
-    bottom: -10px;
-    align-items: center;
-    margin: 5px;
-    padding: 10px;
+    margin: 0 10px;
+    padding: 5px;
     min-width: 170px;
+    align-items: center;
+    justify-content: space-around;
+}
 }
 
 .amount-items {
@@ -510,14 +674,15 @@ table tr td {
 }
 
 .cart-button {
-    position: relative;
-    padding: 7px;
-    left: 30px;
+    left: 10px;
+    top: 10px;
 }
 
 .cart-button a {
+    display: inline;
     text-decoration: none;
     color: white;
+    position: relative;
 }
 
 .cart-button a:hover {
@@ -527,34 +692,32 @@ table tr td {
 .amount-cart {
     margin-left: 8px;
     margin-right: 8px;
+    position: absolute;
+    top: 3px;
 }
 
 .total-price {
-    position: absolute;
+    position: relative;
     color: #F2900F;
-    font-size: 1.2rem;
-    position: absolute;
-    left: 130px;
-    top: 20px;
+    font-size: 1rem;
+    margin-left: 20px;
 }
 
 .authorization {
     position: relative;
-    bottom: 3px;
-    right: 70px;
+    display: inline;
+    margin-left: 20px;
 }
 
 .authorization #login-button {
-  border-radius: 5px;
+    border-radius: 5px;
     text-decoration: none;
     color: white;
-    margin: 3px;
     padding: 4px;
-    background-color: #3BB94C;
     display: inline-block;
+    background-color: rgba(17, 185, 40, 1);
     position: relative;
-    left: 95px;
-    border: solid 1px aqua;
+    border: solid 1px rgba(5, 70, 14, 1);
 }
 
 #login-button:hover {
@@ -562,20 +725,14 @@ table tr td {
 }
 
 .register {
-    padding: 4px;
-}
-
-.register p {
-    display: inline;
-    color: #E29F9F;
-    font-size: 14px;
+    display: inline-block;
 }
 
 .register #register-button {
-    display: inline;
+    display: inline-block;
     color: white;
     text-decoration: none;
-    font-weight: 500;
+    font-weight: 500;;
 }
 
 #register-button:hover {
@@ -668,6 +825,7 @@ table tr td {
     text-align: left;
     font-size: 23px;
     font-family: 'Exo 2', sans-serif;
+    font-weight: 600;
 }
 
 #logout {
@@ -848,8 +1006,7 @@ table tr td {
 
 .empty-customer-content {
     font-size: 1.2rem;
-    position: absolute;
-    font-size: 1.2rem;
+    display: block;
     position: absolute;
     top: 50%;
     left: 21%;
@@ -960,7 +1117,7 @@ table tr td {
     font-weight: 600;
 }
 
-[id^=coupon-] {
+[id^='coupon-'] {
     width: auto;
     height: 34px;
     margin-right: 7px;
@@ -997,4 +1154,232 @@ table tr td {
     padding: 10px;
     border-top: 1px solid #D3D7D2;
     border-bottom: 1px solid #D3D7D2;
+}
+
+/*Комментарии*/
+
+.comment-body-profile {
+    padding: 1rem 2rem 1rem 4rem;
+    text-align: justify;
+    text-indent: 20px;
+}
+
+[id^='comment-'][class^='d-flex'] {
+    cursor: pointer;
+}
+
+.date-comment-profile {
+    left: 0;
+    padding: 0;
+}
+
+.product-name-profile {
+    display: block;
+    margin-right: 0.5rem;
+    font-family: 'EB Garamond', serif;
+    font-size: 0.8rem;
+    align-self: center;
+}
+
+.product-name-profile a {
+    text-decoration: none;
+    text-transform: uppercase;
+    color: #B7AFAF;
+    font-weight: 600;
+}
+
+.product-name-profile a:hover {
+    text-decoration: underline;
+}
+
+.comment-id-profile {
+    color: #797979;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.rate-comment-profile {
+    display: inline-block;
+    padding: 5px;
+    position: relative;
+    top: 0;
+    left: 80%;
+    border-left: solid 1px #dee2e6;
+}
+
+.rate-comment-profile div {
+    display: inline-block;
+    margin-left: 10px;
+}
+
+/*Просмотренные товары*/
+
+.product-card-watched {
+    position: relative;
+    margin: 10px;
+    padding: 5px;
+    width: 171px;
+    height: 220px;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+}
+
+.image-product-watched {
+    display: flex;
+    justify-content: center;
+    margin: 5px;
+}
+
+.prod-name-watched {
+    display: flex;
+    justify-content: center;
+    height: 23%;
+    width: 100%;
+    //padding: 5px;
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+    font-family: 'Montserrat', sans-serif;
+    text-align: center;
+}
+
+.prod-name-watched a {
+    text-decoration: none;
+    color: #5E5C5C;
+}
+
+.prod-rating-watched {
+    display: block;
+    text-align: center;
+    margin: 5px 0;
+}
+
+.prod-price-watched {
+    display: block;
+    text-align: center;
+    //margin-left: 0.8rem;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.prod-fav-watched {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.prod-fav-watched svg {
+    fill: red;
+    color: red;
+}
+
+/*Выпадающий список с категориями товаров главного навбара*/
+
+.dropdwn {
+    position: absolute;
+    left: 90px;
+    top: 23px;
+    list-style: none;
+    padding-left: 0;
+    width: 193px;
+    background-color: rgba(51,84,175,1);
+    border-radius: 8px;
+    margin-bottom: inherit;
+
+}
+
+.dropdwn .dropdwn-item {
+    padding: 5px 5px 5px 20px;
+    margin: 5px 0;
+    display: none;
+    z-index: 2;
+    position: relative;
+}
+
+.dropdwn li a {
+    color: white;
+    text-decoration: none;
+}
+
+.dropdwn li a:hover {
+    color: rgba(207, 196, 199, 1);
+    text-decoration: none;
+    text-decoration: underline;
+}
+
+#main-nav-item {
+    color: white;
+    padding: 5px;
+    margin-left: 10px;
+    margin-right: 35px;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: rgba(51,84,156,1);
+    text-align: center;
+    border-radius: 8px;
+    position: relative;
+}
+
+#main-nav-item .material-symbols-outlined {
+    position: absolute;
+    top: 7px;
+    right: 5px;
+    margin-right: 0;
+}
+
+/*Дополнительные пункты меню главного навбара*/
+
+.additional-menu-items {
+    display: inline;
+    position: relative;
+    margin-left: 200px;
+    margin-bottom: 0;
+    padding-left: 0;
+    //padding-right: 15px;
+}
+
+.additional-menu-items li {
+    display: inline;
+    font-weight: bold;
+    padding: 5px;
+    margin: 0 10px;
+    background-color: rgba(51,84,156,1);
+    border-radius: 8px;
+}
+
+.additional-menu-items a {
+    text-decoration: none;
+    color: white;
+}
+
+.additional-menu-items a:hover {
+    color: rgba(207, 196, 199, 1);
+    text-decoration: underline;
+}
+
+/*Строка поиска*/
+#search-form {
+    position: relative;
+    padding: 10px;
+    margin-left: 50px;
+    margin-right: 15px;
+    display: flex;
+}
+
+#search-form #search-btn {
+    padding: 6px;
+    border-radius: 5px;
+    border: 1px rgba(5, 70, 14, 1) solid;
+    margin-left: 0.5rem;
+    background-color: rgba(17, 185, 40, 1);
+    color: white;
+    height: 40px;
+}
+
+#search-form #search-btn:hover { background-color: #268833 }
+
+#id_query {
+    width: 350px;
+    padding: 0 1.2rem;
+    border-radius: 8px;
+    height: 40px;
 }

@@ -1,11 +1,42 @@
 <div class="personal-info">
-  <h3>My comments</h3>
-  <ol>
-    {% for comment in comments %}
-    <li>{{ comment.product.name }}</li>
-    <li>{{ comment.body }}</li>
-    <li>{{ comment.created }}</li>
-    <li>{{ comment.updated }}</li>
-    {% endfor %}
-  </ol>
+  <h3>Comments</h3>
+  {% for comment in comments %}
+    <span class="comment-id-profile">№ {{ comment.pk }}</span>
+    <div class="d-block border rounded mb-3">
+      <div id="comment-{{ comment.pk }}" class="d-flex justify-content-between my-2 ms-2">
+        <div class="d-flex align-items-center">
+            <span class="material-symbols-outlined" style="margin-right: 5px;">calendar_month
+            </span> <span class="date date-comment-profile">{{ comment.created|date:"d.m.Y l" }}</span>
+        </div>
+        {% if comment.updated == comment.created %}
+          <div class="d-inline">
+            Updated: <span class="date date-comment-profile">{{ comment.updated|date:"d.m.Y l" }}</span>
+          </div>
+        {% endif %}
+        <div class="product-name-profile">
+          <a href="{{ comment.product.get_absolute_url }}">{{ comment.product.name }}</a>
+        </div>
+      </div>
+      <div id="comment-expander-{{ comment.pk }}" style="display: none;">
+        <div class="d-flex position-relative border-bottom border-top">
+          <span class="material-symbols-outlined position-absolute" style="top: 19px;left: 9px;">comment</span>
+          <div class="comment-body-profile">{{ comment.body }}</div>
+        </div>
+        <div class="rate-comment-profile">
+          <div>
+            <span class="material-symbols-outlined me-1">thumb_up</span>
+            <span>(5)</span>
+          </div>
+          <div>
+            <span class="material-symbols-outlined me-1">thumb_down</span>
+            <span>(1)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <div class="empty-customer-content">
+          <h4>You are not left comments yet</h4>
+    </div>
+  {% endfor %}
 </div>
