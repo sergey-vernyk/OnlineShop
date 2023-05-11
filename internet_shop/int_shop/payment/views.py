@@ -99,11 +99,11 @@ def webhook(request):
             sig_header,
             endpoint_secret
         )
-    except ValueError as e:
+    except ValueError:
         # невалидный payload
         return HttpResponse(status=400)
 
-    except stripe.error.SignatureVerificationError as e:
+    except stripe.error.SignatureVerificationError:
         # невалидная сигнатура
         return HttpResponse(status=400)
 

@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'easy_thumbnails',
     'django.contrib.postgres',
     'social_django',
+    'rest_framework.authtoken',
 
     'goods.apps.GoodsConfig',
     'orders.apps.OrdersConfig',
@@ -67,6 +68,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'cart.middleware.prev_current_urls_middleware',  # сохраняет текущий и предыдущий URL адреса в сессию
 ]
 
 ROOT_URLCONF = 'int_shop.urls'
@@ -200,7 +202,6 @@ REDIS_DB = 2
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',  # встроенная модель
     'social_core.backends.facebook.FacebookOAuth2',  # авторизация на сайте при помощи Facebook
-    'social_core.backends.twitter.TwitterOAuth',  # авторизация на сайте при помощи Twitter
     'social_core.backends.google.GoogleOAuth2',  # авторизация на сайте при помощи Google
 )
 

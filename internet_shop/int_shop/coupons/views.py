@@ -1,36 +1,35 @@
-from django.shortcuts import redirect
-
+from common.decorators import ajax_required
 from account.models import Profile
 from coupons.forms import CouponApplyForm
 from .models import Coupon
-from django.utils import timezone
-from django.core.exceptions import ObjectDoesNotExist
+from django.views.decorators.http import require_POST
+from django.http.response import JsonResponse
+from decimal import Decimal
 
 
+@ajax_required
+@require_POST
 def apply_coupon(request):
     """
     Применение купона со страницы корзины
     и добавление его в профиль пользователя
     """
-    now = timezone.now()
-    if request.method == 'POST':
-        coupon_form = CouponApplyForm(request.POST)
-        if coupon_form.is_valid():
-            code = coupon_form.cleaned_data.get('code')
-            try:
-                coupon = Coupon.objects.get(code__iexact=code,
-                                            valid_from__lte=now,
-                                            valid_to__gte=now,
-                                            active=True)
-            except ObjectDoesNotExist:
-                request.session['coupon_id'] = None
-            else:
-                request.session['coupon_id'] = coupon.pk
-                Profile.objects.get(user=request.user).coupons.add(coupon)
-
-    return redirect('cart:cart_detail')
+    coupon_form = CouponApplyForm(request.POST)
+    if coupon_form.is_valid():
+        code = coupon_form.cleaned_data.get('code')
+        coupon = Coupon.objects.get(code=code)
+        request.session['coupon_id'] = coupon.pk
+        Profile.objects.get(user=request.user).coupons.add(coupon)
+        return JsonResponse({'success': True,
+                             'coupon_discount': coupon.discount / Decimal(100)})
+    else:
+        request.session['coupon_id'] = None
+        return JsonResponse({'success': False,
+                             'form_errors': coupon_form.errors})
 
 
+@ajax_required
+@require_POST
 def cancel_coupon(request):
     """
     Отмена применения купона к корзине,
@@ -42,4 +41,5 @@ def cancel_coupon(request):
     del request.session['coupon_id']
     request.session.modified = True
 
-    return redirect('cart:cart_detail')
+    return JsonResponse({'success': True,
+                         'coupon_discount': coupon.discount / Decimal(100)})

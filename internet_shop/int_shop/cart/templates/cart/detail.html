@@ -1,164 +1,167 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load thumbnail %}
+{% load filters %}
+{% load get_value_from_dict %}
 
 
-{% block title %}Cart detail | OnlineShop{% endblock %}
-
+{% block title %}Cart | OnlineShop{% endblock %}
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/cart.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=PT+Sans+Caption:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+{% endblock %}
 {% block content %}
-
 <div class="container p-3">
-    <h5 class="mb-3">
-        <a class="text-decoration-none text_body" href="{% url 'goods:product_list' %}">
-            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
-                 class="bi bi-arrow-left-short" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0
+    <!--верхняя строка корзины-->
+    <div class="cart-top">
+        <h2 class="mb-1 d-block">Shopping cart</h2>
+        <div class="d-block align-self-center" style="margin-right: calc(10% - 0.8rem);">
+            <a class="back-link" href="{{ request.session.urls.previous_url }}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                     class="bi bi-arrow-left-short" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0
                  1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5z"/>
-            </svg>
-            Continue shopping
-        </a>
-    </h5>
-    <hr>
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="mb-1">Shopping cart</h2>
-            <p class="amount-items">
-                You have <span>{{ cart.get_amount_items_in }}</span> item<span>{{cart.get_amount_items_in|pluralize }}</span> in your cart
-            </p>
+                </svg>
+                Continue shopping
+            </a>
         </div>
     </div>
-    <div class="col-lg-7">
-        {% for item in cart %}
-            {% with product=item.product %}
-                <div class="card mb-3">
-                    <div class="shadow p-3 bg-body rounded">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between">
-                                <div class="d-flex flex-row align-items-center">
-                                    <div>
-                                        <a class="text-decoration-none" href="{{ product.get_absolute_url }}">
-                                            <img class="img-fluid rounded-3" src="{% if product.image %}{% thumbnail product.image 100x100 %}{% else %}{% static 'img/no_image.png' %}{% endif %}"
-                                                 alt="shopping-item"></a>
-                                    </div>
-                                    <div class="ms-3">
-                                        <h5>
-                                            <a class="text-decoration-none" href="{{ product.get_absolute_url }}">
-                                            {{ product.name }}</a>
-                                        </h5>
-                                    </div>
-                                </div>
-                                <div class="d-flex flex-row align-items-center">
-                                    <div style="width: 140px;">
-                                        <form id="update-form-{{ product.id }}" method="post">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="url" value="{% url 'cart:cart_add' %}">
-                                            <input type="hidden" name="product_id" value="{{ product.id }}">
-                                            <div class="d-inline">
-                                                <button id="add-to-cart-{{ product.id }}" class="btn btn-info btn-sm" type="submit">Update</button>
-                                            </div>
-                                            <div class="d-inline">
-                                                {{ item.quantity_form.quantity }}
-                                            </div>
-                                        </form>
-                                    </div>
-                                    <div style="width: 100px;">
-                                        <h5 class="m-0"> ${{ item.total_price }}</h5>
-                                    </div>
-                                    <a href="{% url 'cart:cart_remove' %}" data-pk="{{ product.id }}" class="cart-remove">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
-                                        <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5
-                                        0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2
-                                         2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59
-                                          0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042
-                                           3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1
-                                            .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1
-                                             .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"/>
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endwith %}
-        {% endfor %}
-        {% if cart %}
-            <div class="input-group">
-                <div class="flex-row mb-3">
-                    <div class="d-flex justify-content-start">
-                        <form method="post" action="{% url 'present_cards:apply_present_card' %}">
-                            {% csrf_token %}
-                            {{ present_card_form.code.label }}
-                            {{ present_card_form.code }}
-                            {% if cart.present_card_id %}
-                                <a href="{% url 'present_cards:cancel_present_card' %}" class="btn btn-info btn-sm" role="button">Cancel</a>
+    <div class="row flex-nowrap align-items-start">
+        <div class="block-cart-items">
+            <!--карточки добавленных товаров-->
+            {% for item in cart %}
+                <div class="cart-item">
+                    {% with product=item.product %}
+                        <div class="item-image">
+                            {% if product.image %}
+                                <a href="{{ product.get_absolute_url }}">
+                                    <img src="{{ product.image.url }}" width="100" height="100">
+                                </a>
                             {% else %}
-                                <button class="btn btn-info btn-sm" type="submit">Apply</button>
+                                <a href="{{ product.get_absolute_url }}">
+                                    <img src="{% static 'img/no_image_crop.png' %}" width="100" height="100">
+                                </a>
                             {% endif %}
-                        </form>
-                    </div>
-                </div>
-                <div class="flex-row">
-                    <div class="d-flex justify-content-start">
-                        <div class="me-3">
-                            <form method="post" action="{% url 'coupons:apply_coupon' %}">
+                        </div>
+                        <div class="item-name">
+                            <a href="{{ product.get_absolute_url }}">
+                                <span>{{ product.name }}</span>
+                            </a>
+                        </div>
+                        <div class="item-quantity">
+                            <form id="update-form-{{ product.id }}"
+                                  data-url="{% url 'cart:cart_add' %}" method="post">
                                 {% csrf_token %}
-                                {{ coupon_form.code.label }}
-                                {{ coupon_form.code }}
-                                {% if cart.coupon_id %}
-                                    <a href="{% url 'coupons:cancel_coupon' %}" class="btn btn-info btn-sm" role="button">Cancel</a>
-                                {% else %}
-                                    <button class="btn btn-info btn-sm" type="submit">Apply</button>
-                                {% endif %}
+                                {{ item.quantity_form.quantity }}
                             </form>
                         </div>
+                        <div class="item-price">
+                            <!--расчет стоимости товара по его количеству-->
+                            {% with product_id=product.id|to_str product_price=product.price %}
+                                ${{ cart.cart|get_dict_item:product_id|get_dict_item:'quantity'|multiply:product_price }}
+                            {% endwith %}
+                        </div>
+                        <div class="item-remove">
+                                <svg data-url="{% url 'cart:cart_remove' %}"
+                                     data-pk="{{ product.id }}"
+                                     xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="cart-remove bi bi-trash3" viewBox="0 0 16 16">
+                                    <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5
+                                                0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2
+                                                 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59
+                                                  0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042
+                                                   3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1
+                                                    .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1
+                                                     .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"/>
+                                </svg>
+                        </div>
+                    {% endwith %}
+                 </div>
+            {% endfor %}
+        </div>
+        {% if cart %}
+            <div class="block-totals">
+                <h3>Totals</h3>
+                <div class="amount-items">
+                    <div>
+                        <span>{{ cart.get_amount_items_in }}</span>
+                        <span>product{{cart.get_amount_items_in|pluralize }}</span> for amount:
                     </div>
+                        <span>${{ cart.get_total_price_with_discounts }}</span>
                 </div>
-            </div>
-            <div class="flex-row">
-                <div class="d-flex justify-content-end">
-                    <p class="me-3">
-                        Subtotal:
-                    </p>
-                    <p class="mb-2">
-                        ${{ cart.get_total_price }}
-                    </p>
-                </div>
-            </div>
-            {% if cart.coupon_id or cart.present_card_id %}
-                <div class="flex-row">
-                    <div class="d-flex justify-content-end">
-                        <p class="me-3">
-                            Discount:
-                        </p>
-                        <p class="mb-2 text-success">
-                            -${{ cart.get_total_discount }}
-                        </p>
+                <div class="block-summary">
+                    <h5 class="fw-bold">Discounts</h5>
+                    <!--Форма для кода купона-->
+                    <div class="coupon-check">
+                        <label for="have-coupon">Have a coupon?</label>
+                        <input style="cursor: pointer" type="checkbox" name="have-coupon" id="have-coupon">
                     </div>
-                </div>
-            {% endif %}
-            <div class="flex-row">
-                <div class="d-flex justify-content-end">
-                    <p class="me-3">
-                        Total:
-                    </p>
-                    <p class="mb-2">
-                        {% with total=cart.get_total_price_with_discounts %}
-                            {% if total <= 0 %}
-                                $0.00
+                    <form id="coupon-form" style="display: none;"
+                          data-url-apply="{% url 'coupons:apply_coupon' %}"
+                          data-url-cancel="{% url 'coupons:cancel_coupon' %}">
+                        {% csrf_token %}
+                        {% for field in coupon_form %}
+                            {{ field }}
+                        {% endfor %}
+                        <button class="coupon-btn" type="submit">
+                            {% if cart.coupon_id %}
+                                Cancel
                             {% else %}
-                                $ {{ total }}
+                                Apply
                             {% endif %}
-                        {% endwith %}
-                    </p>
+                        </button>
+                        {% if cart.coupon_id %}
+                            <span class="material-symbols-outlined">check_circle</span>
+                        {% endif %}
+                    </form>
+                    <!--ошибки для формы купона-->
+                    <ul class="errorlist"></ul>
+
+                    <!--Форма для кода подарочной карты (заполняется в JavaScript)-->
+                    <div class="card-check">
+                        <label for="have-card">Have a present card?</label>
+                        <input style="cursor: pointer" type="checkbox" name="have-card" id="have-card">
+                    </div>
+                    <form id="present-card-form" style="display: none;"
+                          data-url-apply="{% url 'present_cards:apply_present_card' %}"
+                          data-url-cancel="{% url 'present_cards:cancel_present_card' %}">
+                        {% csrf_token %}
+                        {% for field in present_card_form %}
+                            {{ field }}
+                        {% endfor %}
+                        <button class="present-card-btn" type="submit">
+                            {% if cart.present_card_id %}
+                                Cancel
+                            {% else %}
+                                Apply
+                            {% endif %}
+                        </button>
+                        {% if cart.present_card_id %}
+                            <span class="material-symbols-outlined">check_circle</span>
+                        {% endif %}
+                    </form>
+                    <!--ошибки для формы подарочной карты (заполняется в JavaScript)-->
+                    <ul class="errorlist"></ul>
                 </div>
-            </div>
-            <div class="d-flex justify-content-end">
-                <a class="btn btn-success btn-sm" role="button" href="{% url 'orders:order_create' %}">Checkout</a>
+                {% if cart.coupon_id or cart.present_card_id %}
+                    <div class="discounts-total">
+                        <div class="discount-title">Amount discounts:</div>
+                        <div class="discount-value">-${{ cart.get_total_discount }}</div>
+                    </div>
+                    <div class="without-discounts">
+                        <div class="without-title">Without discounts:</div>
+                        <div class="without-value">${{ cart.get_total_price }}</div>
+                    </div>
+                {% endif %}
+                <a id="checkout-btn" href="{% url 'orders:order_create' %}" role="button">Checkout</a>
             </div>
         {% endif %}
     </div>
 </div>
 <script src="{% static 'js/add_to_cart.js' %}"></script>
+<script src="{% static 'js/update_quantity.js' %}"></script>
+<script src="{% static 'js/activate_deactivate_discounts_inputs.js' %}"></script>
 <script src="{% static 'js/remove_from_cart.js' %}" type="module"></script>
+<script src="{% static 'js/apply_cancel_card_or_coupon.js' %}"></script>
 {% endblock %}

@@ -20,8 +20,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.views.generic import DetailView
 from django.db.models import QuerySet
 from datetime import datetime
-from django.core import files
-from .utils import get_image_from_url
+from .utils import get_image_from_url, create_profile_from_social
 import requests
 
 # инициализация Redis
@@ -87,11 +86,13 @@ class UserRegisterView(CreateView):
             # передача задачи по отправке письма в celery
             activate_account.delay({'domain': domain, 'is_secure': is_secure}, new_user.pk, new_user.email)
             # Создаем профиль пользователя с доп. полями
-            Profile.objects.create(user=new_user,
-                                   date_of_birth=date_of_birth,
-                                   photo=user_photo,
-                                   gender=form.cleaned_data.get('gender'))
-            messages.success(request, 'Thank for your registration. Now you can login your account')
+            profile = Profile.objects.create(user=new_user,
+                                             date_of_birth=date_of_birth,
+                                             photo=user_photo,
+                                             gender=form.cleaned_data.get('gender'))
+            Favorite.objects.create(profile=profile)  # создание объекта избранного для профиля
+            messages.success(request, f'Please, check your email!'
+                                      f'You have to receive email with instruction for activate account')
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
@@ -187,20 +188,18 @@ def save_social_user_to_profile(backend, user, response, *args, **kwargs):
     if backend.name == 'facebook':
         # если профиль еще не был создан
         if kwargs.get('is_new'):
-            date_of_birth = response.get('birthday')
+            date_of_birth = datetime.strptime(response.get('birthday'), '%m/%d/%Y')
             gender = response.get('gender')[0].upper()
             photo_url = response.get('picture')['data']['url']
             photo_name = f'fb_{response.get("id")}_photo.jpeg'
 
             bytes_inst = get_image_from_url(photo_url)  # получение фото в байт-формате
-
-            profile = Profile.objects.create(user_id=user.pk,
-                                             gender=gender,
-                                             date_of_birth=datetime.strptime(date_of_birth, '%m/%d/%Y'))
-
-            profile.photo.save(photo_name, files.File(bytes_inst))  # сохранение фото для профиля
-
-            Favorite.objects.create(profile=profile)  # создание объекта избранного для нового профиля
+            # создание профиля с полученных данных
+            create_profile_from_social(date_of_birth=date_of_birth,
+                                       gender=gender,
+                                       user_id=user.pk,
+                                       photo_name=photo_name,
+                                       photo=bytes_inst)
 
     elif backend.name == 'google-oauth2':
         if kwargs.get('is_new'):
@@ -225,15 +224,16 @@ def save_social_user_to_profile(backend, user, response, *args, **kwargs):
             json_info = user_info.json()
 
             gender = json_info['genders'][0]['formattedValue']
-            date_of_birth = json_info['birthdays'][0]['date']
+            bd = json_info['birthdays'][0]['date']
+            date_of_birth = datetime.strptime(
+                '/'.join(str(bd[k]) for k in bd), '%Y/%m/%d'
+            )
             account_id = json_info['resourceName'].split('/')[1]
             photo_name = f'google_{account_id}_photo.jpeg'
 
-            profile = Profile.objects.create(user_id=user.pk,
-                                             gender=gender[0],
-                                             date_of_birth=datetime.strptime(
-                                                 '/'.join(str(date_of_birth[k]) for k in date_of_birth), '%Y/%m/%d')
-                                             )
-            profile.photo.save(photo_name, files.File(bytes_inst))  # сохранение фото для профиля
-
-            Favorite.objects.create(profile=profile)  # создание объекта избранного для нового профиля
+            # создание профиля с полученных данных
+            create_profile_from_social(date_of_birth=date_of_birth,
+                                       gender=gender[0],
+                                       user_id=user.pk,
+                                       photo_name=photo_name,
+                                       photo=bytes_inst)

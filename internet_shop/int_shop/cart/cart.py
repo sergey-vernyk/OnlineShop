@@ -1,6 +1,6 @@
 from decimal import Decimal
 from typing import NoReturn, Generator, Union
-
+from copy import deepcopy
 from django.conf import settings
 
 from coupons.models import Coupon
@@ -71,7 +71,7 @@ class Cart:
         """
         products_ids = [pk for pk in self.cart]
         products = Product.objects.filter(id__in=products_ids)
-        cart = self.cart.copy()
+        cart = deepcopy(self.cart)
 
         for pk, prod in zip(products_ids, products):
             cart[pk]['product'] = prod
@@ -119,14 +119,15 @@ class Cart:
         и/или вычета фиксированной суммы от подарочной карты
         """
         price_without_discount = self.get_total_price()
+        coupon, present_card = self.coupon, self.present_card
 
-        if self.coupon and self.present_card:
+        if coupon and present_card:
             result_amount = price_without_discount - (
-                        (price_without_discount * self.coupon.discount / 100) + self.present_card.amount)
-        elif self.coupon:
-            result_amount = price_without_discount - (price_without_discount * self.coupon.discount / 100)
-        elif self.present_card:
-            result_amount = price_without_discount - self.present_card.amount
+                    (price_without_discount * coupon.discount / 100) + present_card.amount)
+        elif coupon:
+            result_amount = price_without_discount - (price_without_discount * coupon.discount / 100)
+        elif present_card:
+            result_amount = price_without_discount - present_card.amount
         else:
             result_amount = price_without_discount
 
@@ -134,6 +135,6 @@ class Cart:
 
     def get_total_discount(self) -> Decimal:
         """
-        Сумма скидки с учётом купона
+        Сумма скидки с учётом купона и/или подарочной карты
         """
         return self.get_total_price() - self.get_total_price_with_discounts()

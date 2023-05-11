@@ -1,0 +1,215 @@
+.amount-items {
+    font-size: 20px;
+    display: flex;
+    justify-content:  space-between;
+    padding-bottom: 10px;
+    border-bottom:  1px solid #dee2e6;
+    align-items: center;
+}
+
+
+.amount-items > div > span:nth-child(1) {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.amount-items > span:nth-child(2) {
+    font-weight: bold;
+    font-size: 25px;
+    margin-left: 0.5rem;
+}
+
+.block-cart-items {
+    width: 800px;
+    padding: 0 0.6rem;
+    border: 1px solid gainsboro;
+    border-radius: 8px;
+    background-color: white;
+    width: 60% !important;
+    min-width: 575px;
+}
+
+.cart-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 15px 0;
+    border-bottom: 1px solid #dee2e6;
+    height: 120px;
+}
+
+.item-image img { margin: 0.5rem; }
+
+.item-name {
+    width: 350px;
+    margin: 0 1rem;
+    font-size: 1.2rem;
+}
+
+.item-name a {
+    text-decoration: none;
+    color: black;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    
+}
+
+.item-name a:hover {
+    text-decoration: underline;
+    color: black;
+}
+
+.item-quantity {
+    width: 70px;
+    margin: 0 1rem;
+}
+
+#id_quantity {
+    border-radius: 5px;
+    border: 1px solid;
+}
+
+.item-price {
+    width: 150px;
+    font-weight: bold;
+    margin: 0 1rem;
+    font-size: 1.3rem;
+    font-family: 'PT Sans Caption', sans-serif;
+}
+
+.item-remove svg {
+    fill: grey;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.item-remove {
+    margin: 0.7rem;
+}
+
+.item-remove path {
+    z-index: 1;
+}
+
+.item-remove svg:hover {
+    fill: orange;
+}
+
+.block-totals {
+    width: 30% !important;
+    margin-left: 0.8rem;
+    padding: 1rem !important;
+    border: 1px solid gainsboro;
+    background-color: white;
+    border-radius: 8px;
+    min-height: 120px;
+}
+
+.block-summary {
+    margin: 15px 0;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.cart-top {
+    display: flex;
+    justify-content: space-between;
+    align-content: center;
+    margin-top: 1rem;
+    margin-bottom: 1.2rem;
+}
+
+.back-link {
+    color: green;
+    text-decoration: none;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.coupon-check, .card-check {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+}
+
+#coupon-form, #present-card-form {
+    display: flex;
+    align-items: center;
+}
+
+#coupon-form #id_code, #present-card-form #id_code {
+    border-radius: 8px;
+    border: 1px solid;
+    width: 180px;
+    padding-left: 8px;
+    margin-right: 1rem;
+}
+
+#coupon-form .material-symbols-outlined, #present-card-form .material-symbols-outlined {
+    color: green;
+    margin-left: 30px;
+    margin-right: 0;
+}
+
+.coupon-btn, .present-card-btn {
+    border-radius: 5px;
+    display: inline;
+    padding: 3px;
+    height: 30px;
+    background-color: transparent;
+    color: black;
+    line-height: 0.3rem;
+    border: 1px solid black;
+}
+
+.discounts-total, .without-discounts {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.discounts-total .discount-title {
+    display: inline-block;
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+.discounts-total .discount-value {
+    display: inline-block;
+    color: red;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.without-discounts .without-title {
+    display: inline-block;
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+.without-discounts .without-value {
+    display: inline-block;
+    color: green;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+#checkout-btn {
+    text-decoration: none;
+    color: white;
+    background-color: rgba(17, 185, 40, 1);
+    display: block;
+    text-align: center;
+    font-size: 1.3rem;
+    padding: 5px;
+    margin-top: 1.2rem;
+    border: 1px solid black;
+    border-radius: 5px;
+}
+
+#checkout-btn:hover {
+    background-color: #198754;
+}

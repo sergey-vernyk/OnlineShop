@@ -19,6 +19,6 @@ class PresentCardAdmin(admin.ModelAdmin):
 
 
 @admin.register(Category)
-class PresentCardAdmin(admin.ModelAdmin):
+class PresentCardCategoryAdmin(admin.ModelAdmin):
     list_display = ['name', 'slug']
     prepopulated_fields = {'slug': ('name',)}

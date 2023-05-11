@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from .cart import Cart
+from common.decorators import ajax_required
 from cart.forms import CartQuantityForm
 from coupons.forms import CouponApplyForm
 from coupons.models import Coupon
@@ -10,28 +11,28 @@ from django.http.response import JsonResponse
 from django.views.decorators.http import require_POST
 
 
+@ajax_required
 @require_POST
 def cart_add(request):
     """
     Добавление товара в корзину
     """
-    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
-    if is_ajax:
-        product_id = request.POST.get('product_id')
-        quantity = request.POST.get('quantity')
+    product_id = request.POST.get('product_id')
+    quantity = request.POST.get('quantity')
 
-        cart = Cart(request)
-        product = get_object_or_404(Product, id=product_id)
-        form = CartQuantityForm(request.POST)
-        if form.is_valid():
-            cart.add(product, quantity=int(quantity))
+    cart = Cart(request)
+    product = get_object_or_404(Product, id=product_id)
+    form = CartQuantityForm(request.POST)
+    if form.is_valid():
+        cart.add(product, quantity=int(quantity))
 
-        return JsonResponse({'success': True,
-                             'cart_len': len(cart),
-                             'total_price': cart.get_total_price_with_discounts()})
-    else:
-        return JsonResponse({'error': 'Not ajax request'})
+    return JsonResponse({'success': True,
+                         'cart_len': len(cart),
+                         'added_prod_cost': cart.cart[product_id]['quantity'] * product.price,
+                         'total_price': cart.get_total_price(),
+                         'total_price_discounts': cart.get_total_price_with_discounts(),
+                         'total_discount': cart.get_total_discount()})
 
 
 def cart_detail(request):
@@ -60,19 +61,22 @@ def cart_detail(request):
                                                 'present_card_form': present_card_form})
 
 
+@ajax_required
+@require_POST
 def cart_remove(request):
     """
     Удаление товара с корзины
     """
-    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
-
-    if is_ajax:
-        product_id = request.POST.get('product_id')
-        cart = Cart(request)
-        cart.remove(product_id)
-        return JsonResponse({'success': True,
-                             'cart_len': len(cart),
-                             'total_price': cart.get_total_price_with_discounts()})
-
-    else:
-        return JsonResponse({'error': 'Not ajax request'})
+    prev_url = None
+    product_id = request.POST.get('product_id')
+    cart = Cart(request)
+    cart.remove(product_id)
+    if not cart:  # если больше нет товаров в корзине - удалить примененные купон или карту
+        cart.clear()
+        prev_url = request.session.get('urls')['previous_url']
+    return JsonResponse({'success': True,
+                         'cart_len': len(cart),
+                         'total_price': cart.get_total_price(),
+                         'total_price_discount': cart.get_total_price_with_discounts(),
+                         'total_discount': cart.get_total_discount(),
+                         'prev_url': prev_url})

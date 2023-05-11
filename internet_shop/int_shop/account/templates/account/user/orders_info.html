@@ -3,7 +3,7 @@
 {% load get_value_from_dict %}
 
 <div class="personal-info">
-    <h3>My orders</h3>
+    <h3>Orders</h3>
     {% for order in orders %}
         {% with order_items=items|get_dict_item:order.pk total_cost=order.get_total_cost|subtract:order.get_total_discount %}
             <div id="min-max-detail-{{ order.pk }}" role="button">

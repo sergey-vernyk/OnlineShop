@@ -143,7 +143,6 @@ body, html {
 
 .login-form {
     display: block;
-    position: relative;
     margin: 100px auto;
     width: 800px;
     min-width: 700px;
@@ -266,6 +265,16 @@ body, html {
     text-decoration: none;
 }
 
+.facebook .bi {
+    fill: blue;
+    margin-right: 0.8rem;
+}
+
+.google .bi {
+    fill: #6C6565;
+    margin-right: 0.8rem;
+}
+
 /*Форма регистрации*/
 .register-form {
     display: block;
@@ -343,24 +352,35 @@ body, html {
 }
 
 /*messages framework*/
-.success-message {
+.success-message, .error-message {
     display: flex;
-    margin: 10px !important;
+    position: relative;
     justify-content: center;
     align-items: center;
     height: 60px;
+    width: 800px;
     font-size: 20px;
-    background-color: #ADF9AA;
-    border: 2px solid #66E162;
+    //background-color: #ADF9AA;
+    border: 2px solid #B9B5B5;
+    margin-top: 20px;
     border-radius: 5px;
 }
 
-.error-message {
+.success-message .material-symbols-outlined, .error-message .material-symbols-outlined {
+    position: absolute;
+    right: 0;
+    top: 0;
     font-size: 15px;
-    background-color: red;
-    border: 1px solid black;
-    border-radius: 5px;
+    margin-right: 0;
+    cursor: pointer;
+}
 
+.success-message {
+    background-color: #ADF9AA;
+}
+
+.error-message {
+    background-color: #F45353;
 }
 
 .close {
@@ -573,10 +593,6 @@ table tr td {
     padding-right: 10px;
 }
 
-#id_quantity {
-    border-radius: 5px;
-}
-
 [id^="add-to-cart-"]:hover {
     background-color: #397D77;
 
@@ -647,7 +663,6 @@ table tr td {
     text-decoration: none;
     color: white;
     font-weight: 650;
-    font-style: italic;
 }
 
 .user-panel a:nth-child(2):hover {
@@ -663,14 +678,6 @@ table tr td {
     align-items: center;
     justify-content: space-around;
 }
-}
-
-.amount-items {
-    font-size: 21px;
-}
-
-.amount-items span {
-    font-weight: bold;
 }
 
 .cart-button {
@@ -997,6 +1004,11 @@ table tr td {
     word-break: break-word;
 }
 
+.product-name a:hover {
+    text-decoration: underline;
+    color: grey;
+}
+
 .price {
     margin: 0;
     font-size: 1.2rem;
@@ -1219,7 +1231,7 @@ table tr td {
     margin: 10px;
     padding: 5px;
     width: 171px;
-    height: 220px;
+    //height: 220px;
     border: 1px solid #dee2e6;
     border-radius: 10px;
 }

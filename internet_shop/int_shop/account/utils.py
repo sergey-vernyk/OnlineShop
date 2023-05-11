@@ -1,7 +1,10 @@
 from io import BytesIO
 from typing import BinaryIO
-
+from django.core import files
 import requests
+
+from account.models import Profile
+from goods.models import Favorite
 
 USER_FIELDS = ["username", "email"]
 
@@ -16,6 +19,25 @@ def get_image_from_url(url: str) -> BinaryIO:
         bytes_inst.write(resp.content)
 
     return bytes_inst
+
+
+def create_profile_from_social(**kwargs):
+    """
+    Создание экземпляра Profile, используя данные с API соц. сетей
+    """
+    user_id = kwargs.get('user_id')
+    gender = kwargs.get('gender')
+    date_of_birth = kwargs.get('date_of_birth')
+    photo_name = kwargs.get('photo_name')
+    photo = kwargs.get('photo')
+
+    profile = Profile.objects.create(user_id=user_id,
+                                     gender=gender,
+                                     date_of_birth=date_of_birth)
+
+    profile.photo.save(photo_name, files.File(photo))  # сохранение фото для профиля
+
+    Favorite.objects.create(profile=profile)  # создание объекта избранного для нового профиля
 
 
 def create_user(strategy, details, backend, user=None, *args, **kwargs):

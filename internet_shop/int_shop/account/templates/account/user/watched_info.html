@@ -8,9 +8,11 @@
       <div class="product-card-watched">
         <div class="image-product-watched">
           {% if product.image %}
-            <img src="{{ product.image.url }}" width="80" height="80">
+            <a href="{{ product.get_absolute_url }}">
+              <img src="{{ product.image.url }}" width="80" height="80">
+            </a>
           {% else %}
-            <img src="{% static 'img/no_image_crop.png' %}" width="80" height="80">
+            <a href="{{ product.get_absolute_url }}"><img src="{% static 'img/no_image_crop.png' %}" width="80" height="80"></a>
           {% endif %}
         </div>
         <div class="prod-name-watched">

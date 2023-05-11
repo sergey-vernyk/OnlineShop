@@ -67,5 +67,3 @@ class SearchForm(forms.Form):
     Форма для поиска товаров на сайте
     """
     query = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'What find?'}))
-
-
