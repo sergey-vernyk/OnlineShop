@@ -4,6 +4,7 @@ from account.models import Profile
 from coupons.models import Coupon
 from goods.models import Product
 from present_cards.models import PresentCard
+from django.core.validators import MinValueValidator
 
 
 class Order(models.Model):
@@ -19,7 +20,7 @@ class Order(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     email = models.EmailField()
-    address = models.CharField(max_length=50)
+    address = models.CharField(max_length=255, blank=True)
     phone = models.CharField(max_length=20)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -33,7 +34,6 @@ class Order(models.Model):
     coupon = models.ForeignKey(Coupon, related_name='orders', on_delete=models.SET_NULL, null=True, blank=True)
     delivery = models.OneToOneField('Delivery', related_name='order', on_delete=models.SET_NULL, null=True)
     stripe_id = models.CharField(max_length=255, blank=True)
-    is_email_was_sent = models.BooleanField(default=False)
     profile = models.ForeignKey(Profile, related_name='orders', on_delete=models.CASCADE, default='')
 
     def __str__(self):
@@ -74,10 +74,17 @@ class Delivery(models.Model):
         ('Apartment', 'Apartment'),
     )
 
+    DELIVERY_SERVICES = (
+        ('New Post', 'New Post'),
+        ('Ukrpost', 'Ukrpost'),
+        ('Meest Express', 'Meest Express'),
+    )
+
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
+    service = models.CharField(choices=DELIVERY_SERVICES, max_length=15, blank=True)
     method = models.CharField(choices=DELIVERY_METHOD, max_length=20)
-    office_number = models.IntegerField(blank=True, null=True)
+    office_number = models.IntegerField(default=1, blank=True, null=True, validators=[MinValueValidator(1)])
     delivery_date = models.DateField()
 
     def __str__(self):

@@ -1,0 +1,49 @@
+.success-payment {
+    border: 1px solid grey;
+    border-radius: 10px;
+    padding: 1rem;
+    background-color: #eff4f9;
+}
+
+.success-payment p {
+    display: flex;
+    justify-content: center;
+    font-family: 'Merriweather', serif;
+    font-size: 1.1rem;
+    align-items: center;
+}
+
+.success-payment p b:before, .success-payment p b:after {
+    content: "\00a0";
+}
+
+.payment-go-home {
+    display: flex;
+    text-decoration: none;
+    color: #2050ED;
+    text-transform: title;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+}
+
+.payment-go-home {
+    color: #5E7CE2;
+}
+
+.payment-go-home .material-symbols-outlined {
+    margin-right: 5px;
+}
+
+.header-success-payment {
+    text-align: center;
+    text-decoration: underline;
+    font-family: 'Merriweather', serif;
+    margin-bottom: 20px;
+}
+
+.amount-payment {
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+.amount-payment:before { content: "\00a0" }

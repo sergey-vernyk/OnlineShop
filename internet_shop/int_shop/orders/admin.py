@@ -19,7 +19,7 @@ class OrderAdmin(admin.ModelAdmin):
             'fields': ('delivery',)
         }),
         ('Other', {
-            'fields': ('comment', 'call_confirm', 'created', 'updated', 'is_email_was_sent')
+            'fields': ('comment', 'call_confirm', 'created', 'updated')
         })
     )
 
@@ -27,18 +27,19 @@ class OrderAdmin(admin.ModelAdmin):
     def get_full_name(self, obj):
         return f'{obj.first_name} {obj.last_name}'
 
-    list_display = ['id', 'get_full_name', 'is_paid', 'is_done', 'is_email_was_sent']
-    readonly_fields = ['created', 'updated', 'is_email_was_sent']
+    list_display = ['id', 'get_full_name', 'is_paid', 'is_done']
+    readonly_fields = ['created', 'updated']
     search_fields = ['last_name', 'phone']
     date_hierarchy = 'created'
-    list_filter = ['is_email_was_sent', 'is_paid']
+    list_filter = ['is_paid']
 
 
 @admin.register(Delivery)
 class DeliveryAdmin(admin.ModelAdmin):
-    list_display = ['get_full_name', 'method', 'office_number', 'delivery_date']
+    list_display = ['get_full_name', 'method', 'service', 'office_number', 'delivery_date']
     search_fields = ['last_name']
     date_hierarchy = 'delivery_date'
+    list_filter = ['service', 'method']
 
     @admin.display(description='Name')
     def get_full_name(self, obj):
@@ -48,3 +49,4 @@ class DeliveryAdmin(admin.ModelAdmin):
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
     list_display = ['pk', 'order', 'product', 'price', 'quantity']
+    list_filter = ['order', 'product']

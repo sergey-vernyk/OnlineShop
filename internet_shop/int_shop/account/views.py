@@ -1,11 +1,11 @@
 import redis as redis
-from django.contrib.auth.views import LoginView, PasswordChangeView
+from django.contrib.auth.views import LoginView, PasswordChangeView, PasswordResetView, PasswordResetConfirmView
 from django.views.generic import CreateView
 from django.conf import settings
 
 from goods.models import Product, Favorite
 from orders.models import OrderItem, Order
-from .forms import LoginForm, UserPasswordChangeForm, RegisterUserForm
+from .forms import LoginForm, UserPasswordChangeForm, RegisterUserForm, ForgotPasswordForm, SetNewPasswordForm
 from django.urls import reverse_lazy
 from account.models import Profile
 from .tasks import activate_account
@@ -15,13 +15,15 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from .tokens import activation_account_token
 from django.shortcuts import redirect
-from django.contrib import messages
 from django.contrib.sites.shortcuts import get_current_site
 from django.views.generic import DetailView
 from django.db.models import QuerySet
 from datetime import datetime
 from .utils import get_image_from_url, create_profile_from_social
 import requests
+from django.views.generic.edit import FormMixin
+from django.contrib.messages.views import messages
+from django.utils.safestring import mark_safe
 
 # инициализация Redis
 r = redis.Redis(host=settings.REDIS_HOST,
@@ -91,7 +93,7 @@ class UserRegisterView(CreateView):
                                              photo=user_photo,
                                              gender=form.cleaned_data.get('gender'))
             Favorite.objects.create(profile=profile)  # создание объекта избранного для профиля
-            messages.success(request, f'Please, check your email!'
+            messages.success(request, f'Please, check your email! '
                                       f'You have to receive email with instruction for activate account')
             return self.form_valid(form)
         else:
@@ -237,3 +239,31 @@ def save_social_user_to_profile(backend, user, response, *args, **kwargs):
                                        user_id=user.pk,
                                        photo_name=photo_name,
                                        photo=bytes_inst)
+
+
+class ForgotPasswordView(PasswordResetView, FormMixin):
+    """
+    Представления для отправки Email для сброса забытого пароля
+    от учетной записи
+    """
+
+    form_class = ForgotPasswordForm
+    template_name = 'registration/password_reset_form.html'
+    success_url = reverse_lazy('password_reset')
+    html_email_template_name = 'registration/password_reset_email_html.html'
+    message = (f"We've emailed you instructions for setting your password. "
+               f"If you don't receive an email, please make sure you've entered the address you registered with")
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            messages.success(request, mark_safe(self.message))  # вывод сообщения внизу формы
+
+        return super().post(request, *args, **kwargs)
+
+
+class SetNewPasswordView(PasswordResetConfirmView):
+    """
+    Представление для установки нового пароля после сброса
+    """
+    form_class = SetNewPasswordForm

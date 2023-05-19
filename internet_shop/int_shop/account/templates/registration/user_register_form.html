@@ -8,7 +8,7 @@
 {% block content %}
 <div class="container d-flex justify-content-center">
     <div class="register-form">
-        <h2 class="text-center pb-2 border-bottom fw-bold">Register user</h2>
+        <h3 class="text-center pb-2 border-bottom" style="font-family: 'Merriweather', serif;">Register user</h3>
         <form id="reg-form" action="{% url 'register_user' %}" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {% for field in form %}
@@ -18,7 +18,7 @@
                                for="{{ field.id_for_label }}">{{ field.label }}
                                 {% if field.field.required %}<span class="required-field">*</span>{% endif %}
                         </label>
-                        <div class="reg-field reg-photo">
+                        <div class="reg-photo">
                             {{ field }}
                         </div>
                     {% elif field.label == 'Gender' %}
@@ -39,9 +39,7 @@
                                for="{{ field.id_for_label }}">{{ field.label }}
                                 {% if field.field.required %}<span class="required-field">*</span>{% endif %}
                         </label>
-                        <div class="reg-field">
-                            {{ field }}
-                        </div>
+                        {{ field }}
                     {% endif %}
                     {% if field.help_text %}
                         <p class="help">{{ field.help_text }}</p>

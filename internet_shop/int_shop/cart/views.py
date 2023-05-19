@@ -41,10 +41,6 @@ def cart_detail(request):
     """
     coupon_code = None
     present_card_code = None
-    cart = Cart(request)
-    if cart:
-        for item in cart:
-            item['quantity_form'] = CartQuantityForm(initial={'quantity': item['quantity']})
 
     # если купон был применен, отобразить его код в форме
     if request.session.get('coupon_id'):
@@ -56,7 +52,7 @@ def cart_detail(request):
     #  заполняем форму принятыми кодами купона, если они были применены
     coupon_form = CouponApplyForm(initial={'code': coupon_code.code if coupon_code else ''})
     present_card_form = PresentCardApplyForm(initial={'code': present_card_code.code if present_card_code else ''})
-    return render(request, 'cart/detail.html', {'cart': cart,
+    return render(request, 'cart/detail.html', {'cart': Cart(request),
                                                 'coupon_form': coupon_form,
                                                 'present_card_form': present_card_form})
 

@@ -24,6 +24,7 @@ $(document).ready(function() {
 				} else if ($(this).attr('id').endsWith('card')) {
 					$('#present-card-form').show();
 				}
+				$(this).parent().nextAll().filter('.errorlist').eq(0).show(); //отображение ошибок возле формы
 				break;
 
 			case false:
@@ -32,6 +33,7 @@ $(document).ready(function() {
 				} else if ($(this).attr('id').endsWith('card')) {
 					$('#present-card-form').hide();
 				}
+				$(this).parent().nextAll().filter('.errorlist').eq(0).hide(); //скрытие ошибок возле формы
 				break;
 		}
 	})

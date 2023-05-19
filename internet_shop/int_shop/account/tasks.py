@@ -31,5 +31,7 @@ def activate_account(data: dict, user_id: int, user_email: str) -> str:
                                  from_email=settings.FROM_EMAIL,
                                  to=(user_email,))
 
+    email_message.content_subtype = 'html'  # добавление html контента в письмо
+
     status = email_message.send(fail_silently=False)
     return 'Successfully' if status else 'Not successfully'

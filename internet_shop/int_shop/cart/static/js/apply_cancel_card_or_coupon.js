@@ -72,8 +72,11 @@ $(document).ready(function() {
 				//если есть ошибки в форме
 				if (formErrors) {
 					var error = formErrors['code'][0];
-					//добавление ошибки в список ошибок в шаблоне
-					$(boundErrorList).prepend(`<li style="text-align: left;">${error}</li>`);
+					//если еще не было отображено ошибок
+					if(!boundErrorList.has('li').length) {
+					    //добавление ошибки в список ошибок в шаблоне
+					    $(boundErrorList).prepend(`<li style="text-align: left;">${error}</li>`);
+					}
 				} else {
 					$(boundErrorList).find('li').remove(); //удаление элемента списка с ошибкой
                     //применение скидок

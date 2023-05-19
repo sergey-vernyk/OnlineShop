@@ -19,7 +19,10 @@ $(document).ready(function() {
                 //поиск блока с карточкой товара, в котором изменилось кол-во
                 var currentProductCart = parentForm.closest('.cart-item').find('.item-price');
                 var currentProductCost = response['added_prod_cost']; //текущая стоимость товара после изменения кол-ва
-                $('.amount-cart').text(response['cart_len']); //кол-во товара в корзине
+                var currentProductsInCart = response['cart_len'];
+                const isPluralAmount = currentProductsInCart === 1 ? false : true; //множественное или единичное кол-во товаров
+                $('.amount-cart').text(currentProductsInCart); //кол-во товара в корзине
+                $('.amount-items > div:nth-child(1) > span:nth-child(2)').text(isPluralAmount ? 'products': 'product');
                 $('.total-price').text('$' + response['total_price_discounts']); //окончательная цена товаров в header
                 currentProductCart.text('$' + currentProductCost);
                 $('.amount-items > div:nth-child(1) > span:nth-child(1)').text(response['cart_len']);

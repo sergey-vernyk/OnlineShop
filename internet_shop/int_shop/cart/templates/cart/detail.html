@@ -1,9 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load thumbnail %}
-{% load filters %}
-{% load get_value_from_dict %}
-
 
 {% block title %}Cart | OnlineShop{% endblock %}
 {% block styles %}
@@ -59,9 +56,7 @@
                         </div>
                         <div class="item-price">
                             <!--расчет стоимости товара по его количеству-->
-                            {% with product_id=product.id|to_str product_price=product.price %}
-                                ${{ cart.cart|get_dict_item:product_id|get_dict_item:'quantity'|multiply:product_price }}
-                            {% endwith %}
+                            ${{ item.total_price }}
                         </div>
                         <div class="item-remove">
                                 <svg data-url="{% url 'cart:cart_remove' %}"
@@ -85,8 +80,10 @@
                 <h3>Totals</h3>
                 <div class="amount-items">
                     <div>
-                        <span>{{ cart.get_amount_items_in }}</span>
-                        <span>product{{cart.get_amount_items_in|pluralize }}</span> for amount:
+                        {% with cart_total=cart|length %}
+                            <span>{{ cart_total }}</span>
+                            <span>product{{cart_total|pluralize }}</span> for amount:
+                        {% endwith %}
                     </div>
                         <span>${{ cart.get_total_price_with_discounts }}</span>
                 </div>

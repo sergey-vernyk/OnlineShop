@@ -1,0 +1,296 @@
+.block-order-info {
+    width: 700px !important;
+    min-width: 600px !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #eff4f9;
+    border: 1px solid #ced4da;
+    border-radius: 10px;
+    padding: 1.2rem;
+    margin-bottom: 1.3rem;
+    margin-right: 1rem;
+}
+
+.block-order-info h4 {
+    font-family: 'Merriweather', serif;
+    font-weight: 500;
+}
+
+.block-purchases-info {
+    width: 500px !important;
+    display: block;
+    border: 1px solid #ced4da;
+    border-radius: 10px;
+    padding: 15px 5px !important;
+    background-color: #DCDCDC;
+    font-family: 'Merriweather', serif;
+}
+
+.order-form-fields {
+    display: block;
+    position: relative;
+    margin: 30px auto;
+}
+
+.order-label {
+    display: inline-block;
+    font-family: 'Merriweather', serif;
+}
+
+.order-field {
+    position: relative;
+    float: right;
+    width: 300px;
+    padding-left: 10px;
+    border-radius: 5px;
+    margin-left: 10px;
+    border: 1px solid #898383;
+}
+
+.check-order-field {
+    display: inline;
+    margin-left: 1rem;
+}
+
+
+.order-field-choice {
+    background-color: white;
+    display: inline-block;
+    float: right;
+    border-radius: 5px;
+    border: 1px solid #898383;
+    width: 300px;
+    padding-left: 10px;
+}
+
+.order-field-comment {
+    display: block;
+    float: right;
+    border: 1px solid #898383;
+    border-radius: 5px;
+    padding-left: 0.5rem;
+    max-height: 80px;
+}
+
+.call-confirm-order-field {
+    display: inline;
+    margin-left: 1rem;
+}
+
+.call-confirm-order-label {
+    display: inline-block;
+    font-family: 'Merriweather', serif;
+    margin-top: 50px;
+    position: relative;
+}
+
+.order-back-btn a {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 5px;
+    text-decoration: none;
+    color: black;
+    text-align: center;
+    background-color: #b7edde;
+    border: 1px solid grey;
+    border-radius: 5px;
+    width: 100px;
+}
+
+.order-back-btn a:hover { background-color: #ccf2b3; }
+
+.place-order-btn {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 5px;
+    text-decoration: none;
+    color: white;
+    text-align: center;
+    background-color: #3040d5;
+    border: 1px solid grey;
+    border-radius: 5px;
+    width: 150px;
+}
+
+.place-order-btn:hover { background-color: #606de0; }
+
+.place-order-btn .material-symbols-outlined, .order-back-btn a .material-symbols-outlined { margin-right: 5px; }
+
+.order-prod-image {
+    display: inline;
+    width: 25% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.order-prod-name {
+    display: inline;
+    width: 32% !important;
+    text-align: start;
+    font-size: 0.8rem;
+    font-weight: bold;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.order-prod-name a {
+    text-decoration: none;
+    color: black;
+}
+
+.order-prod-qnty {
+    display: inline;
+    width: 13% !important;
+    text-align: center;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.order-prod-total-price {
+    display: inline;
+    width: 25% !important;
+    text-align: end;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.order-total-amount {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 15px 0;
+}
+
+.order-total-amount span:nth-child(1) {
+    font-weight: bold;
+    margin-left: 1.2rem;
+}
+
+.order-total-amount span:nth-child(2) {
+    margin-right: 1.5rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.order-total-discount {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #29E996;
+    padding: 15px 0;
+    margin: 10px 0;
+    border-radius: 5px;
+}
+
+.order-total-discount span:nth-child(1) { margin-left: 1.2rem; }
+
+.order-total-discount span:nth-child(2) { margin-right: 1.5rem; }
+
+.order-total-with-discount {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.order-total-with-discount span:nth-child(1) {
+    margin-left: 1.2rem;
+    font-weight: bold;
+}
+
+.order-total-with-discount span:nth-child(2) {
+    margin-right: 1.5rem;;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.success-order {
+    border: 1px solid grey;
+    border-radius: 10px;
+    background-color: #eff4f9;
+    padding: 1rem;
+}
+
+.header-success-order {
+    font-family: 'Merriweather', serif;
+    text-decoration: underline;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+}
+
+.info-success-order {
+    display: flex;
+    justify-content: center;
+    font-family: 'Merriweather', serif;
+    font-weight: 400;
+    font-size: 1.3rem;
+    text-align: center;
+}
+
+.info-success-order a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    padding: 0 5px;
+    color: #2A943F;
+    font-weight: 700;
+    margin-left: 10px;
+    border-bottom: 1px solid;
+}
+
+.info-success-order b:before {
+    content: "\00a0";
+}
+
+.info-success-order .material-symbols-outlined { margin-right: 8px; }
+
+.make-payment {
+    display: flex;
+    margin: 1rem 0;
+    justify-content: center;
+    align-items: center;
+}
+
+.make-payment p {
+    display: inline;
+    margin-bottom: 0;
+    font-family: 'Montserrat', sans-serif;
+    margin-right: 10px;
+}
+
+.pay-btn {
+    display: flex;
+    text-decoration: none;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    color: white;
+    background-color: #2A943F;
+    border-radius: 8px;
+    padding: 5px 10px;
+    border: 1px solid black;
+    align-items: center;
+}
+
+.pay-btn:hover {
+    background-color: #56bf6b;
+}
+
+.order-go-home {
+    display: flex;
+    text-decoration: none;
+    color: #2050ED;
+    text-transform: title;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+}
+
+.order-go-home:hover {
+    color: #5E7CE2;
+}
+
+.order-go-home .material-symbols-outlined {
+    margin-right: 5px;
+}

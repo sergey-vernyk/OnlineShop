@@ -8,6 +8,7 @@ from goods.models import Product
 from django.core.exceptions import ObjectDoesNotExist
 
 from present_cards.models import PresentCard
+from .forms import CartQuantityForm
 
 
 class Cart:
@@ -74,6 +75,7 @@ class Cart:
         cart = deepcopy(self.cart)
 
         for pk, prod in zip(products_ids, products):
+            cart[pk]['quantity_form'] = CartQuantityForm(initial={'quantity': cart[pk]['quantity']})
             cart[pk]['product'] = prod
             cart[pk]['price'] = Decimal(cart[pk]['price'])
             cart[pk]['total_price'] = Decimal(cart[pk]['price'] * cart[pk]['quantity'])

@@ -19,11 +19,14 @@ class PresentCardApplyForm(forms.Form):
         now = timezone.now()
         code = self.cleaned_data.get('code')
         try:
-            PresentCard.objects.get(code__iexact=code,
-                                    valid_from__lte=now,
-                                    valid_to__gte=now,
-                                    active=True)
+            card = PresentCard.objects.get(code__iexact=code,
+                                           valid_from__lte=now,
+                                           valid_to__gte=now,
+                                           active=True)
         except ObjectDoesNotExist:
-            self.add_error('code', 'Invalid coupon code')
+            self.add_error('code', 'Invalid card code')
         else:
-            return code
+            if card.profile is not None:  # если уже был кем-то использован
+                self.add_error('code', 'The code was already used')
+            else:
+                return code

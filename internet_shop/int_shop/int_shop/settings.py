@@ -143,6 +143,8 @@ USE_L10N = False  # отображение числа и даты, исполь�
 
 DATETIME_FORMAT = 'd/m/y l H:i:s'  # формат времени 24 часа (день/месяц/год День недели часы:минуты:секунды)
 
+DATE_INPUT_FORMATS = ('%d-%m-%Y',)
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
@@ -165,22 +167,27 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')  # путь, по которому
 
 LOGIN_REDIRECT_URL = 'goods:product_list'
 LOGOUT_REDIRECT_URL = 'login'
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # вывод всех сообщений с почты в shell (без SMTP)
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # вывод всех сообщений с почты в shell (без SMTP)
 CART_SESSION_ID = 'cart'
 
 STRIPE_PUBLISHABLE_KEY = env('STRIPE_PUBLISHABLE_KEY')
 STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET = env('STRIPE_WEBHOOK_SECRET')
 
-EMAIL_HOST = env('EMAIL_HOST')
-EMAIL_HOST_USER = env('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
-EMAIL_PORT = env('EMAIL_PORT')
-EMAIL_USE_SSL = False
-EMAIL_USE_TLS = True
+# EMAIL_HOST = env('EMAIL_HOST')
+# EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+# EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+# EMAIL_PORT = env('EMAIL_PORT')
+# EMAIL_USE_SSL = False
+# EMAIL_USE_TLS = True
 FROM_EMAIL = env('FROM_EMAIL')
 
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
+EMAIL_HOST_USER = '2f9fd0eea9d687'
+EMAIL_HOST_PASSWORD = '2298f6d72b35e4'
+EMAIL_PORT = '2525'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 #  длительность валидности ссылки для сброса пароля
 PASSWORD_RESET_TIMEOUT = 14400

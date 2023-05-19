@@ -2,12 +2,12 @@ from typing import NoReturn
 from django.urls import reverse_lazy
 from django.views.generic import FormView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-
 from account.models import Profile
 from cart.cart import Cart
 from .forms import OrderCreateForm, DeliveryCreateForm
 from orders.models import Order, OrderItem
 from orders.tasks import order_created
+from django.http.response import HttpResponseRedirect
 
 
 class OrderCreateView(LoginRequiredMixin, FormView):
@@ -33,7 +33,10 @@ class OrderCreateView(LoginRequiredMixin, FormView):
         order_form = self.get_form()
         delivery_form = self.get_form(form_class=DeliveryCreateForm)
 
-        if order_form.is_valid():
+        order_valid = order_form.is_valid()
+        delivery_valid = delivery_form.is_valid()
+
+        if all([order_valid, delivery_valid]):
             order = order_form.save(commit=False)
             # если в корзине есть валидный купон и/или подарочная карта, присваиваем к заказу
             if cart.coupon:
@@ -43,10 +46,7 @@ class OrderCreateView(LoginRequiredMixin, FormView):
                 order.present_card = cart.present_card
                 cart.present_card.profile = profile  # добавляем карту в профиль и сохраняем ее
                 cart.present_card.save(update_fields=['profile'])
-        else:
-            return self.form_invalid(order_form)
 
-        if delivery_form.is_valid():
             delivery = delivery_form.save()
             # привязка доставки и профиля к заказу
             order.delivery = delivery
@@ -56,9 +56,10 @@ class OrderCreateView(LoginRequiredMixin, FormView):
             self.request.session['order_id'] = order.pk
             # отправка сообщения о завершении заказа на почту
             order_created.delay(order_id=order.pk)
-            return self.form_valid(order_form)
-        else:
-            return self.form_invalid(delivery_form)
+            return HttpResponseRedirect(self.success_url)
+        else:  # возврат форм с ошибками
+            return self.render_to_response(context={'form': order_form,
+                                                    'delivery_form': delivery_form})
 
     def create_order_items_from_cart(self, order: Order) -> NoReturn:
         """

@@ -1,5 +1,6 @@
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, UserCreationForm, PasswordResetForm, \
+    SetPasswordForm
 from django.contrib.auth import password_validation
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
@@ -72,13 +73,15 @@ class UserPasswordChangeForm(PasswordChangeForm):
     Форма для изменения пароля учетной записи пользователя
     """
     old_password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control w-25',
-                                                                     'autocomplete': 'new-password'}),
-                                   help_text=password_validation.password_validators_help_text_html())
-    new_password1 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control w-25',
-                                                                      'autocomplete': 'new-password'}),
-                                    label='New Password')
+                                                                     'autocomplete': 'new-password'}), )
+    new_password1 = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control w-25', 'autocomplete': 'new-password'}),
+        label='New Password', help_text='Your password must contain at least\n'
+                                        '8 characters and can’t be entirely numeric.'
+    )
     new_password2 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control w-25'}),
-                                    label='New password confirmation')
+                                    label='New password confirmation',
+                                    help_text="Enter the same password as before, for verification.")
 
 
 class RegisterUserForm(UserCreationForm):
@@ -112,7 +115,7 @@ class RegisterUserForm(UserCreationForm):
     gender = forms.CharField(required=False, label='Gender', widget=forms.RadioSelect(choices=Profile.GENDER))
 
     user_photo = forms.ImageField(required=False, label='Photo',
-                                  widget=forms.FileInput(attrs={'class': 'reg-field'}))
+                                  widget=forms.FileInput(attrs={'class': 'reg-photo'}))
 
     field_order = ('username', 'first_name', 'last_name', 'gender',
                    'email', 'phone_number', 'date_of_birth', 'password1',
@@ -153,3 +156,52 @@ class RegisterUserForm(UserCreationForm):
             raise ValidationError('Incorrect date')
         else:
             return date
+
+
+class ForgotPasswordForm(PasswordResetForm):
+    """
+    Форма для ввода email адреса для восстановления забытого пароля
+    от учетной записи
+    """
+
+    email = forms.EmailField(label='Email',
+                             max_length=254,
+                             widget=forms.EmailInput(attrs={'class': 'email-field',
+                                                            'autocomplete': 'email'}))
+
+    def clean_email(self) -> str:
+        """
+        Проверка существования активного пользователя
+        или существующего адреса в системе с введенным в форму email
+        """
+        email = self.cleaned_data.get('email')
+        user = self.get_users(email)  # получения генератора с пользователем
+        try:
+            received_email = next(user).email  # получение email пользователя
+        except StopIteration:
+            raise ValidationError('Current email doesn\'t registered or user not active')
+
+        return received_email
+
+
+class SetNewPasswordForm(SetPasswordForm):
+    """
+    Форма для ввода нового пароля после сброса
+    """
+
+    new_password1 = forms.CharField(
+        label='New password',
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password',
+                                          'class': 'pass-field'}),
+        help_text='Your password must contain at least\n'
+                  '8 characters and can’t be entirely numeric.'
+    )
+    new_password2 = forms.CharField(
+        label='Confirm new password',
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password',
+                                          'class': 'pass-field'}),
+        help_text="Enter the same password as before, for verification.")
+
+    error_messages = {
+        "password_mismatch": 'The two password fields didn’t match.',
+    }

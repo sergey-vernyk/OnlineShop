@@ -37,8 +37,6 @@ def create_checkout_session(request):
             return str(e)
 
         return redirect(checkout_session.url, code=303)
-    else:
-        return render(request, 'payment/checkout.html')
 
 
 def create_session_line_items(order: Order) -> list:
@@ -72,9 +70,12 @@ def payment_success(request):
     # если заказ был оплачен - обозначаем это и сохраняем
     if session.payment_status == 'paid':
         order.is_paid = True
-        order.save()
+        order.save(update_fields=['is_paid'])
 
-    return render(request, 'payment/success.html')
+    amount_total = Decimal(session.amount_total or session.amount_subtotal) / Decimal('100').quantize(Decimal('0.01'))
+
+    return render(request, 'payment/success.html', {'amount_total': amount_total,
+                                                    'order_id': session.client_reference_id})
 
 
 def payment_cancel(request):
