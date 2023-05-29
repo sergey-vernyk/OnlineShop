@@ -50,14 +50,29 @@ class Order(models.Model):
         Общая сумма скидки
         """
         total_cost = self.get_total_cost()
-
+        coupon, present_card = self.coupon, self.present_card
         total_discount = Decimal('0')
-        if self.coupon:
-            total_discount += (total_cost * (self.coupon.discount / Decimal(100))).quantize(Decimal('0.01'))
-        if self.present_card:
-            total_discount += self.present_card.amount
+
+        if coupon:
+            total_discount += (total_cost * (coupon.discount / Decimal(100))).quantize(Decimal('0.01'))
+        if present_card:
+            total_discount += present_card.amount
 
         return total_discount
+
+    # def get_total_discount(self) -> dict:
+    #     """
+    #     Общая сумма скидки
+    #     """
+    #     discounts_values = {'coupon': None, 'present_card': None}
+    #     coupon, present_card = self.coupon, self.present_card
+    #
+    #     if coupon:
+    #         discounts_values['coupon'] = coupon.discount / Decimal(100)
+    #     if present_card:
+    #         discounts_values['present_card'] = present_card.amount
+    #
+    #     return discounts_values
 
     class Meta:
         ordering = ('-created',)

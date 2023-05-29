@@ -23,14 +23,21 @@
           <div class="comment-body-profile">{{ comment.body }}</div>
         </div>
         <div class="rate-comment-profile">
-          <div>
-            <span class="material-symbols-outlined me-1">thumb_up</span>
-            <span>(5)</span>
-          </div>
-          <div>
-            <span class="material-symbols-outlined me-1">thumb_down</span>
-            <span>(1)</span>
-          </div>
+          {% if customer in comment.profiles_likes.all %}
+            <span class="material-symbols-outlined filled" id="like-{{ comment.pk }}">thumb_up</span>
+          {% else %}
+            <span class="material-symbols-outlined unfilled" id="like-{{ comment.pk }}">thumb_up</span>
+          {% endif %}
+
+          <span id="likes-count-{{ comment.pk }}">({{ comment.profiles_likes.count }})</span>
+          <!-- если комментарию был установлен dislike текущим пользователем profile -->
+          {% if customer in comment.profiles_unlikes.all %}
+            <span class="material-symbols-outlined filled" id="unlike-{{ comment.pk }}">thumb_down</span>
+          {% else %}
+            <span class="material-symbols-outlined unfilled" id="unlike-{{ comment.pk }}">thumb_down</span>
+          {% endif %}
+
+          <span id="unlikes-count-{{ comment.pk }}">({{ comment.profiles_unlikes.count }})</span>
         </div>
       </div>
     </div>

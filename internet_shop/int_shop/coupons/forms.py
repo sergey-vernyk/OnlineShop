@@ -21,8 +21,7 @@ class CouponApplyForm(forms.Form):
         try:
             Coupon.objects.get(code__iexact=code,
                                valid_from__lte=now,
-                               valid_to__gte=now,
-                               active=True)
+                               valid_to__gte=now)
         except ObjectDoesNotExist:
             self.add_error('code', 'Invalid coupon code')
         else:

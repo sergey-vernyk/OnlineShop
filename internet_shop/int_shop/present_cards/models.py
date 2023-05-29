@@ -10,7 +10,6 @@ class PresentCard(models.Model):
     code = models.CharField(max_length=50, unique=True)
     valid_from = models.DateTimeField(null=False)
     valid_to = models.DateTimeField(null=False)
-    active = models.BooleanField(default=False)
     from_name = models.CharField(max_length=50)
     from_email = models.EmailField()
     to_name = models.CharField(max_length=50)
@@ -30,9 +29,6 @@ class PresentCard(models.Model):
         """
         now = timezone.now()
         return self.valid_from <= now <= self.valid_to
-
-    class Meta:
-        ordering = ('active',)
 
 
 class Category(models.Model):

@@ -261,6 +261,8 @@
     margin-right: 10px;
 }
 
+.make-payment .material-symbols-outlined { margin-right: 10px;}
+
 .pay-btn {
     display: flex;
     text-decoration: none;

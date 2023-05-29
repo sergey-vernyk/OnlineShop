@@ -3,7 +3,7 @@
     <div class="info-block">
         <div class="info-row">
             <span class="info-name">Full Name</span>
-            <span class="info-value">{{ customer.user.get_full_name }}</span>
+            <span class="info-value">{{ request.user.get_full_name }}</span>
         </div>
         <div class="info-row">
             <span class="info-name">Gender</span>
@@ -25,7 +25,7 @@
         </div>
         <div class="info-row">
             <span class="info-name">Email</span>
-            <span class="info-value">{{ customer.email }}</span>
+            <span class="info-value">{{ request.user.email }}</span>
         </div>
         <div class="info-row">
             <span class="info-name">About</span>

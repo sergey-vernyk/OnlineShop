@@ -7,7 +7,11 @@
     <div id="fav-prod-{{ product.id }}" class="row border rounded p-2 mt-2 position-relative">
       <div class="col-3 d-flex align-items-center justify-content-center">
         <a href="{{ product.get_absolute_url }}">
-          <img src="{{ product.image.url }}" alt="product-image" width="100" height="100">
+          {% if product.image %}
+            <img src="{{ product.image.url }}" alt="product-image" width="100" height="100">
+          {% else %}
+            <img src="{% static 'img/no_image_crop.png' %}" alt="product-image" width="100" height="100">
+          {% endif %}
         </a>
       </div>
       <div class="col-9 pe-5">
@@ -17,16 +21,8 @@
           </p>
         </div>
         <div class="attr mb-3">
-          <div class="rating-star d-inline mb-3">
-            {% with product_rating=product.rating %}
-              {% for i in '12345'|make_list %}
-                {% if product_rating|cut_fraction >= i %}
-                  <span id="star-{{ i }}" class="fa fa-star checked"></span>
-                {% else %}
-                  <span id="star-{{ i }}" class="fa fa-star"></span>
-                {% endif %}
-              {% endfor %}
-            {% endwith %}
+          <div class="d-inline mb-3">
+            {% include 'rating_stars.html' %}
           </div>
           <div class="d-inline ms-5 position-relative">
             <a class="text-decoration-none link-dark fw-bold" href="{{ product.get_absolute_url|add:'#comments' }}">

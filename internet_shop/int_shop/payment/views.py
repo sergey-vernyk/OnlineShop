@@ -73,6 +73,7 @@ def payment_success(request):
         order.save(update_fields=['is_paid'])
 
     amount_total = Decimal(session.amount_total or session.amount_subtotal) / Decimal('100').quantize(Decimal('0.01'))
+    order_paid.delay(order_id, amount_total)
 
     return render(request, 'payment/success.html', {'amount_total': amount_total,
                                                     'order_id': session.client_reference_id})

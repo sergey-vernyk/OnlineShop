@@ -15,59 +15,95 @@ var removeIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25"
                   </svg>`
 
 $(document).ready(function() {
-    $('[id^=remove-fav], #add-rem-fav').click(function() {
-        var product_id;
-        var action;
-        //определение кнопки, которая была нажата (удалить или добавить)
-        if ($(this).attr('id').startsWith('add-')) {
-            product_id = $(this).data('pk');
-            action = getAction($(this).text());
-        } else if ($(this).attr('id').startsWith('remove-')) {
-            product_id = this.id.slice(11); //получение id товара
-            action = $(this).data('action');
-        }
+	//на странице детального описания товара и в списке просмотренных товаров
+	$('[id^=remove-fav], #add-rem-fav').click(function() {
+		var product_id;
+		var action;
+		//определение кнопки, которая была нажата (удалить или добавить)
+		if ($(this).attr('id').startsWith('add-')) {
+			product_id = $(this).data('pk');
+			action = $(this).next('input[name=action]').attr('value'); //нужное действие в скрытом поле
+		} else if ($(this).attr('id').startsWith('remove-')) {
+			product_id = this.id.slice(11); //получение id товара
+		}
 
-        var url = $(this).data('url');
-        const csrftoken = getCookie('csrftoken');
+		var url = $(this).data('url');
+		const csrftoken = getCookie('csrftoken');
 
-        $.ajax({
-            url: url,
-            method: 'POST',
-            dataType: 'json',
-            data: {
-                action: action,
-                product_id: product_id,
-                csrfmiddlewaretoken: csrftoken,
-            },
+		$.ajax({
+			url: url,
+			method: 'POST',
+			dataType: 'json',
+			data: {
+				action: action,
+				product_id: product_id,
+				csrfmiddlewaretoken: csrftoken,
+			},
 
-            success: function(response) {
-                var amount_prods = response['amount_prods']; //текущее кол-во товаров в избранном\
-                $('.add-to-favorite > svg').remove();
-                if (action === 'remove') {
-                    $('.add-to-favorite').prepend(removeIcon);
-                    $(`#fav-prod-${product_id}`).remove(); //удаление блока с товаром из избранного
-                    //отображение текущего кол-ва товаров в header
-                    $('.often-use-menu > ul:nth-child(2) > li:nth-child(2) > span:nth-child(1) > a:nth-child(1)').text(amount_prods);
-                    if (amount_prods === 0) {
-                        //если нет больше товаров в избранном
-                        $('.personal-info').append(`<div class="empty-customer-content">
+			success: function(response) {
+				var amount_prods = response['amount_prods']; //текущее кол-во товаров в избранном
+				$('.add-to-favorite > svg').remove();
+				if (action === 'remove') {
+					$('.add-to-favorite').prepend(removeIcon);
+					$(`#fav-prod-${product_id}`).remove(); //удаление блока с товаром из избранного
+					//отображение текущего кол-ва товаров в избранном в header
+					$('.often-use-menu > ul:nth-child(2) > li:nth-child(2) > span:nth-child(1) > a:nth-child(1)').text(amount_prods);
+					if (amount_prods === 0) {
+						//если нет больше товаров в избранном
+						$('.personal-info').append(`<div class="empty-customer-content">
                                                     <h4 class="d-inline">There are no favorite products yet...</h4>
                                                     </div>`);
-                    }
-                    $('#add-rem-fav').text('Add to Favorite'); // изменить надпись на кнопке
-                } else if (action === 'add') {
-                    $('.add-to-favorite').prepend(addIcon);
-                    $('#add-rem-fav').text('Remove from Favorite');
-                }
-            },
+					}
+					$('#add-rem-fav').next('input[name=action]').attr('value', 'add'); // изменить надпись на кнопке
+				} else if (action === 'add') {
+					$('.add-to-favorite').prepend(addIcon);
+					$('#add-rem-fav').next('input[name=action]').attr('value', 'remove');
+				}
+			},
 
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.log(textStatus, errorThrown);
-            },
-        })
-        //функция возвращает нужное действие, которое находится в тексте кнопки
-        function getAction(text) {
-            return text.split(' ')[0].toLowerCase();
-        }
-    });
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log(textStatus, errorThrown);
+			},
+		})
+		//функция возвращает нужное действие, которое находится в тексте кнопки
+		function getAction(text) {
+			return text.split(' ')[0].toLowerCase();
+		}
+	});
+
+	//кнопка в списке товаров на главной странице
+	$('.prod-fav-mainlist').click(function() {
+		var childClass = $(this).children().attr('class'); //класс объекта значка избранного
+		var action = childClass.includes('fill') ? 'remove' : 'add'; //если значок заполнен - товар в избранном
+		var url = $(this).data('url');
+		var productId = $(this).data('pk');
+		const csrftoken = getCookie('csrftoken');
+
+		$.ajax({
+			url: url,
+			method: 'POST',
+			dataType: 'json',
+			data: {
+				product_id: productId,
+				csrfmiddlewaretoken: csrftoken,
+				action: action,
+			},
+			success: function(response) {
+				//поиск товара, который был добавлен/удален в/из избранного
+				var currProd = $('.prod-fav-mainlist').filter(function() {
+					return Number($(this).attr('data-pk')) === productId;
+				});
+
+				//изменение значка на противоположный
+				if (action === 'add') {
+					$(currProd).children().replaceWith(addIcon);
+				} else if (action === 'remove') {
+					$(currProd).children().replaceWith(removeIcon);
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log(textStatus, errorThrown);
+			},
+		})
+	})
 })

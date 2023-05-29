@@ -138,25 +138,33 @@ class DetailUserView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['favorites'] = self.object.profile_favorite.product.prefetch_related()
+        context['location'] = location = self.kwargs.get('location')
 
-        # заказы и отдельные единицы для каждого заказа текущего пользователя self.object
-        context['orders'] = Order.objects.select_related('profile', 'delivery').filter(profile_id=self.object.pk)
-        context['order_items'] = {
-            order.pk: OrderItem.objects.select_related('order', 'product').filter(order_id=order.pk)
-            for order in context['orders']
-        }
-
-        coupons = self.object.coupons.prefetch_related().order_by('pk')
-        # установка заказов для каждого купона self.object и возврат обновленного queryset coupons
-        context['coupons'] = self._set_orders_for_coupon(context['orders'], coupons)
-
-        context['comments'] = self.object.profile_comments.select_related('product').order_by('updated', 'created')
-        context['present_cards'] = self.object.profile_cards.all()
-        # товары, просмотренные пользователем self.object
-        products_ids = (int(pk) for pk in r.smembers(f'profile_id:{self.object.pk}'))
-        context['watched'] = Product.objects.filter(pk__in=products_ids)
-        context['location'] = self.kwargs.get('location')
+        if location == 'favorites':
+            context['favorites'] = self.object.profile_favorite.product.prefetch_related()
+        elif location == 'orders' or location == 'coupons':
+            # заказы и отдельные единицы для каждого заказа текущего пользователя self.object
+            context['orders'] = Order.objects.select_related('profile', 'delivery', 'coupon', 'present_card').filter(
+                profile_id=self.object.pk)
+            order_items = OrderItem.objects.select_related('order', 'product')
+            context['order_items'] = {
+                order.pk: order_items.filter(order_id=order.pk)
+                for order in context['orders']
+            }
+            coupons = self.object.coupons.prefetch_related('category').order_by('pk')
+            # установка заказов для каждого купона self.object и возврат обновленного queryset coupons
+            context['coupons'] = self._set_orders_for_coupon(context['orders'], coupons)
+        elif location == 'comments':
+            context['comments'] = self.object.profile_comments.prefetch_related('product',
+                                                                                'profiles_likes',
+                                                                                'profiles_unlikes'
+                                                                                ).order_by('updated', 'created')
+        elif location == 'present_cards':
+            context['present_cards'] = self.object.profile_cards.all()
+        elif location == 'watched':
+            # товары, просмотренные пользователем self.object
+            products_ids = (int(pk) for pk in r.smembers(f'profile_id:{self.object.pk}'))
+            context['watched'] = Product.objects.filter(pk__in=products_ids)
 
         return context
 
@@ -182,6 +190,7 @@ class DetailUserView(DetailView):
                 # если существует купон для заказа и купоны одинаковы
                 if c and c == coupon:
                     coupon.choices = o
+                    break
 
         return coupons
 

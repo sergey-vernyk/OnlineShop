@@ -21,8 +21,7 @@ class PresentCardApplyForm(forms.Form):
         try:
             card = PresentCard.objects.get(code__iexact=code,
                                            valid_from__lte=now,
-                                           valid_to__gte=now,
-                                           active=True)
+                                           valid_to__gte=now)
         except ObjectDoesNotExist:
             self.add_error('code', 'Invalid card code')
         else:

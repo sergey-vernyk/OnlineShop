@@ -145,9 +145,10 @@
 /*Пункт с заказами*/
 .personal-info .order-pk {
     width: 10%;
-    font-size: 1.2em;
+    font-size: 1.1em;
     font-weight: 600;
     width: 17%;
+    font-family: 'Merriweather', serif;
 }
 
 .highlighted-element {
@@ -175,14 +176,16 @@
 }
 
 .personal-info [id^="total-cost-"] {
-    font-size: 1.2em;
+    font-size: 1.1em;
     font-weight: 800;
     width: 17%;
+    font-family: 'Merriweather', serif;
 }
 
 .personal-info [id^="items-images-"] {
     padding: 0px 5px !important;
     display: flex;
+    align-items: center;
 }
 
 .personal-info [id^="items-images-"] div {
@@ -191,9 +194,17 @@
     margin-left: 7px;
 }
 
+.personal-info .item-image {
+    margin-right: 7px;
+}
+
+.item-image img {
+    margin: 0 7px;
+}
+
 [id^=expander-] img {
     position: absolute;
-    right: 1.2rem;
+    right:1rem;
     bottom: 2.0rem;
     padding: 5px;
 }
@@ -217,22 +228,32 @@
 }
 
 .add-review {
+    display: flex;
+    width: 150px;
     position: relative;
-    padding-left: 1.6rem;
-    margin: 0 2.0rem 0 0.8rem;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+.add-review .material-symbols-outlined {
+    margin-right: 7px;
+    position: relative;
 }
 
 .add-review a {
     display: flex;
     text-decoration: none;
+    align-items: center;
     color: green;
-    font-weight: 700;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
+    font-family: 'Merriweather', serif;
 }
 
 .quantity p  {
     margin: 0;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
+    text-align: center;
+    font-family: 'Merriweather', serif;
 }
 
 .quantity {
@@ -240,15 +261,17 @@
 }
 
 .product-name {
-    display: flex;
-    flex-grow: 1;
+    display: inline-block;
+    text-align: center;
+    width: 270px;
+    font-family: 'Montserrat', sans-serif;
  }
 
 .product-name a {
     margin: 0;
     text-decoration: none;
     color: black;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     flex-shrink: 2;
     flex-grow: 1;
     word-break: break-word;
@@ -261,9 +284,11 @@
 
 .price {
     margin: 0;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 600;
     width: 13%;
+    text-align: end;
+    font-family: 'Merriweather', serif;
 }
 
 .empty-customer-content {
@@ -280,11 +305,13 @@
     margin: 1rem 0;
     border-top: 1px solid #ced4da;
     border-bottom: 1px solid #ced4da;
+    font-family: 'Merriweather', serif;
 }
 
 .payment-info {
     padding: 1.1rem 1.1rem;
     margin: 1rem 0;
+    font-family: 'Merriweather', serif;
 }
 
 .delivery-info .item, .payment-info .item {
@@ -414,6 +441,7 @@
     padding: 10px;
     border-top: 1px solid #D3D7D2;
     border-bottom: 1px solid #D3D7D2;
+    text-indent: 20px;
 }
 
 /*Комментарии*/
@@ -430,6 +458,8 @@
 .date-comment-profile {
     left: 0;
     padding: 0;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.8rem;
 }
 
 .product-name-profile {
@@ -458,17 +488,48 @@
 }
 
 .rate-comment-profile {
-    display: inline-block;
-    padding: 5px;
+    display: inline-flex;
+    align-items: center;
     position: relative;
-    top: 0;
     left: 80%;
-    border-left: solid 1px #dee2e6;
+    padding: 5px;
 }
 
-.rate-comment-profile div {
-    display: inline-block;
-    margin-left: 10px;
+.filled {
+    --filled-thumb: 1;
+}
+
+.unfilled {
+    --unfilled-thumb: 0;
+}
+
+/*стиль значка пальца вверх/вниз*/
+.material-symbols-outlined {
+    font-variation-settings:
+    'FILL' var(--filled-thumb),
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 48
+  }
+
+ /*значок палец вверх*/
+ .rate-comment-profile > span:nth-child(1) {
+    margin-right: 10px;
+    cursor: default;
+}
+
+.rate-comment-profile [id^='likes-count-'] {
+    margin-right: 10px;
+}
+
+/*значок палец вниз*/
+.rate-comment-profile > span:nth-child(3) {
+    margin-right: 10px;
+    cursor: default;
+}
+
+.rate-comment-profile [id^='unlikes-count-'] {
+    margin-right: 10px;
 }
 
 /*Просмотренные товары*/
@@ -477,7 +538,6 @@
     margin: 10px;
     padding: 5px;
     width: 171px;
-    //height: 220px;
     border: 1px solid #dee2e6;
     border-radius: 10px;
 }
@@ -491,6 +551,7 @@
 .prod-name-watched {
     display: flex;
     justify-content: center;
+    align-items: center;
     height: 23%;
     width: 100%;
     margin: 0.5rem 0;
@@ -593,7 +654,7 @@
 }
 
 .block-set-pass {
-    padding: 15px 20px;
+    padding: 20px;
     width: 470px;
     margin-top: 2rem;
     border: 1px solid #ced4da;
@@ -611,9 +672,12 @@
     border: 1px solid green;
     padding: 5px 10px;
     border-radius: 5px;
-    background-color: #3427E8;
+    background-color: #568EED;
     color: white;
-    margin-bottom: 1rem;
+}
+
+.change-pass-btn:hover {
+    background-color: #2f76ed;
 }
 
 #set-new-pass-form > label:nth-child(5)
@@ -622,7 +686,10 @@
 .set-pass { width: 250px; }
 
 /*элемент списка ошибок*/
-.err-pass { text-align: start !important; }
+.err-pass {
+    text-align: start !important;
+    width: 250px;
+ }
 
 .block-set-success-pass {
     border: 1px solid #ced4da;
@@ -663,53 +730,229 @@
 
 .block-set-success-pass .material-symbols-outlined { margin-right: 5px; }
 
-/*Шаблона email для активации аккаунта*/
 
-/*
-.block-email-conf {
-	font-size: 1.4rem;
-	font-family: font-family: 'Merriweather', serif;
-	text-align: center;
-	padding: 15px;
-	border-bottom: solid 1px #E1E2E1;
+/*Форма входа в систему*/
+.login-form {
+    display: block;
+    margin: 100px auto;
+    width: 800px;
+    min-width: 700px;
+    border-radius: 10px;
+    padding: 15px 15px 50px 15px;
+    background-color: #eff4f9;
+    border: 1px solid #ced4da;
 }
 
-.block-email-conf img {
-	display: inline;
-}
-.block-email-conf p {
-	margin-top: 5px;
+.simple-auth {
+    width: 60% !important;
+    display: block;
+    padding: 10px;
+    padding-right: 10px;
+    padding-left: 10px;
+    margin-left: 10px !important;
+    margin-right: 10px !important;
+    border: 1px solid #adb5bd;
+    border-radius: 10px;
 }
 
-.block-email-conf > div {
-	display: inline-flex;
+.simple-auth form { width: 450px; }
+
+.simple-auth .auth-form-fields {
+    display: block;
+    position: relative;
+    margin: 20px auto;
+}
+
+.check-auth-field {
+    display: inline-block;
+    margin-left: 100px;
+}
+
+.simple-auth .auth-field {
+    position: relative;
+    float: right;
+    width: 250px;
+    padding-left: 10px;
+    border-radius: 5px;
+    margin-left: 10px;
+    border: 1px solid #898383;
+    border-radius: 5px;
+}
+
+.simple-auth .auth-label {
+    display: inline-block;
+    font-family: 'Merriweather', serif;
+}
+
+.login-form .form-fields {
+	width: 350px;
+	font-size: 20px;
+	margin-bottom: 20px;
+}
+
+.login-buttons {
+    display: flex;
+    width: 450px;
+    justify-content: space-between;
+}
+
+.log-button {
+    display: flex;
+    align-items: center;
+    background-color: #568EED;
+    padding: 5px 10px;
+    color: white;
+    border-radius: 5px;
+    border: 1px solid;
+    width: 120px;
+    height: 40px;
+    align-self: center;
+}
+
+.log-button .material-symbols-outlined {margin-right: 10px;}
+
+.log-button:hover { background-color: #2f76ed; }
+
+.addit-links {
+    display: inline-block;
+    position: relative;
+}
+
+.forgot-pass-link {
+    display: block;
+    text-decoration: none;
+    color: #A68C8C;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: 'Bitter', serif;
+}
+
+.reg-link {
+    display: block;
+    text-decoration: none;
+    color: #A68C8C;
+    font-size: 1rem;
+    font-family: 'Bitter', serif;
+}
+
+.reg-link:hover, .forgot-pass-link:hover {
+    color: red;
+    text-decoration: underline;
+}
+
+/*Вход в систему через соц. сети*/
+.social {
+    display: flex;
+    flex-direction: column;
+	width: 37% !important;
 	justify-content: center;
-	align-items: center;
+    align-items: center;
 }
 
-.block-email-conf h2 {
-	text-align: center;
-	display: inline;
-	margin-bottom: 15px;
-	margin-top: 0;
+.social li {
+    list-style-type: none;
+    font-size: 20px;
+    padding: 5px;
 }
 
-.block-email-conf p a {
-	text-decoration: none;
-	color: green;
-	text-decoration: underline;
+.social ul {
+    padding: 5px;
 }
 
-.block-email-conf p a:hover {
-	color: red;
+.social a {
+    text-decoration: none;
 }
 
-.conf-email {
-	font-weight: bold;
-	font-style: italic;
+.facebook .bi {
+    fill: blue;
+    margin-right: 0.8rem;
 }
 
-.username-email {
-	font-weight: bold;
-	font-style: italic;
-}*/
+.google .bi {
+    fill: #6C6565;
+    margin-right: 0.8rem;
+}
+
+/*Форма регистрации*/
+.register-form {
+    display: block;
+    position: relative;
+    margin: 50px auto 80px auto;
+    padding: 15px;
+    border: 1px solid #ced4da;
+    border-radius: 10px;
+    background-color: #eff4f9;
+    width: 600px;
+}
+
+#reg-form{ padding: 10px; }
+
+.register-form .reg-form-fields {
+    display: block;
+    margin: 20px auto;
+    position: relative;
+}
+
+.reg-form-fields .reg-field {
+    position: relative;
+    float: right;
+    width: 250px;
+    padding-left: 10px;
+    border-radius: 5px;
+    margin-left: 10px;
+    border: 1px solid grey;
+}
+
+.reg-form-fields #id_about {
+    min-height: 95px;
+}
+
+.reg-photo {
+    padding-left: 0px !important;
+    position: relative;
+    float: right;
+    width: 250px;
+ }
+
+.reg-form-fields .reg-label {
+    display: inline-block;
+    font-family: 'Merriweather', serif;
+}
+
+.reg-button {
+    display: flex;
+    align-items: center;
+    width: 150px;
+    font-size: 1.2rem;
+    background-color: #568EED;
+    position: absolute;
+    bottom: 20px;
+    left: 15px;
+    padding: 5px 10px;
+    color: white;
+    border-radius: 5px;
+    border: 1px solid;
+}
+
+.radio-gender {
+    display: inline;
+    font-family: 'Merriweather', serif;
+}
+
+.gender-choice {
+    display: block;
+    float: right;
+    margin-right: 100px;
+}
+
+.radio-gender:nth-child(1) { margin-right: 15px; }
+
+.help {
+    font-style: italic;
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px;
+    width: 160px;
+    position: relative;
+    margin: 5px 0;
+    color: darkgray;
+}

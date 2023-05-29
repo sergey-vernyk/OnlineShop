@@ -5,6 +5,7 @@
 {% block title %}OnlineShop{% endblock %}
 {% block styles %}
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,300,0,0" />
+    <link rel="stylesheet" href="{% static 'css/goods.css' %}">
 {% endblock %}
 {% block content %}
 <main id="main-list">
@@ -12,41 +13,25 @@
         <div class="row row-col-3 m-2">
             <div class="col-sm-2 mx-1 text-center border shadow-sm rounded filter-prod">
                 {% if category %}
-                    {% include 'filters_menu.html' %}  <!--Добавление боковой панели справа с фильтрами-->
+                    {% include 'filters_menu.html' %}  <!--Добавление боковой панели слева с фильтрами-->
                 {% endif %}
             </div>
-            <div class="col border px-0 shadow-sm">
+            <div class="col border px-0 mb-4 rounded" style="border-color: #ced4da !important; border-top: 0 !important;">
                 {% include 'products_navs.html' with category=category %}
-                <div class="d-flex justify-content-between border-bottom pb-1 my-2">
+                <div class="d-flex justify-content-between pb-1 my-2">
                     <div class="breadcrumbs">
                         For breadcrumbs
                     </div>
-                    <div class="sorting">
-                        <form action="{% url 'goods:product_ordering' category.slug|default:'all' page_obj.number %}"
-                              id="sorting-form" onchange="formSubmit()">
-                            <span class="material-symbols-outlined" style="margin-right: 4px; position: relative; top: 5px;">sort</span>
-                            <select name="sort" id="sorting_id" onchange="checkSelect()">
-                                <!--Перебор всех полей для сортировки-->
-                                {% for k, v in sorting_by_price.fields.sorting.choices %}
-                                    <option id="opt-{{ forloop.counter }}"
-                                            {% if selected_sort == k %}selected{% endif %}
-                                            value="{{ k }}">{{ v }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </form>
-                    </div>
+                {% include 'sorting.html' with place='mainlist' %} <!--шаблон с выпадающим меню для сортировки товаров-->
                 </div>
-                <div class="row h-100">
-                    <div id="productData" class="col m-3">
-                        {% for product in products %}
-                            {% include 'goods/product/card.html' with product=product %}
-                        {% empty %}
-                            <div class="d-flex justify-content-center">
-                                <h4>There are no results for your query <b>"{{ request.GET.query }}"</b></h4>
-                            </div>
-                        {% endfor %}
-                    </div>
+                <div class="d-inline-flex flex-wrap mx-4 mb-4 p-2" style="gap: 55px;">
+                    {% for product in products %}
+                        {% include 'goods/product/card.html' with product=product %}
+                    {% empty %}
+                        <div class="d-flex justify-content-center">
+                            <h4>There are no results for your query <b>"{{ request.GET.query }}"</b></h4>
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -55,7 +40,7 @@
     {% if is_paginated %}
         <div class="row">
             <div class="d-flex justify-content-center my-2">
-                {% include 'paginator.html' with place='prod_list' sorting=is_sorting %}
+                {% include 'paginator.html' with place='mainlist' sorting=is_sorting %}
             </div>
         </div>
     {% endif %}
@@ -65,5 +50,7 @@
     <script src="{% static 'js/ordering_products.js' %}"></script>
     <!--Добавление товара в корзину-->
     <script src="{% static 'js/add_to_cart.js' %}"></script>
+    <!--Добавление/удаление товара в/из избранное-->
+    <script src="{% static 'js/add_remove_favorite.js' %}" type="module"></script>
 </main>
 {% endblock %}

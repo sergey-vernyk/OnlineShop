@@ -59,14 +59,12 @@
     color: black;
 }
 
-.item-quantity {
-    width: 70px;
-    margin: 0 1rem;
-}
-
-#id_quantity {
-    border-radius: 5px;
+.qnty-field {
+    width: 50px;
+    text-align: center;
+    font-weight: bold;
     border: 1px solid;
+    border-radius: 5px;
 }
 
 .item-price {

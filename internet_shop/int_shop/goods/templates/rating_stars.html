@@ -1,0 +1,11 @@
+<div class="rating-star">
+    {% with product_rating=product.rating %}
+        {% for i in '12345'|make_list %}
+            {% if product_rating|floatformat:"0" >= i|floatformat:"0" %}
+                <span id="star-{{ i }}" class="fa fa-star checked"></span>
+            {% else %}
+                <span id="star-{{ i }}" class="fa fa-star"></span>
+            {% endif %}
+        {% endfor %}
+    {% endwith %}
+</div>

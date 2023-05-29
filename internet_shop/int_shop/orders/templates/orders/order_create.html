@@ -55,7 +55,7 @@
                         {{ field }}
                         <ul class="errorlist">
                             {% for error in field.errors %}
-                            <li>{{ error }}</li>
+                                <li>{{ error }}</li>
                             {% endfor %}
                         </ul>
                     </div>
@@ -84,13 +84,13 @@
                         {% with product=item.product %}
                             <div class="order-prod-image">
                                 {% if product.image %}
-                                <a href="{{ product.get_absolute_url }}" target="_blank">
-                                    <img src="{{ product.image.url }}" alt="product-image" height="80" width="80">
-                                </a>
+                                    <a href="{{ product.get_absolute_url }}" target="_blank">
+                                        <img src="{{ product.image.url }}" alt="product-image" height="80" width="80">
+                                    </a>
                                 {% else %}
-                                <a href="{{ product.image.url }}" target="_blank">
-                                    <img src="{% static 'img/no_image_crop' %}" alt="product-image">
-                                </a>
+                                    <a href="{{ product.image.url }}" target="_blank">
+                                        <img src="{% static 'img/no_image_crop' %}" alt="product-image">
+                                    </a>
                                 {% endif %}
                             </div>
                             <div class="order-prod-name">

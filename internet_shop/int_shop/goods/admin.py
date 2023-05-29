@@ -52,7 +52,9 @@ class ProductAdmin(admin.ModelAdmin):
     """
     Товары
     """
-    list_display = ['name', 'pk', 'manufacturer', 'price', 'created', 'updated', 'available', 'promotional', 'rating']
+    list_display = ['name', 'pk', 'manufacturer',
+                    'price', 'created', 'updated',
+                    'available', 'promotional', 'rating']
     readonly_fields = ['image_tag']
     list_editable = ['price', 'available']
     list_filter = ['manufacturer', 'category', 'available']

@@ -3,7 +3,6 @@ from django import forms
 from .models import Delivery, Order
 import phonenumbers
 from phonenumbers import carrier
-from datetime import datetime
 from django.conf import settings
 
 

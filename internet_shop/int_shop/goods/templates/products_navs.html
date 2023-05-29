@@ -2,22 +2,26 @@
 <!--Все товары, фильтр по товарам, популярные товары, новые и товары со скидками-->
 <ul class="nav nav-justified justify-content-center prod-navs">
     <li class="nav-item">
-        <a class="nav-link border rounded-end " href="{% url 'goods:product_list' %}">All</a>
+        <a class="nav-link" style="border-left: 0 !important;" href="{% url 'goods:product_list' %}">All</a>
     </li>
     {% if category %}
         <li class="nav-item">
-            <a class="nav-link border rounded" id="filters-prod" href="#">Filter</a>
+            <a class="nav-link" id="filters-prod" href="#">Filter</a>
         </li>
     {% endif %}
     <li class="nav-item">
-        <a class="nav-link border rounded"
+        <a class="nav-link"
            href="{% if category %}{% url 'goods:popular_list_by_category' category.slug %}{% else %}{% url 'goods:popular_list' %}{% endif %}">Popular
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link border rounded" href="{% url 'goods:new_list' %}">New</a>
+        <a class="nav-link"
+           href="{% if category %}{% url 'goods:new_list_by_category' category.slug %}{% else %}{% url 'goods:new_list' %}{% endif %}">New
+        </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link border rounded-start" href="{% url 'goods:promotions_list' %}">Promotion</a>
+        <a class="nav-link" style="border-right: 0 !important;"
+           href="{% if category %}{% url 'goods:promotion_list_by_category' category.slug %}{% else %}{% url 'goods:promotion_list' %}{% endif %}">Promotion
+        </a>
     </li>
 </ul>

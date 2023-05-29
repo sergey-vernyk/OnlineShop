@@ -12,7 +12,6 @@ class Coupon(models.Model):
     valid_from = models.DateTimeField(null=False)
     valid_to = models.DateTimeField(null=False)
     discount = models.PositiveIntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
-    active = models.BooleanField(default=False)
     category = models.ForeignKey('Category', related_name='coupons', on_delete=models.CASCADE, default='')
 
     def __str__(self):

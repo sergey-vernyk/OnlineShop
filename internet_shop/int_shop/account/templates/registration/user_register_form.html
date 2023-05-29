@@ -1,9 +1,12 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Register user | OnlineShop{% endblock %}
-{% block style %}
+{% block styles %}
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    <link rel="stylesheet" href="{% static 'css/account.css' %}">
 {% endblock %}
 {% block content %}
 <div class="container d-flex justify-content-center">
@@ -52,7 +55,10 @@
                 </div>
             {% endfor %}
         </form>
-        <button form="reg-form" type="submit" class="reg-button">Register</button>
+        <button form="reg-form" type="submit" class="reg-button">
+            <span class="material-symbols-outlined">how_to_reg</span>
+            Register
+        </button>
     </div>
 </div>
 {% endblock %}

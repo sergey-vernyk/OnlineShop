@@ -27,16 +27,17 @@
                         </div>
                         <!--Изображения товаров (не более 2-х)-->
                         <div id="items-images-{{ order.pk }}">
-                            {% with count_items=order_items.count %}
-                                {% for item in order_items %}
-                                    <div style="margin-right: 7px;">
-                                        {% if forloop.counter > 2 %}
-                                            +{{ count_items|add:-2 }}
-                                        {% else %}
+                            {% with count_items=order_items|length %}
+                                <div class="item-image">
+                                    {% for item in order_items %}
+                                        {% if forloop.counter < 3 %}
                                             <img src="{{ item.product.image.url }}" width="60" height="60" alt="product-image">
                                         {% endif %}
-                                    </div>
-                                {% endfor %}
+                                    {% endfor %}
+                                </div>
+                                {% if count_items > 2 %}
+                                    +{{ count_items|add:-2 }}
+                                {% endif %}
                             {% endwith %}
                         </div>
                         <div id="expander-{{ order.pk }}">
@@ -47,7 +48,7 @@
                     <div id="order-detail-{{ order.pk }}" style="display: none;">
                         <div class="d-block">
                             {% for item in order_items %}
-                                <div class="d-flex" style="align-items: center;">
+                                <div class="d-flex pe-3" style="align-items: center;">
                                     <div class="product-image">
                                         {% if item.product.image %}
                                             <a target="_blank" href="{{ item.product.get_absolute_url }}">
@@ -61,24 +62,24 @@
                                         <a href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a>
                                     </div>
                                     <div class="add-review">
-                                        <div class="material-symbols-outlined"
-                                             style="margin: 0; position: absolute; top: 7px; right: 115px;">chat
-                                        </div>
                                         <a target="_blank"
-                                           href="{{ item.product.get_absolute_url|add:'#comments' }}">Add review</a>
+                                           href="{{ item.product.get_absolute_url|add:'#comments' }}">
+                                            <span class="material-symbols-outlined">chat</span>
+                                            Add review
+                                        </a>
                                     </div>
                                     <div class="quantity">
                                         <p>{{ item.quantity }} pcs.</p>
                                     </div>
                                     <div class="price">
-                                        ${{ item.price }}
+                                        ${{ item.get_cost }}
                                     </div>
                                 </div>
                             {% endfor %}
                         </div>
                         <!--Информация о доставке-->
                         <div class="delivery-info">
-                            <p style="font-weight: bold;">Delivery</p>
+                            <p class="fw-bold fs-5">Delivery</p>
                             <div class="item">
                                 <div class="name">
                                     Delivery date
@@ -95,26 +96,28 @@
                                     {{ order.delivery.method }}
                                 </div>
                             </div>
-                                {% with delivery_method=order.delivery.method %}
-                                    {% if order.delivery.method == 'Post office' %}
-                                    <div class="item">
-                                        <div class="name">
-                                            Post office №
-                                        </div>
-                                        <div class="attr">
-                                            {{ order.delivery.office_number }}
-                                        </div>
+                            {% with delivery_method=order.delivery.method %}
+                                {% if order.delivery.method == 'Post office' %}
+                                <div class="item">
+                                    <div class="name">
+                                        Post office №
                                     </div>
-                                    {% endif %}
-                                {% endwith %}
-                            <div class="item">
-                                <div class="name">
-                                    Delivery address
+                                    <div class="attr">
+                                        {{ order.delivery.office_number }}
+                                    </div>
                                 </div>
-                                <div class="attr">
-                                    {{ order.address }}
+                                {% endif %}
+                            {% endwith %}
+                            {% if order.delivery.method == 'Apartment' %}
+                                <div class="item">
+                                    <div class="name">
+                                        Delivery address
+                                    </div>
+                                    <div class="attr">
+                                        {{ order.address }}
+                                    </div>
                                 </div>
-                            </div>
+                            {% endif %}
                             <div class="item">
                                 <div class="name">
                                     Recipient
@@ -126,7 +129,7 @@
                             </div>
                         </div>
                         <div class="payment-info">
-                            <p style="font-weight: bold;">Payment</p>
+                            <p class="fw-bold fs-5">Payment</p>
                             <div class="item">
                                 <div class="name">
                                     Pay method

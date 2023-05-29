@@ -68,7 +68,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'cart.middleware.prev_current_urls_middleware',  # сохраняет текущий и предыдущий URL адреса в сессию
+    'common.middleware.previous_and_current_urls_middleware',  # сохраняет текущий и предыдущий URL адреса в сессию
 ]
 
 ROOT_URLCONF = 'int_shop.urls'
@@ -76,7 +76,7 @@ ROOT_URLCONF = 'int_shop.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

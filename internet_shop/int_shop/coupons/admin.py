@@ -1,6 +1,12 @@
 from django.contrib import admin
+from common.utils import ValidDiscountsListFilter
+from .models import Coupon, Category
 
-from coupons.models import Coupon, Category
+
+class ValidCouponListFilter(ValidDiscountsListFilter):
+    """
+    Фильтр по валидности купона
+    """
 
 
 @admin.register(Coupon)
@@ -8,9 +14,12 @@ class CouponAdmin(admin.ModelAdmin):
     """
     Купоны
     """
-    list_display = ['code', 'category', 'valid_from', 'valid_to', 'discount', 'active']
-    list_filter = ['active', 'category']
-    list_editable = ['active']
+    list_display = ['code', 'category', 'valid_from', 'valid_to', 'is_valid', 'discount']
+    list_filter = [ValidCouponListFilter, 'category']
+
+    @admin.display(description='Valid status')
+    def is_valid(self, instance):
+        return 'Valid' if instance.is_valid else 'Invalid'
 
 
 @admin.register(Category)

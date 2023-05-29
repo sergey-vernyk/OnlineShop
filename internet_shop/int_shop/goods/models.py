@@ -45,12 +45,12 @@ class Product(models.Model):
     image = models.ImageField(upload_to=product_image_path, blank=True)
     available = models.BooleanField(default=True)
     promotional = models.BooleanField(default=False)
+    promotional_price = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='products')
-    rating = models.DecimalField(default=0, max_digits=2, decimal_places=1, validators=[MinValueValidator(Decimal(1.0)),
-                                                                                        MaxValueValidator(
-                                                                                            Decimal(5.0))])
+    rating = models.DecimalField(default=0.0, max_digits=2, decimal_places=1,
+                                 validators=[MinValueValidator(Decimal(0.0)), MaxValueValidator(Decimal(5.0))])
 
     def __str__(self):
         return self.name
@@ -64,10 +64,26 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         """
         Переопределение метода, что бы добавить id созданного
-        товара в список со всеми id товаров, которые хранятся в БД Redis
+        товара в множество со всеми id товаров, которые хранятся в БД Redis
+        и создать каталоги для хранения фото товара
         """
         super().save(*args, **kwargs)
+        try:
+            os.makedirs(os.path.join(settings.MEDIA_ROOT, f'products_{self.name}', 'Detail_photos'))
+        except FileExistsError:
+            pass
         r.sadd('products_ids', self.pk)
+
+    def delete(self, **kwargs):
+        """
+        Переопределение метода, что бы удалить товар вместе с id этого
+        товара из множества со всеми id товаров, которые хранятся в БД Redis
+        и удалить каталоги для хранения фото товара.
+        Возвращает кол-во удаленных записей из БД (ожидается 1)
+        """
+        os.removedirs(os.path.join(settings.MEDIA_ROOT, f'products_{self.name}', 'Detail_photos'))
+        r.srem('products_ids', self.pk)
+        super().delete(**kwargs)
 
     def get_absolute_url(self):
         return reverse('goods:product_detail', args=(self.pk, self.slug))
@@ -134,6 +150,8 @@ class Comment(models.Model):
     user_email = models.EmailField(default='', verbose_name='Email')
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='profile_comments', default='')
     body = models.TextField(verbose_name='Comment')
+    profiles_likes = models.ManyToManyField(Profile, related_name='comments_liked', blank=True, default=0)
+    profiles_unlikes = models.ManyToManyField(Profile, related_name='comments_unliked', blank=True, default=0)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 

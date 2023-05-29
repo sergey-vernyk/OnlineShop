@@ -12,7 +12,7 @@ class RatingSetForm(forms.ModelForm):
         model = Product
         fields = ('star',)
         widgets = {
-            'star': forms.Select(attrs={'class': 'form-control form-control'})
+            'star': forms.HiddenInput()
         }
 
 
@@ -25,10 +25,11 @@ class CommentProductForm(forms.ModelForm):
         model = Comment
         fields = ('user_name', 'user_email', 'body')
         widgets = {
-            'user_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your name'}),
-            'user_email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'example@example.com'}),
-            'body': forms.Textarea(attrs={'class': 'form-control',
+            'user_name': forms.TextInput(attrs={'class': 'comment-field', 'placeholder': 'Your name'}),
+            'user_email': forms.EmailInput(attrs={'class': 'comment-field', 'placeholder': 'example@example.com'}),
+            'body': forms.Textarea(attrs={'class': 'comment-field-area',
                                           'rows': 3,
+                                          'cols': 23,
                                           'placeholder': 'Type your review...'}),
         }
 

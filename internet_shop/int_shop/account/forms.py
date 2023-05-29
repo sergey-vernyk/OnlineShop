@@ -1,13 +1,15 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, UserCreationForm, PasswordResetForm, \
     SetPasswordForm
-from django.contrib.auth import password_validation
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from .models import Profile
 from datetime import datetime
+
+help_messages = ('Your password must contain at least 8 characters and can’t be entirely numeric.',
+                 'Enter the same password as before, for verification.')
 
 
 class LoginForm(AuthenticationForm):
@@ -72,43 +74,39 @@ class UserPasswordChangeForm(PasswordChangeForm):
     """
     Форма для изменения пароля учетной записи пользователя
     """
-    old_password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control w-25',
-                                                                     'autocomplete': 'new-password'}), )
+    old_password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'pass-field',
+                                                                     'autocomplete': 'new-password'}),
+                                   help_text='If you have forgotten old password, click "Forgot password?" below.')
     new_password1 = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control w-25', 'autocomplete': 'new-password'}),
-        label='New Password', help_text='Your password must contain at least\n'
-                                        '8 characters and can’t be entirely numeric.'
+        widget=forms.PasswordInput(attrs={'class': 'pass-field', 'autocomplete': 'new-password'}),
+        label='New Password', help_text=help_messages[0]
     )
-    new_password2 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control w-25'}),
+    new_password2 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'pass-field'}),
                                     label='New password confirmation',
-                                    help_text="Enter the same password as before, for verification.")
+                                    help_text=help_messages[1])
 
 
 class RegisterUserForm(UserCreationForm):
     """
     Форма для создания пользователя сайта
     """
-    username = forms.CharField(required=True, label='Username', widget=forms.TextInput(
-        attrs={'class': 'reg-field'}
-    ))
+    username = forms.CharField(required=True, label='Username', widget=forms.TextInput(attrs={'class': 'reg-field'}))
     email = forms.CharField(required=True, label='Email', widget=forms.EmailInput(attrs={'class': 'reg-field'}))
     phone_number = forms.CharField(required=False, label='Phone',
                                    widget=forms.TextInput(attrs={'class': 'reg-field',
                                                                  'placeholder': '+x (xxx) xxx xx xx'}))
     password1 = forms.CharField(required=True, label='Password', widget=forms.PasswordInput(
         attrs={'class': 'reg-field', 'autocomplete': 'new-password'}),
-                                help_text='Your password must contain at least\n'
-                                          '8 characters and can’t be entirely numeric.')
-    password2 = forms.CharField(required=True, label='Password confirmation', widget=forms.PasswordInput(
+                                help_text=help_messages[0])
+    password2 = forms.CharField(required=True, label='Confirm password', widget=forms.PasswordInput(
         attrs={'class': 'reg-field', 'autocomplete': 'new-password'}),
-                                help_text="Enter the same password as before, for verification.")
+                                help_text=help_messages[1])
 
     first_name = forms.CharField(required=True, label='First name',
                                  widget=forms.TextInput(attrs={'class': 'reg-field'}))
     last_name = forms.CharField(required=False, label='Last name', widget=forms.TextInput(attrs={'class': 'reg-field'}))
-    date_of_birth = forms.CharField(required=False, label='Date of birth', widget=forms.TextInput(
-        attrs={'class': 'reg-field', 'placeholder': 'dd-mm-yyyy'}
-    ))
+    date_of_birth = forms.DateField(required=False, label='Date of birth', widget=forms.DateInput(
+        attrs={'class': 'reg-field', 'placeholder': 'dd-mm-yyyy'}))
     about = forms.CharField(label='About', required=False, widget=forms.Textarea(attrs={'rows': 6, 'cols': 5,
                                                                                         'class': 'reg-field'}))
 
@@ -120,6 +118,12 @@ class RegisterUserForm(UserCreationForm):
     field_order = ('username', 'first_name', 'last_name', 'gender',
                    'email', 'phone_number', 'date_of_birth', 'password1',
                    'password2', 'user_photo', 'about')
+
+    error_messages = {
+        'date_of_birth': {
+            'invalid': 'Incorrect date',
+        }
+    }
 
     def clean_username(self):
         """
@@ -144,18 +148,6 @@ class RegisterUserForm(UserCreationForm):
             raise ValidationError('Email is already register')
 
         return email
-
-    def clean_date_of_birth(self):
-        """
-        Проверка даты рождения на правильность
-        """
-        birth_date = self.cleaned_data.get('date_of_birth')
-        try:
-            date = datetime.strptime(birth_date, '%d-%m-%Y')
-        except ValueError:
-            raise ValidationError('Incorrect date')
-        else:
-            return date
 
 
 class ForgotPasswordForm(PasswordResetForm):
@@ -193,14 +185,13 @@ class SetNewPasswordForm(SetPasswordForm):
         label='New password',
         widget=forms.PasswordInput(attrs={'autocomplete': 'new-password',
                                           'class': 'pass-field'}),
-        help_text='Your password must contain at least\n'
-                  '8 characters and can’t be entirely numeric.'
+        help_text=help_messages[0]
     )
     new_password2 = forms.CharField(
         label='Confirm new password',
         widget=forms.PasswordInput(attrs={'autocomplete': 'new-password',
                                           'class': 'pass-field'}),
-        help_text="Enter the same password as before, for verification.")
+        help_text=help_messages[1])
 
     error_messages = {
         "password_mismatch": 'The two password fields didn’t match.',

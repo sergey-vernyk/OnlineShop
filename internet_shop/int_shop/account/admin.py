@@ -16,7 +16,7 @@ class PresentCardInline(admin.StackedInline):
         ('PresentCards', {
             'classes': ('collapse',),
             'fields': ('code', 'valid_from', 'valid_to',
-                       'active', 'from_name', 'from_email',
+                       'from_name', 'from_email',
                        'category', 'message', 'amount'),
         }),
     )
@@ -51,13 +51,28 @@ class CommentInline(admin.StackedInline):
     """
     model = Comment
     extra = 1
-    readonly_fields = ('user_name', 'user_email', 'product')
+    readonly_fields = ('user_name', 'user_email', 'product', 'get_amount_profile_likes', 'get_amount_profile_unlikes')
     fieldsets = (
         ('Comment', {
             'classes': ('collapse',),
-            'fields': ('user_name', 'user_email', 'body', 'product'),
+            'fields': ('user_name', 'user_email', 'body',
+                       'get_amount_profile_likes', 'get_amount_profile_unlikes', 'product'),
         }),
     )
+
+    @admin.display(description='Likes')
+    def get_amount_profile_likes(self, obj):
+        """
+        Возвращает кол-во лайков под комментарием obj
+        """
+        return obj.profiles_likes.count()
+
+    @admin.display(description='Unlikes')
+    def get_amount_profile_unlikes(self, obj):
+        """
+        Возвращает кол-во дизлайков под комментарием obj
+        """
+        return obj.profiles_unlikes.count()
 
 
 @admin.register(Profile)
@@ -70,7 +85,7 @@ class ProfileAdmin(admin.ModelAdmin):
               'user_photo_tag', 'photo', 'phone_number', 'created',
               'about', 'coupons')
     inlines = [FavoriteInline, CommentInline, PresentCardInline, OrdersInline]
-    readonly_fields = ['user', 'user_photo_tag', 'created', 'profile_full_name']
+    readonly_fields = ['user_photo_tag', 'created', 'profile_full_name']
     filter_horizontal = ('coupons',)
 
     @admin.display(description='Username')  # отображение названия поля в шапке админ сайта модели
