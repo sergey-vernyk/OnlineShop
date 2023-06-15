@@ -1,11 +1,11 @@
 {% load split_full_path %}
 
-<ul class="pagination my-2">
+<ul class="pagination mt-2 mb-3">
     <!--Если есть предыдущая страница-->
     {% if page_obj.has_previous %}
         <li class="page-item">
             {% if sorting %}
-                {% if place == 'mainlist' or place == 'popular' or place == 'new' %}
+                {% if place == 'mainlist' or place == 'popular' or place == 'new' or place == 'promotion' %}
                     <a class="page-link" href="{% url 'goods:product_ordering' place category.slug|default:'all' page_obj.previous_page_number %}?sort={{ request.GET.sort }}" tabindex="-1" aria-disabled="true">
                         <span class="material-symbols-outlined">arrow_back_ios</span>
                     </a>
@@ -57,7 +57,7 @@
     {% if page_obj.has_next %}
         <li class="page-item">
             {% if sorting %}
-                {% if place == 'mainlist' or place == 'popular' or place == 'new' %}
+                {% if place == 'mainlist' or place == 'popular' or place == 'new' or place == 'promotion' %}
                     <a class="page-link" href="{% url 'goods:product_ordering' place category.slug|default:'all' page_obj.next_page_number %}?sort={{ request.GET.sort }}" tabindex="-1" aria-disabled="true">
                         <span class="material-symbols-outlined">arrow_forward_ios</span>
                     </a>

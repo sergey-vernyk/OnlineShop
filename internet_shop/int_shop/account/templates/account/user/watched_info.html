@@ -15,22 +15,24 @@
             <a href="{{ product.get_absolute_url }}"><img src="{% static 'img/no_image_crop.png' %}" width="80" height="80"></a>
           {% endif %}
         </div>
+        {% if product.promotional %}
+          <div class="promo-prod-pic-watched">
+            Promo
+        </div>
+        {% endif %}
         <div class="prod-name-watched">
           <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
         </div>
         <div class="prod-rating-watched rating-star">
-          {% with product_rating=product.rating %}
-              {% for i in '12345'|make_list %}
-                {% if product_rating|cut_fraction >= i %}
-                  <span id="star-{{ i }}" class="fa fa-star checked"></span>
-                {% else %}
-                  <span id="star-{{ i }}" class="fa fa-star"></span>
-                {% endif %}
-              {% endfor %}
-            {% endwith %}
+          {% include 'rating_stars.html' %}
         </div>
         <div class="prod-price-watched">
-          ${{ product.price }}
+          {% if product.promotional %}
+            <div class="prod-price-watch-card default">${{ product.price }}</div>
+            <div class="prod-price-watch-card promo">${{ product.promotional_price }}</div>
+          {% else %}
+            <div class="prod-price-watch-card">${{ product.price }}</div>
+          {% endif %}
         </div>
         <div class="prod-fav-watched">
           {% if product in favorites %}
@@ -50,7 +52,7 @@
       </div>
     {% empty %}
       <div class="empty-customer-content">
-          <h4>You are not watched products yet</h4>
+          <h4>You haven't watched products yet</h4>
       </div>
     {% endfor %}
   </div>

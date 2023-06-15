@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load thumbnail %}
 
 {% block title %}Cart | OnlineShop{% endblock %}
 {% block styles %}
@@ -63,12 +62,12 @@
                                      data-pk="{{ product.id }}"
                                      xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="cart-remove bi bi-trash3" viewBox="0 0 16 16">
                                     <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5
-                                                0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2
-                                                 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59
-                                                  0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042
-                                                   3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1
-                                                    .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1
-                                                     .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"/>
+                                        0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2
+                                         2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59
+                                         0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042
+                                         3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1
+                                         .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1
+                                         .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"/>
                                 </svg>
                         </div>
                     {% endwith %}
@@ -79,67 +78,74 @@
             <div class="block-totals">
                 <h3>Totals</h3>
                 <div class="amount-items">
-                    <div>
-                        {% with cart_total=cart|length %}
+                    {% with cart_total=cart|length discount_price=cart.get_total_price_with_discounts %}
+                        <div>
                             <span>{{ cart_total }}</span>
                             <span>product{{cart_total|pluralize }}</span> for amount:
-                        {% endwith %}
-                    </div>
-                        <span>${{ cart.get_total_price_with_discounts }}</span>
+                        </div>
+                        {% if discount_price < 0 %}
+                            <span>Free</span>
+                        {% else %}
+                            <span>${{ discount_price }}</span>
+                        {% endif %}
+                    {% endwith %}
                 </div>
                 <div class="block-summary">
-                    <h5 class="fw-bold">Discounts</h5>
+                    <h5 class="fw-bold mb-3">Discounts</h5>
                     <!--Форма для кода купона-->
-                    <div class="coupon-check">
-                        <label for="have-coupon">Have a coupon?</label>
-                        <input style="cursor: pointer" type="checkbox" name="have-coupon" id="have-coupon">
-                    </div>
-                    <form id="coupon-form" style="display: none;"
-                          data-url-apply="{% url 'coupons:apply_coupon' %}"
-                          data-url-cancel="{% url 'coupons:cancel_coupon' %}">
-                        {% csrf_token %}
-                        {% for field in coupon_form %}
-                            {{ field }}
-                        {% endfor %}
-                        <button class="coupon-btn" type="submit">
+                    <div class="coupon-discount-block">
+                        <div class="coupon-check">
+                            <label for="have-coupon">Have a coupon?</label>
+                            <input style="cursor: pointer" type="checkbox" name="have-coupon" id="have-coupon">
+                        </div>
+                        <form id="coupon-form" style="display: none;"
+                              data-url-apply="{% url 'coupons:apply_coupon' %}"
+                              data-url-cancel="{% url 'coupons:cancel_coupon' %}">
+                            {% csrf_token %}
+                            {% for field in coupon_form %}
+                                {{ field }}
+                            {% endfor %}
+                            <button class="coupon-btn" type="submit">
+                                {% if cart.coupon_id %}
+                                    Cancel
+                                {% else %}
+                                    Apply
+                                {% endif %}
+                            </button>
                             {% if cart.coupon_id %}
-                                Cancel
-                            {% else %}
-                                Apply
-                            {% endif %}
-                        </button>
-                        {% if cart.coupon_id %}
                             <span class="material-symbols-outlined">check_circle</span>
-                        {% endif %}
-                    </form>
-                    <!--ошибки для формы купона-->
-                    <ul class="errorlist"></ul>
-
-                    <!--Форма для кода подарочной карты (заполняется в JavaScript)-->
-                    <div class="card-check">
-                        <label for="have-card">Have a present card?</label>
-                        <input style="cursor: pointer" type="checkbox" name="have-card" id="have-card">
+                            {% endif %}
+                        </form>
+                        <!--ошибки для формы купона-->
+                        <ul class="errorlist" style="display: none;"></ul>
                     </div>
-                    <form id="present-card-form" style="display: none;"
-                          data-url-apply="{% url 'present_cards:apply_present_card' %}"
-                          data-url-cancel="{% url 'present_cards:cancel_present_card' %}">
-                        {% csrf_token %}
-                        {% for field in present_card_form %}
-                            {{ field }}
-                        {% endfor %}
-                        <button class="present-card-btn" type="submit">
+                    <!--Форма для кода подарочной карты (заполняется в JavaScript)-->
+                    <div class="card-discount-block">
+                        <div class="card-check">
+                            <label for="have-card">Have a present card?</label>
+                            <input style="cursor: pointer" type="checkbox" name="have-card" id="have-card">
+                        </div>
+                        <form id="present-card-form" style="display: none;"
+                              data-url-apply="{% url 'present_cards:apply_present_card' %}"
+                              data-url-cancel="{% url 'present_cards:cancel_present_card' %}">
+                            {% csrf_token %}
+                            {% for field in present_card_form %}
+                                {{ field }}
+                            {% endfor %}
+                            <button class="present-card-btn" type="submit">
+                                {% if cart.present_card_id %}
+                                    Cancel
+                                {% else %}
+                                    Apply
+                                {% endif %}
+                            </button>
                             {% if cart.present_card_id %}
-                                Cancel
-                            {% else %}
-                                Apply
+                                <span class="material-symbols-outlined">check_circle</span>
                             {% endif %}
-                        </button>
-                        {% if cart.present_card_id %}
-                            <span class="material-symbols-outlined">check_circle</span>
-                        {% endif %}
-                    </form>
-                    <!--ошибки для формы подарочной карты (заполняется в JavaScript)-->
-                    <ul class="errorlist"></ul>
+                        </form>
+                        <!--ошибки для формы подарочной карты (заполняется в JavaScript)-->
+                        <ul class="errorlist" style="display: none;"></ul>
+                    </div>
                 </div>
                 {% if cart.coupon_id or cart.present_card_id %}
                     <div class="discounts-total">
@@ -151,7 +157,10 @@
                         <div class="without-value">${{ cart.get_total_price }}</div>
                     </div>
                 {% endif %}
-                <a id="checkout-btn" href="{% url 'orders:order_create' %}" role="button">Checkout</a>
+                <a id="checkout-btn" href="{% url 'orders:order_create' %}" role="button">
+                    <span class="material-symbols-outlined">shopping_cart_checkout</span>
+                    Checkout
+                </a>
             </div>
         {% endif %}
     </div>

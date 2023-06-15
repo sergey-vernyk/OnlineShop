@@ -1,3 +1,8 @@
+input[type="text"] {
+    font-family: 'Merriweather', serif;
+    font-size: 1rem;
+}
+
 .amount-items {
     font-size: 20px;
     display: flex;
@@ -73,6 +78,7 @@
     margin: 0 1rem;
     font-size: 1.3rem;
     font-family: 'PT Sans Caption', sans-serif;
+    text-align: center;
 }
 
 .item-remove svg {
@@ -101,6 +107,7 @@
     background-color: white;
     border-radius: 8px;
     min-height: 120px;
+    min-width: 350px;
 }
 
 .block-summary {
@@ -124,11 +131,24 @@
     font-weight: 600;
 }
 
+.coupon-discount-block, .card-discount-block {
+    padding: 10px 5px;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+}
+
+.coupon-discount-block { margin-bottom: 10px;}
+
+.errorlist {
+     margin-bottom: 5px !important;
+     padding-left: 10px;
+}
+
 .coupon-check, .card-check {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 0;
+    padding: 10px 10px;
     font-family: 'Montserrat', sans-serif;
     font-size: 15px;
 }
@@ -136,12 +156,14 @@
 #coupon-form, #present-card-form {
     display: flex;
     align-items: center;
+    padding: 0 10px;
 }
 
 #coupon-form #id_code, #present-card-form #id_code {
-    border-radius: 8px;
+    border-radius: 5px;
     border: 1px solid;
     width: 180px;
+    min-width: 150px;
     padding-left: 8px;
     margin-right: 1rem;
 }
@@ -161,6 +183,7 @@
     color: black;
     line-height: 0.3rem;
     border: 1px solid black;
+    font-family: 'Merriweather', serif;
 }
 
 .discounts-total, .without-discounts {
@@ -196,11 +219,12 @@
 }
 
 #checkout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-decoration: none;
     color: white;
     background-color: rgba(17, 185, 40, 1);
-    display: block;
-    text-align: center;
     font-size: 1.3rem;
     padding: 5px;
     margin-top: 1.2rem;
@@ -210,4 +234,8 @@
 
 #checkout-btn:hover {
     background-color: #198754;
+}
+
+#checkout-btn .material-symbols-outlined {
+    margin-right: 10px;
 }

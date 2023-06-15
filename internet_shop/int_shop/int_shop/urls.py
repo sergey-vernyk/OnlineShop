@@ -29,6 +29,7 @@ urlpatterns = [
     path('present_cards/', include('present_cards.urls')),
     path('payment/', include('payment.urls')),
     path('__debug__/', include('debug_toolbar.urls')),
+    path('summernote/', include('django_summernote.urls')),
 ]
 
 if settings.DEBUG:  # сохранение файлов по этому адресу будет происходить только в режиме разработки

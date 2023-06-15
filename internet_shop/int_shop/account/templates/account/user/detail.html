@@ -12,9 +12,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Rubik&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@1,300&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=EB+Garamond&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald&display=swap" rel="stylesheet">
 {% endblock %}
 {% block content %}
-    <div class="container my-4" style="min-width: 960px;">
+    <div class="container">
         <div class="row customer-header">
             <div class="brief-info">
                 <div style="display: flex; align-items: center;">
@@ -70,29 +71,36 @@
                 </div>
             </div>
         </div>
-        <div class="row pb-2" style="flex-wrap: nowrap;">
+        <div class="row pb-2 align-items-start flex-nowrap mb-4">
             {% with username=request.user.username %}
                 <div class="sidebar-customer">
                     <div class="sidebar-item">
-                        <span class="material-symbols-outlined">person</span><a href="{% url 'customer_detail' username 'about' %}"><span>Personal info</span></a>
+                        <span class="material-symbols-outlined">person</span>
+                        <a href="{% url 'customer_detail' username 'about' %}"><span>Personal info</span></a>
                     </div>
                     <div class="sidebar-item">
-                        <span class="material-symbols-outlined">shopping_cart</span><a href="{% url 'customer_detail' username 'orders' %}"><span>Orders</span></a>
+                        <span class="material-symbols-outlined">shopping_cart</span>
+                        <a href="{% url 'customer_detail' username 'orders' %}"><span>Orders</span></a>
                     </div>
                     <div class="sidebar-item">
-                        <span class="material-symbols-outlined">favorite</span><a href="{% url 'customer_detail' username 'favorites' %}"><span>Favorites</span></a>
+                        <span class="material-symbols-outlined">favorite</span>
+                        <a href="{% url 'customer_detail' username 'favorites' %}"><span>Favorites</span></a>
                     </div>
                     <div class="sidebar-item">
-                        <span class="material-icons">card_giftcard</span><a href="{% url 'customer_detail' username 'coupons' %}"><span>Coupons</span></a>
+                        <span class="material-icons">card_giftcard</span>
+                        <a href="{% url 'customer_detail' username 'coupons' %}"><span>Coupons</span></a>
                     </div>
                     <div class="sidebar-item">
-                        <span class="material-icons">card_giftcard</span><a href="{% url 'customer_detail' username 'present_cards' %}"><span>Present cards</span></a>
+                        <span class="material-icons">card_giftcard</span>
+                        <a href="{% url 'customer_detail' username 'present_cards' %}"><span>Present cards</span></a>
                     </div>
                     <div class="sidebar-item">
-                        <span class="material-symbols-outlined">chat_bubble</span><a href="{% url 'customer_detail' username 'comments' %}"><span>Comments</span></a>
+                        <span class="material-symbols-outlined">chat_bubble</span>
+                        <a href="{% url 'customer_detail' username 'comments' %}"><span>Comments</span></a>
                     </div>
                     <div class="sidebar-item">
-                        <span class="material-symbols-outlined">visibility</span><a href="{% url 'customer_detail' username 'watched' %}"><span>Watched products</span></a>
+                        <span class="material-symbols-outlined">visibility</span>
+                        <a href="{% url 'customer_detail' username 'watched' %}"><span>Watched products</span></a>
                     </div>
                     <div id="logout" class="sidebar-item">
                         <div style="display: flex;justify-content: end;align-items: center;">
@@ -106,7 +114,7 @@
                 {% if location == 'about' %}
                     {% include 'account/user/personal_info.html' with customer=customer %}
                 {% elif location == 'orders' %}
-                    {% include 'account/user/orders_info.html' with orders=orders items=order_items %}
+                    {% include 'account/user/orders_info.html' with orders=orders %}
                 {% elif location == 'comments' %}
                     {% include 'account/user/comments_info.html' with comments=comments customer=customer %}
                 {% elif location == 'coupons' %}
@@ -125,4 +133,6 @@
 <script src="{% static 'js/add_remove_favorite.js' %}" type="module"></script>
 <script src="{% static 'js/go_to_choose_order.js' %}"></script>
 <script src="{% static 'js/highlight_order.js' %}"></script>
+<script src="{% static 'js/collapse_expand_comment.js' %}"></script>
+<script src="{% static 'js/collapse_expand_list_orders.js' %}"></script>
 {% endblock %}

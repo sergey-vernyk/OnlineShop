@@ -4,23 +4,28 @@
 }
 
 body, html {
-  max-width: 100%;
-  overflow-x: hidden;
-  font-family: 'Source Sans Pro', sans-serif !important;
-  background-color: #EAEAEA !important;
+    min-height: 100%;
+    width: 100%;
+    overflow-x: hidden;
+    font-family: 'Source Sans Pro', sans-serif !important;
+    background-color: #EAEAEA !important;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 /*Пагинация*/
-.pagination li {
-    margin: 0 5px !important;
-}
+.pagination li { margin: 0 5px !important; }
 
 .pagination .page-link {
     font-family: 'Merriweather', serif !important;
     font-size: 1.2rem;
     border-radius: 30% !important;
-    height: 55px;
-    width: 55px;
+    height: 45px;
+    width: 45px;
     border: 1px solid rgb(196, 184, 196);
     display: flex;
     justify-content: center;
@@ -29,8 +34,8 @@ body, html {
 
 .pagination .active {
     background-color: rgba(51,84,175,1);
-    height: 55px;
-    width: 55px;
+    height: 45px;
+    width: 45px;
     border: 1px solid rgb(196, 184, 196);
     border-radius: 30% !important;
     pointer-events: none;
@@ -43,8 +48,8 @@ body, html {
 
 
 .pagination .disabled {
-    height: 55px;
-    width: 55px;
+    height: 45px;
+    width: 45px;
     border-radius: 30%;
 }
 
@@ -62,13 +67,6 @@ body, html {
     box-shadow: 2px 2px 6px 0px rgba(224,215,206,1);
 }
 
-#main-list {
-    /*background-color: #F8F8FF;*/
-}
-
-#productData {
-    min-height: 300px;
-}
 
 .prod-card {
     background-color: #F5FDF0;
@@ -76,13 +74,11 @@ body, html {
     width: 295px;
 }
 
-.catPropName {
-    background-color: #BAAEF7;
-}
+.navbar-brand { margin-right: 15px !important; }
 
 #main-navbar {
     width:100%;
-    height:80px;
+    min-height:80px;
     font-family:'Comic Sans MS';
     font-size:18px;
     line-height:1.3em;
@@ -147,61 +143,84 @@ body, html {
 
 .error-message { background-color: #F45353; }
 
+.shop-name {
+    color: white;
+    font-family: 'Yanone Kaffeesatz', sans-serif;
+    font-size: 1.8rem;
+    display: flex;
+    min-width: 110px;
+}
+
 /*панель пользователя на navbar*/
 .user-panel {
-    display: inline;
+    display: block;
     position: relative;
     padding: 8px;
     margin: 0 10px;
-    min-width: 108px;
 }
 
-.user-panel a:nth-child(2) {
+.user-panel a:hover {
+    color: #F7CB39;
+    border-color: #F7CB39;
+}
+
+.user-panel a {
+    display: flex;
+    border: 3px solid white;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
     text-decoration: none;
     color: white;
-    font-weight: 650;
+    background-color: rgb(17, 185, 40);;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
 }
-
-.user-panel a:nth-child(2):hover { color: #4DCD66; }
 
 /* Корзина */
 .cart-panel {
     display: flex;
     margin: 0 10px;
-    padding: 5px;
-    min-width: 170px;
+    padding: 10px;
     align-items: center;
     justify-content: space-around;
 }
 
-.cart-button {
-    left: 10px;
-    top: 10px;
-}
+.cart-button { display: flex;}
 
 .cart-button a {
-    display: inline;
+    display: flex;
     text-decoration: none;
-    color: white;
     position: relative;
+    color: white;
+    align-items: center;
 }
 
-.cart-button a:hover {
-    color: #F7CB39;
-}
+.cart-button a:hover { color: #F7CB39;}
 
 .amount-cart {
     margin-left: 8px;
-    margin-right: 8px;
-    position: absolute;
-    top: 3px;
+    font-size: 0.9rem;
+    width: 25px;
+    height: 25px;
+    padding: 4px;
+    border-radius: 50% 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #d05555;
+    color: white;
+    line-height: initial;
 }
 
 .total-price {
     position: relative;
-    color: #F2900F;
+    color: white;
     font-size: 1rem;
-    margin-left: 20px;
+    margin-left: 10px;
+    font-weight: 500;
 }
 
 .authorization {
@@ -225,25 +244,21 @@ body, html {
     background-color: #268833;
 }
 
-.register {
-    display: inline-block;
-}
+.register { display: inline-block;}
 
-.register #register-button {
+#register-button {
     display: inline-block;
     color: white;
     text-decoration: none;
-    font-weight: 500;;
+    font-weight: 500;
 }
 
-#register-button:hover {
-    color: #F76C6C;
-}
+#register-button:hover { color: #F7CB39; }
 
 /*Выпадающий список с категориями товаров главного навбара*/
 .dropdwn {
     position: absolute;
-    left: 90px;
+    left: 200px;
     top: 23px;
     list-style: none;
     padding-left: 0;
@@ -254,24 +269,26 @@ body, html {
     z-index: 10;
 }
 
-.dropdwn .dropdwn-item {
-    padding: 5px 5px 5px 20px;
-    margin: 5px 0;
+.dropdwn-item {
+    padding-left: 10px;
+    margin: 15px 0;
     display: none;
     z-index: 2;
     position: relative;
 }
 
-.dropdwn li a {
-    color: white;
-    text-decoration: none;
+.dropdwn-item .material-symbols-outlined {
+    align-self: center;
+    margin-right: 5px;
 }
 
-.dropdwn li a:hover {
-    color: rgba(207, 196, 199, 1);
+.dropdwn a {
+    color: white;
     text-decoration: none;
-    text-decoration: underline;
+    display: flex;
 }
+
+.dropdwn-item a:hover { color: rgb(184, 138, 150) !important; }
 
 #main-nav-item {
     color: white;
@@ -291,6 +308,9 @@ body, html {
     right: 10px;
     margin-right: 0;
 }
+
+#main-nav-item:hover { color: rgb(184, 138, 150) }
+
 
 /*Дополнительные пункты меню главного навбара*/
 .additional-menu-items {
@@ -315,21 +335,21 @@ body, html {
     color: white;
 }
 
-.additional-menu-items a:hover {
-    color: rgba(207, 196, 199, 1);
-    text-decoration: underline;
-}
+.additional-menu-items a:hover { color: rgb(184, 138, 150) !important;}
 
 /*Строка поиска*/
 #search-form {
+    display: flex;
+    align-items: center;
     position: relative;
     padding: 10px;
-    margin-left: 50px;
-    margin-right: 15px;
-    display: flex;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
-#search-form #search-btn {
+#search-btn {
+    display: flex;
+    align-items: center;
     padding: 6px;
     border-radius: 5px;
     border: 1px rgba(5, 70, 14, 1) solid;
@@ -339,13 +359,16 @@ body, html {
     height: 40px;
 }
 
-#search-form #search-btn:hover { background-color: #268833 }
+#search-btn .material-symbols-outlined { margin-right: 5px; }
 
-#id_query {
+#search-btn:hover { background-color: #268833; }
+
+.search-field-input {
     width: 350px;
     padding: 0 1.2rem;
+    border: 1px solid;
     border-radius: 8px;
-    height: 40px;
+    height: 38px;
 }
 
 .rating-star [id^="star-"] {
@@ -359,4 +382,140 @@ body, html {
     color: orange;
     display: inline;
     font-size: 1.2rem;
+}
+
+.footer {
+    background-color: rgba(51,84,175,1);
+    color: white;
+    font-family: 'Montserrat', sans-serif;
+}   
+
+.content { flex-grow: 1; }
+
+.footer-info {
+    display: flex;
+    padding: 0.5rem;
+    justify-content: space-around;
+}
+
+.footer-headers {
+    font-family: 'Yanone Kaffeesatz', sans-serif;
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+.main-row-info { display: flex; }
+
+.contacts {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    width: 300px;
+    padding: 0.5rem 1rem 0 1rem;
+}
+
+.phone-numbers, .shop-prods-categories ul {
+    list-style: none; 
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+.phone-numbers li { margin: 8px 0; }
+
+.phone-numbers li div:nth-child(1) {    
+    display: inline-block;                                           
+    font-weight: 600;
+    margin-right: 5px;
+}
+
+.phone-numbers li div:nth-child(2) {
+    display: inline-block;
+}
+
+.other-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.email {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem 1rem 0.5rem 1rem;
+    height: 150px;
+}
+
+.copyright {
+    font-weight: bold;
+    font-size: 1.1rem;
+    font-family: 'Yanone Kaffeesatz', sans-serif;
+    position: relative;
+    display: inline;
+}
+
+.email ul { margin-bottom: 0; }
+
+.shop-prods-categories {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem 1rem 0 1rem;
+    width: 250px;
+}
+
+.shop-prods-categories ul { font-size: 0.8rem; }
+
+.footer-categories {
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+}
+
+.footer-categories a {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+}
+
+.footer-categories a:hover {
+    color: wheat
+}
+
+.footer-categories a .material-symbols-outlined { margin-right: 5px; }
+
+
+/*страницы с ошибками*/
+.page404-content {
+    font-family: 'Exo 2', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 50vh;
+}
+
+.err-code {
+    font-size: 7rem;
+    font-weight: bold;
+}
+
+.err-message {
+    font-size: 3.5rem;
+    margin: 0.5rem 0;
+}
+
+.additional-err-text {
+    margin: 0.5rem 0;
+    font-size: 1.2rem;
+}
+
+.additional-err-text a { text-decoration: none; }
+
+
+.err-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

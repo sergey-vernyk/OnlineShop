@@ -1,5 +1,6 @@
 $(document).ready(function() {
 	var listInputs = $('[id^=id_code]'); //все input в блоке
+	var initialCurrentAmountPrice = Number($('.amount-items > span:nth-child(2)').text().slice(1)).toFixed(2);
 
 	//делаем неактивные и с другим цветом кнопки для подтверждения формы
 	for (var i = 0; i < listInputs.length; i++) {
@@ -35,9 +36,9 @@ $(document).ready(function() {
 		var submitBtn = $(this).find(':submit');
 		var action = submitBtn.text().trim(); //действие берется с названия кнопки с формы
 		var url;
-		var boundErrorList = $(this).next('.errorlist'); //список ошибок, связанных с выбранной формой
+		var boundErrorList = $(this).parent().find('.errorlist'); //список ошибок, связанных с выбранной формой
 
-		//применение купона или отмена применения
+		//применение купона/карты или отмена применения
 		if (action === 'Apply') {
 			url = $(this).data('url-apply');
 		} else if (action === 'Cancel') {
@@ -65,7 +66,13 @@ $(document).ready(function() {
 				});
 
 				//текущая стоимость товаров со всеми скидками
-				var currentAmountPrice = Number($('.amount-items > span:nth-child(2)').text().slice(1)).toFixed(2);
+				var currentAmountPrice;
+				if($('.amount-items > span:nth-child(2)').text() === 'Free') {
+					currentAmountPrice = initialCurrentAmountPrice;
+				} else {
+					currentAmountPrice = Number($('.amount-items > span:nth-child(2)').text().slice(1)).toFixed(2)
+				}
+
 				var finallyPriceWithCoupon = 0;
 				var finallyPriceWithCard = 0;
 				var formErrors = response['form_errors'];
@@ -86,13 +93,15 @@ $(document).ready(function() {
 						if ($(currentForm).attr('id') === 'coupon-form') {
 							var couponDiscount = response['coupon_discount'];
 							finallyPriceWithCoupon = totalPriceWithoutDiscounts - (totalPriceWithoutDiscounts * Number(couponDiscount)).toFixed(2);
+							initialCurrentAmountPrice = finallyPriceWithCoupon;
 							$('.amount-items > span:nth-child(2), .total-price').text('$' + finallyPriceWithCoupon.toFixed(2));
 						}
 						//применена карта
 						if ($(currentForm).attr('id') === 'present-card-form') {
 							var cardAmount = response['card_amount'];
 							finallyPriceWithCard = currentAmountPrice - Number(cardAmount);
-							$('.amount-items > span:nth-child(2), .total-price').text('$' + finallyPriceWithCard.toFixed(2));
+							initialCurrentAmountPrice = finallyPriceWithCard;
+							$('.amount-items > span:nth-child(2), .total-price').text(finallyPriceWithCard > 0 ? `$${finallyPriceWithCard.toFixed(2)}` : 'Free');
 						}
 
 						//контент появляется, когда применяется одна из скидок
@@ -163,8 +172,13 @@ $(document).ready(function() {
 
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				console.log(textStatus, errorThrown);
+				//переход на страницу для входа в систему, если статус ответа 401
+				if(errorThrown === 'Unauthorized') {
+					var login_url = jqXHR.responseJSON['login_page_url'];
+					window.open(login_url, '_self');
+				}
+				
 			},
 		})
-	});
+	}); 
 })

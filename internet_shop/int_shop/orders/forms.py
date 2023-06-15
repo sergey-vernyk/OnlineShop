@@ -1,9 +1,10 @@
 from django import forms
-
+from django.utils import timezone
 from .models import Delivery, Order
 import phonenumbers
 from phonenumbers import carrier
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 
 class OrderCreateForm(forms.ModelForm):
@@ -96,8 +97,13 @@ class DeliveryCreateForm(forms.ModelForm):
                                                       'min': 1}),
         }
 
-        error_messages = {
-            'delivery_date': {
-                'invalid': 'Incorrect date',
-            }
-        }
+    def clean_delivery_date(self):
+        """
+        Проверка даты доставки на то, что
+        она не меньше сегодняшней даты
+        """
+        date_now = timezone.now().date()
+        date = self.cleaned_data.get('delivery_date')
+
+        if date < date_now:
+            raise ValidationError('Date must be grater or equal than today date')

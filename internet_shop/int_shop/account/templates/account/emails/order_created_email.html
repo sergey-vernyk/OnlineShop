@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300&display=swap" rel="stylesheet">
+    <style type="text/css">
+         .block-order-confirmed {
+            font-size: 0.9rem;
+            font-family: 'Merriweather', serif;
+            text-align: center;
+            padding: 15px;
+            border-bottom: solid 1px #E1E2E1;
+            margin-bottom: 1rem;
+        }
+
+        .block-order-confirmed img { display: inline; }
+
+        .block-order-confirmed p { margin-top: 5px; }
+
+        .block-order-confirmed > div {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .block-order-confirmed h2 {
+            text-align: center;
+            display: inline;
+            margin-bottom: 15px;
+            margin-top: 0;
+        }
+
+        .block-order-confirmed p a {
+            text-decoration: none;
+            color: green;
+            text-decoration: underline;
+        }
+
+        .block-order-confirmed p a:hover { color: red; }
+
+        .main-page-link {
+            font-size: 1.2rem;
+            color:gray;
+            font-weight: bold;
+            text-decoration: none;
+            text-align: end;
+        }
+
+        .main-page-link:hover { color:blue; }
+
+        .user-orders-link {
+            font-size: 1.1rem;
+            color:gray;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .order-id, .order-amount {
+            font-weight: bold;
+            color: seagreen;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+    <body>
+        <div class="block-order-confirmed">
+            <div>
+                <img src="https://iili.io/Hgdzw4n.md.png" alt="Hgdzw4n.md.png" border="0" height="80" width="80">
+                <h2>Order has been confirmed</h2>
+            </div>
+            <p>
+                Thanks for your order! Your order ID is <span class="order-id">{{ order_id }}</span>.
+                Order amount is <span class="order-amount">${{ order_amount }}</span>.
+                Our manager contact you within 10 minutes.
+            </p>
+            <p>
+                You can see your orders follow the <a class="user-orders-link" href="{{ protocol }}://{{ domain }}{% url 'customer_detail' username 'orders' %}">link.</a>
+            </p>
+        </div>
+        <a class="main-page-link" href="{{ protocol }}://{{ domain }}{% url 'goods:product_list' %}">OnlineShop</a>
+    </body>
+</html>

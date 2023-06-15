@@ -199,13 +199,14 @@ class Property(models.Model):
         ('LAN', 'LAN'), ('4G', '4G'), ('5G', '5G'),
         # Battery
         ('Capacity', 'Capacity'), ('Charging', 'Charging'), ('Quick Charge', 'Quick Charge'), ('#Cells', '#Cells'),
-        ('Work Time', 'Work Time'),
+        ('Work Time', 'Work Time'), ('Charging Port', 'Charging Port'),
         # Body
         ('Color', 'Color'), ('Dimensions', 'Dimensions'), ('Material', 'Material'), ('Weight', 'Weight'),
         ('Opening Angle', 'Opening Angle'),
         # Audio
-        ('Manufacturer', 'Manufacturer'),
-        ('Power', 'Power'),
+        ('Manufacturer', 'Manufacturer'), ('Power', 'Power'), ('Frequency Range', 'Frequency Range'),
+        ('Interfaces', 'Interfaces'), ('Inputs', 'Inputs'), ('Supply Types', 'Supply Types'),
+        ('Connections', 'Connections'), ('Channels', 'Channels'),
         # RAM Memory
         ('Volume', 'Volume'),
         ('#Slots', '#Slots'),
@@ -218,10 +219,13 @@ class Property(models.Model):
         # Features
         ('Sensors', 'Sensors'),
         ('Keyboard Lightening', 'Keyboard Lightening'),
+        ('Additional Features', 'Additional Features'),
         # Software
         ('OS', 'OS'),
         ('User interface', 'User interface'),
         ('Version', 'Version'),
+        # Other
+        ('Packaging', 'Packaging')
 
     ], key=lambda x: x[0]))
 
@@ -229,7 +233,7 @@ class Property(models.Model):
     text_value = models.CharField(max_length=255, blank=True)
     numeric_value = models.DecimalField(max_digits=6, decimal_places=2, blank=True, default='0.00')
     units = models.CharField(max_length=10, blank=True)
-    detail_description = models.CharField(max_length=255, blank=True)
+    detail_description = models.TextField(max_length=600, blank=True)
     category_property = models.ForeignKey(PropertyCategory,
                                           related_name='category_properties',
                                           on_delete=models.CASCADE,

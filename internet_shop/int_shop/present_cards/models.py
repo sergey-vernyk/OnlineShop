@@ -16,7 +16,7 @@ class PresentCard(models.Model):
     to_email = models.EmailField()
     category = models.ForeignKey('Category', related_name='present_cards', on_delete=models.CASCADE)
     message = models.TextField(max_length=300, blank=True)
-    amount = models.DecimalField(max_digits=5, decimal_places=2)
+    amount = models.PositiveSmallIntegerField(blank=False)
     profile = models.ForeignKey(Profile, related_name='profile_cards', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):

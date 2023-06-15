@@ -8,6 +8,7 @@ from .forms import OrderCreateForm, DeliveryCreateForm
 from orders.models import Order, OrderItem
 from orders.tasks import order_created
 from django.http.response import HttpResponseRedirect
+from django.contrib.sites.shortcuts import get_current_site
 
 
 class OrderCreateView(LoginRequiredMixin, FormView):
@@ -41,11 +42,8 @@ class OrderCreateView(LoginRequiredMixin, FormView):
             # если в корзине есть валидный купон и/или подарочная карта, присваиваем к заказу
             if cart.coupon:
                 order.coupon = cart.coupon
-                profile.coupons.add(cart.coupon)  # добавляем купон в профиль
             if cart.present_card:
                 order.present_card = cart.present_card
-                cart.present_card.profile = profile  # добавляем карту в профиль и сохраняем ее
-                cart.present_card.save(update_fields=['profile'])
 
             delivery = delivery_form.save()
             # привязка доставки и профиля к заказу
@@ -54,8 +52,13 @@ class OrderCreateView(LoginRequiredMixin, FormView):
             order.save()
             self.create_order_items_from_cart(order)  # создание элементов заказа в базе
             self.request.session['order_id'] = order.pk
+
+            domain = get_current_site(request).domain
+            is_secure = request.is_secure()
             # отправка сообщения о завершении заказа на почту
-            order_created.delay(order_id=order.pk)
+            order_created.delay(data={'domain': domain, 'is_secure': is_secure},
+                                order_id=order.pk,
+                                profile_username=profile.user.username)
             return HttpResponseRedirect(self.success_url)
         else:  # возврат форм с ошибками
             return self.render_to_response(context={'form': order_form,

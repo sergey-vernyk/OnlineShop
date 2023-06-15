@@ -1,6 +1,8 @@
 from django.contrib import admin
 
 from orders.models import Order, Delivery, OrderItem
+from django.utils.safestring import mark_safe
+from django.shortcuts import reverse
 
 
 @admin.register(Order)
@@ -27,11 +29,21 @@ class OrderAdmin(admin.ModelAdmin):
     def get_full_name(self, obj):
         return f'{obj.first_name} {obj.last_name}'
 
-    list_display = ['id', 'get_full_name', 'is_paid', 'is_done']
+    list_display = ['id', 'get_full_name', 'is_paid', 'is_done', 'get_discount']
     readonly_fields = ['created', 'updated']
     search_fields = ['last_name', 'phone']
     date_hierarchy = 'created'
     list_filter = ['is_paid']
+    list_display_links = ['get_discount', 'get_full_name']
+
+    @admin.display(description='Apply discount')
+    def get_discount(self, obj):
+        if obj.coupon:
+            coupon_url = reverse(f'admin:coupons_coupon_change', args=(obj.coupon.pk,))
+            return mark_safe(f'<a href="{coupon_url}">Coupon</a>')
+        if obj.present_card:
+            card_url = reverse(f'admin:present_cards_presentcard_change', args=(obj.present_card.pk,))
+            return mark_safe(f'<a href="{card_url}">Present Card</a>')
 
 
 @admin.register(Delivery)

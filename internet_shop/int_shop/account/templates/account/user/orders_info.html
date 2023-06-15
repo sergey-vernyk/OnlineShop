@@ -1,13 +1,12 @@
 {% load static %}
 {% load subtract %}
-{% load get_value_from_dict %}
 
 <div class="personal-info">
     <h3>Orders</h3>
     {% for order in orders %}
-        {% with order_items=items|get_dict_item:order.pk total_cost=order.get_total_cost|subtract:order.get_total_discount %}
+        {% with items=order.items.all cost_with_discounts=order.get_total_values.total_cost_with_discounts cost_no_discounts=order.get_total_values.total_cost %}
             <div id="min-max-detail-{{ order.pk }}" role="button">
-                <div class="row p-0 border rounded mb-2" style="position: relative;">
+                <div class{% if forloop.counter > 4 and orders.count > 4 %}="all-order-info collapse-order"{% else %}="all-order-info expand-order"{% endif %}>
                     <div class="expander-header">
                         <div class="order-pk">
                             № {{ order.pk }}
@@ -23,13 +22,17 @@
                             {% endif %}
                         </div>
                         <div id="total-cost-{{ order.pk }}">
-                            $ {{ total_cost }}
+                            {% if cost_with_discounts %}
+                                $ {{ cost_with_discounts }}
+                            {% else %}
+                                $ {{ cost_no_discounts }}
+                            {% endif %}
                         </div>
                         <!--Изображения товаров (не более 2-х)-->
                         <div id="items-images-{{ order.pk }}">
-                            {% with count_items=order_items|length %}
+                            {% with count_items=items|length %}
                                 <div class="item-image">
-                                    {% for item in order_items %}
+                                    {% for item in items %}
                                         {% if forloop.counter < 3 %}
                                             <img src="{{ item.product.image.url }}" width="60" height="60" alt="product-image">
                                         {% endif %}
@@ -41,13 +44,13 @@
                             {% endwith %}
                         </div>
                         <div id="expander-{{ order.pk }}">
-                            <img src="{% static 'bootstrap-icons/icons/chevron-down.svg' %}"/>
+                            <span class="material-symbols-outlined">expand_more</span>
                         </div>
                     </div>
                     <!--Информация о каждом товаре из заказа-->
                     <div id="order-detail-{{ order.pk }}" style="display: none;">
                         <div class="d-block">
-                            {% for item in order_items %}
+                            {% for item in items %}
                                 <div class="d-flex pe-3" style="align-items: center;">
                                     <div class="product-image">
                                         {% if item.product.image %}
@@ -160,24 +163,26 @@
                                     </div>
                                 {% endif %}
                             {% endwith %}
-                            {% with total_discount=order.get_total_discount %}
-                                {% if total_discount %}
-                                    <div class="item">
-                                        <div class="name">
-                                            Discount
-                                        </div>
-                                        <div class="attr discount">
-                                            -$ {{ total_discount }}
-                                        </div>
+                            {% if cost_with_discounts %}
+                                <div class="item">
+                                    <div class="name">
+                                        Discount
                                     </div>
-                                {% endif %}
-                            {% endwith %}
+                                    <div class="attr discount">
+                                        -$ {{ order.get_total_values.total_discounts }}
+                                    </div>
+                                </div>
+                            {% endif %}
                             <div class="item total">
                                 <div class="name">
                                     <span style="font-weight: bold;">Total</span>
                                 </div>
                                 <div class="attr">
-                                    $ {{ total_cost }}
+                                    {% if cost_with_discounts %}
+                                        $ {{ cost_with_discounts }}
+                                    {% else %}
+                                        $ {{ cost_no_discounts }}
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -190,4 +195,6 @@
             <h4 class="d-inline">There are no orders yet</h4>
         </div>
     {% endfor %}
+    <div class="show-all-orders">Show another {{ orders.count|add:"-4" }} orders</div>
+    <div class="hide-another-orders">Hide another {{ orders.count|add:"-4" }} orders</div>
 </div>

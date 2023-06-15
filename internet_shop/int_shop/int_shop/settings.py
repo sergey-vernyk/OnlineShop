@@ -19,7 +19,7 @@ environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+SITE_ID = 1
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
@@ -46,10 +46,10 @@ INSTALLED_APPS = [
     'django_bootstrap5',
     'django_extensions',
     'debug_toolbar',
-    'easy_thumbnails',
     'django.contrib.postgres',
     'social_django',
     'rest_framework.authtoken',
+    'django_summernote',
 
     'goods.apps.GoodsConfig',
     'orders.apps.OrdersConfig',
@@ -68,6 +68,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'django.contrib.sites.middleware.CurrentSiteMiddleware',
     'common.middleware.previous_and_current_urls_middleware',  # сохраняет текущий и предыдущий URL адреса в сессию
 ]
 
@@ -150,10 +151,9 @@ DATE_INPUT_FORMATS = ('%d-%m-%Y',)
 
 STATIC_URL = 'static/'
 # (python manage.py collectstatic - собирает все статические файлы проекта и сохраняет их по этому пути)
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+STATIC_ROOT = os.path.join(BASE_DIR, 'assets/')
 STATICFILES_DIRS = [
     BASE_DIR / "static",
-    'node_modules', os.path.join(BASE_DIR, 'node_modules/'),
 ]
 
 # Default primary key field type
@@ -167,6 +167,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')  # путь, по которому
 
 LOGIN_REDIRECT_URL = 'goods:product_list'
 LOGOUT_REDIRECT_URL = 'login'
+LOGIN_URL = 'login'
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # вывод всех сообщений с почты в shell (без SMTP)
 CART_SESSION_ID = 'cart'
 
@@ -183,8 +184,8 @@ STRIPE_WEBHOOK_SECRET = env('STRIPE_WEBHOOK_SECRET')
 FROM_EMAIL = env('FROM_EMAIL')
 
 EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
-EMAIL_HOST_USER = '2f9fd0eea9d687'
-EMAIL_HOST_PASSWORD = '2298f6d72b35e4'
+EMAIL_HOST_USER = '46817091728879'
+EMAIL_HOST_PASSWORD = '1110aaff92a1c8'
 EMAIL_PORT = '2525'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -240,3 +241,11 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['https://www.googleapis.com/auth/user.gender.read',
                                    'https://www.googleapis.com/auth/user.birthday.read']
+
+# настройки summernote для редактирования поля Description в модели Product
+SUMMERNOTE_CONFIG = {
+    'summernote': {
+        'width': '80%',
+        'height': '480',
+    }
+}

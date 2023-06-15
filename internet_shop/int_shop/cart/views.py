@@ -29,7 +29,8 @@ def cart_add(request):
 
     return JsonResponse({'success': True,
                          'cart_len': len(cart),
-                         'added_prod_cost': cart.cart[product_id]['quantity'] * product.price,
+                         'added_prod_cost': cart.cart[product_id]['quantity'] * (
+                                 product.promotional_price or product.price),
                          'total_price': cart.get_total_price(),
                          'total_price_discounts': cart.get_total_price_with_discounts(),
                          'total_discount': cart.get_total_discount()})

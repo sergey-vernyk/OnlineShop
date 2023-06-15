@@ -21,8 +21,10 @@ $(document).ready(function() {
 			case true:
 				if ($(this).attr('id').endsWith('coupon')) {
 					$('#coupon-form').show();
+					$('#have-card').prop('disabled', true);
 				} else if ($(this).attr('id').endsWith('card')) {
 					$('#present-card-form').show();
+					$('#have-coupon').prop('disabled', true);
 				}
 				$(this).parent().nextAll().filter('.errorlist').eq(0).show(); //отображение ошибок возле формы
 				break;
@@ -30,8 +32,10 @@ $(document).ready(function() {
 			case false:
 				if ($(this).attr('id').endsWith('coupon')) {
 					$('#coupon-form').hide();
+					$('#have-card').prop('disabled', false);
 				} else if ($(this).attr('id').endsWith('card')) {
 					$('#present-card-form').hide();
+					$('#have-coupon').prop('disabled', false);
 				}
 				$(this).parent().nextAll().filter('.errorlist').eq(0).hide(); //скрытие ошибок возле формы
 				break;

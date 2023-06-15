@@ -1,3 +1,8 @@
+input[type="text"], input[type="email"], textarea {
+    font-family: 'Merriweather', serif;
+    font-size: 1rem;
+}
+
 /*главный список товаров*/
 .product-card-mainlist {
     position: relative;
@@ -7,7 +12,7 @@
     border-radius: 10px;
     height: 430px;
     box-shadow: 1px 1px 2px 0px rgba(196,184,196,1);
-    background-color: gainsboro;
+    background-color: white;
 }
 
 .image-product-mainlist {
@@ -90,40 +95,198 @@
 
 
 /*Фильтры на главной странице*/
-.filter-prod {
-    min-width: 235px;
+.filter-prod-column {
+    padding: 10px;
+    width: 28% !important;
+    min-width: 250px;
+    border: 1px solid #ced4da;
+    border-radius: 10px;
+    border-right: 0;
+    border-top-right-radius: 0;
 }
 
-.filter-item {
-    background-color: #E9E3E3;
-    min-width: 220px;
+#filters-prod { cursor: pointer; }
+
+.prod-list-column {
+    width: 100%;
+    border-bottom: 1px solid #ced4da;
+    border-left: 1px solid #ced4da;
+    border-right: 1px solid #ced4da;
+    border-radius: 10px;
 }
 
+.filter-header {
+    display: flex;
+    justify-content: center;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 1.2rem;
+    margin: 0.5rem 0;
+    padding-bottom: 0.8rem;
+}
+
+.filter-header .material-symbols-outlined {
+    margin-right: 5px;
+    align-self: center;
+}
+
+.title-filters {
+    position: relative;
+    display: block;
+    text-align: center;
+    font-family: Georgia, Garamond, serif;
+    margin: 0.5rem 0;
+    padding: 0.5rem 0;
+    border: 1px solid #ced4da;
+    background-color: #e2f2e2;
+}
+
+.title-filters .material-symbols-outlined {
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 5px;
+}
+
+.check-field-filter {
+    cursor: pointer;
+    margin: 0 0.5rem;
+}
+
+.filter-items {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 0;
+    font-family: 'Merriweather', serif;
+}
+
+.filter-items .material-symbols-outlined {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.adjust-min-price, .adjust-max-price {
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    border: 1px solid #ced4da;
+    width: 20px;
+    border-radius: 10px;
+}
+
+.min-price, .max-price {
+    text-align: center;
+    width: 85px;
+    border-radius: 5px;
+    border: 1px solid;
+}
+
+.max-price { margin-right: 5px ;}
+.min-price { margin-left: 5px ;}
+
+.form-check-filter {
+    display: flex;
+    align-items: center;
+    margin: 0.5rem 0;
+}
+
+.form-label-filter { display: inline; }
+
+.form-field-filter { display: inline; }
+
+.category-prop-name {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    text-align: center;
+    padding: 0.3rem 0;
+    border-bottom: 1px solid #ced4da;
+    border-top: 1px solid #ced4da;
+}
+
+.prop-name {
+    display: block;
+    text-align: end;
+    text-shadow: #5E5C5C;
+    font-size: 0.7rem;
+    margin-top: 5px;
+    text-decoration: underline;
+}
+
+.count-items-filter {
+    display: inline-block;
+    margin-left: 0.5rem;
+    font-size: 0.9rem;
+    color: #898383;
+}
+
+.filter-apply-btn, .filter-reset-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 0.8rem;
+    border: 1px solid;
+    border-radius: 8px;
+}
+
+.filter-apply-btn .material-symbols-outlined, .filter-reset-btn .material-symbols-outlined {
+    margin-right: 5px;
+}
+
+.filter-apply-btn {
+    background-color: #3370da;
+    color: white;
+    border-color: black;
+}
+
+.filter-apply-btn:hover {
+    background-color: #1b4da2;
+}
+
+.filter-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin: 0.5rem;
+}
 
 
 .cat-header {
     font-family:'Comic Sans MS';
-    margin: 20px 0.5rem;
+    margin: 10px 1rem;
 }
 
-/*вкладки вверху главного списка товаров*/
+.mainlist-header {
+    text-align: center;
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 600;
+    margin: 1rem 0;
+}
+
+/*вкладки вверху списка товаров*/
 .prod-navs a {
     color: #696969;
     font-size: 16px;
     font-weight: bold;
-    font-family: 'Montserrat', sans-serif;
-    border: solid 1px #d9d4d4 !important;
+    font-family: 'Exo 2', sans-serif !important;
+    border-bottom: 0;
     padding: 5px 5px 5px 5px;
-    height: 30px;
-    line-height: initial;
+    line-height: inherit;
 }
 
 .prod-navs a:visited { color: maroon;}
 
 .prod-navs { min-width: 490px; }
 
+.mainlist-row {
+    display: flex;
+    background-color: #eff4f9;
+    margin: 1rem;
+    border-radius: 10px;
+}
 
 .back-link-main {
+    display: flex;
+    align-items: center;
     color: green;
     text-decoration: none;
     font-size: 1.3rem;
@@ -132,17 +295,15 @@
 }
 
 /*Сортировка товаров*/
-.sorting {
-    padding: 5px 0px 5px 5px;
-}
+.sorting { padding: 5px 0px 5px 5px; }
 
 .sorting label {
     font-weight: bold;
     font-size: 15px;
 }
 
-#sorting_id {
-    width: 200px;
+.sorting-select {
+    width: auto;
     height: 30px;
     padding: 2px 5px;
 }
@@ -160,24 +321,6 @@
     min-width: 1140px;
     background-color:#eff4f9;
 }
-
-/* .props-block thead th {
-    background-color: #8d8888;
-} */
-
-/*Таблица с характеристиками товара*/
-/* .props-block thead th {
-    font-weight: bold;
-
-    font-size: 25px;
-    font-family: Georgia, Garamond, serif;
-}
-
-.props-block tr td {
-    font-family: 'Merriweather', serif;
-    text-align: center;
-    
-} */
 
 .property-header{
     display: flex;
@@ -204,7 +347,7 @@
 }
 
 .property-value {
-    display: inline-block;
+    display: block;
     width: 35%;
     text-align: center;
 }
@@ -219,6 +362,15 @@
     background-color: rgba(51,84,175,1);
     color:#d9d4d4;
     
+}
+
+/*Список новых товаров*/
+.navs-product-list {
+    margin: 1rem;
+    background-color: #eff4f9;
+    border-color: #ced4da !important;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
 }
 
 /*Комментарии*/
@@ -238,6 +390,7 @@
 
 .comments-column {
     width: 52%;
+    min-width: 650px;
     padding: 1rem;
     background-color: #eff4f9;
     margin: 1.5rem 1rem;
@@ -285,8 +438,6 @@
 .comment-like-unlike-block {
     display: flex;
     align-items: center;
-    position: relative;
-    left: 20px;
     padding: 5px;
 }
 
@@ -335,37 +486,61 @@
     background-color: white;
 }
 
+.dialog-rate-comment-titlebar {
+    width: calc(300px - 0.5em);
+    height: 30px;
+    padding: 5px !important;
+    background: gainsboro;
+    border-radius: 3px;
+}
+
+.dialog-rate-comment-content {
+    font-size: 0.8rem;
+    padding: 1px !important;
+    display: block;
+    text-align: center;
+    line-height: initial;
+}
+
+.dialog-rate-comment-title {
+    color: grey;
+    font-size: 0.8rem;
+    display: block;
+    text-align: center;
+    margin: 0 !important;
+}
+
 .date {
     font-family: 'Bradley Hand';
-    font-size: 13px;
+    font-size: 14px;
     padding: 5px;
     font-style: italic;
     text-decoration: underline;
-    margin: 5px;
     position: relative;
-    left: 780px;
+    display: flex;
+    justify-content: end;
 }
 
 .comment-text p {
-    position: relative;
     font-family: 'Brush Script Std';
     font-size: 18px;
     margin: 0.5rem;
+    margin-left: 4rem;
     padding-top: 1rem;
-    text-indent: 1.5rem;
-    width: 760px;
+    text-indent: 2rem;
     min-width: 500px;
-    left: 130px;
     border-top: 1px solid #eee3e3;
     border-bottom: 1px solid #eee3e3;
     text-align: justify;
     padding-bottom: 1rem;
+    display: flex;
 }
 
 .comment-text { min-width: 500px; }
 
 .show-comments, .hide-comments {
-    display: inline-block;
+    display: inline;
+    position: relative;
     cursor: pointer;
     font-family: 'Oswald', sans-serif;
     font-size: 1.2rem;
@@ -377,20 +552,17 @@
 .show-comments:hover, .hide-comments:hover { color: #F3B539; }
 
 
-.expand-comm {
-    margin-bottom: 0
-}
+.expand-comm { margin-bottom: 0; }
 
-.collapse-comm {
-    display: none;
-}
+.collapse-comm { display: none;}
 
 /*Форма для написания комментария*/
 #form-comment {
     display: block;
     width: 400px;
     margin: 20px auto;
-    height: 175px;
+    /*height: 175px;*/
+    min-height: 175px;
 }
 
 .post-comment {
@@ -401,6 +573,7 @@
     border: solid 1px rgb(216, 213, 213);
     border-radius: 10px;
     width: 30%;
+    min-width: 430px;
 }
 
 .post-comment h4 {
@@ -435,9 +608,11 @@
 .comment-field-area {
     border-radius: 5px;
     border: 1px solid #898383;
-    float: right;
     padding-left: 10px;
     max-height: 100px;
+    margin-left: 148px;
+    margin-top: -18px;
+    width: 250px;
 }
 
 .send-comment-btn {
@@ -453,9 +628,9 @@
     margin-top: 15px;
 }
 
-.send-comment-btn .material-symbols-outlined {
-    margin-right: 10px;
-}
+.send-comment-btn .material-symbols-outlined { margin-right: 10px; }
+
+.send-comment-btn:hover { background-color: #3370da; }
 
 /*Вкладки вверху страницы детальной информации о товаре*/
 .nav-tabs {
@@ -467,7 +642,7 @@
 
 .nav-item {
     display: inline-block;
-    height: 40px;
+    height: 40px;   
     border: 1px solid rgb(216, 213, 213);
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
@@ -476,10 +651,11 @@
 }
 
 .nav-link {
-    display: block;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
     font-family: 'Exo 2', sans-serif !important;
     color: #312f2f !important;
-    text-align: center;
     height: 40px;
     font-size: 18px !important;
     padding: 5px 10px !important;
@@ -488,15 +664,24 @@
 }
 
 .nav-link:hover {
-    color: #4348d9 !important;
+     background-color: rgba(17, 185, 40, 1) !important; 
+     color: white !important;
 }
 
-.content { padding-top: 20px;}
+.active-nav {
+    background-color: rgba(17, 185, 40, 1);
+    color: white !important;
+    border: 1px solid grey;
+    border-top-left-radius: 0.375rem;
+    border-top-right-radius: 0.375rem;
+}
+
+.nav-link .material-symbols-outlined { margin-right: 10px; }
 
 .product-name-detail {
-    display: inline;
+    display: inline-block;
     position: relative;
-    margin-bottom: 20px;
+    margin: 20px 0;
     left: 240px;
     font-family: 'Exo 2', sans-serif;
     font-weight: 500;
@@ -507,7 +692,10 @@
 .product-photos img { padding: 5px; }
 
 .product-card-mainlist [id^="add-to-cart-"] {
+    display: flex;
+    align-items: center;
     position: relative;
+    height: 40px;
     width: auto;
     font-weight: 500;
     font-size: 20px;

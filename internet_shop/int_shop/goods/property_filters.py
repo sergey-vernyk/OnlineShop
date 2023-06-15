@@ -1,86 +1,91 @@
 from .models import Property, PropertyCategory
+from django.db.models import F, Q
+from django.db.models.aggregates import Count
+from django.core.cache import cache
+from django.utils.text import slugify
+
+mobile_phones_necessary_props = (
+    {'Display': ('Diagonal', 'Resolution', 'Type'),
+     'CPU': ('Cores',),
+     'Camera': ('Front', 'Main'),
+     'Communications': ('SIM', 'NFC'),
+     'Battery': ('Capacity',),
+     'Internal Memory': ('Volume',),
+     'Software': ('OS',),
+     'RAM Memory': ('Volume',)}
+)
+
+laptops_necessary_props = (
+    {'Display': ('Diagonal', 'Resolution', 'Type'),
+     'CPU': ('Cores', 'Model'),
+     'Camera': ('Resolution',),
+     'Communications': ('Bluetooth', 'HDMI', 'LAN'),
+     'Battery': ('Work time',),
+     'Internal Memory': ('Volume', 'Type'),
+     'Software': ('OS',),
+     'RAM Memory': ('Volume',),
+     'Body': ('Color', 'Material'),
+     'Video': ('Form Factor', 'Model', 'Volume')}
+)
+
+audio_video_necessary_props = (
+    {'Communications': ('Bluetooth', 'WI-FI'),
+     'Battery': ('Work Time', 'Charging',),
+     'Audio': ('Channels', 'Power', 'Inputs'),
+     'Body': ('Form Factor',)}
+)
+
+smart_gadgets_necessary_props = (
+    {'Display': ('Diagonal', 'Resolution', 'Type'),
+     'Camera': ('Resolution',),
+     'Communications': ('Bluetooth', 'WI-FI'),
+     'Battery': ('Work time', 'Charging Port'),
+     'Internal Memory': ('Volume',),
+     'Body': ('Color', 'Material')}
+)
 
 
-# TODO refactoring
-def get_property_for_mobile_phones() -> list:
+def get_property_for_category(products_category: str, prods_queryset=None) -> dict:
     """
     Функция получает необходимые для поиска свойства
-    мобильных телефонов
+    с категории product_category
     """
+    necessary_props = None
+    rest_props = None
+    lookup = Q()
 
-    # необходимые свойства товара для фильтра
-    needed_props = (
-        {'Display': ('Diagonal', 'Resolution', 'Type'),
-         'CPU': ('Cores',),
-         'Camera': ('Front', 'Main'),
-         'Communications': ('SIM', 'NFC'),
-         'Battery': ('Capacity',),
-         'Internal Memory': ('Volume',),
-         'Software': ('OS',),
-         'RAM Memory': ('Volume',)}
-    )
+    if products_category == 'Mobile phones':
+        necessary_props = mobile_phones_necessary_props
+    elif products_category == 'Laptops':
+        necessary_props = laptops_necessary_props
+    elif products_category == 'Audio Video':
+        necessary_props = audio_video_necessary_props
+    elif products_category == 'Smart Gadgets':
+        necessary_props = smart_gadgets_necessary_props
 
-    # получаем категории свойств, характерных для мобильных телефонов
-    # получаем id этих категорий
-    # получаем значения свойств в виде списка словарей с определенными значениями
+    if prods_queryset:
+        lookup = Q(product__in=prods_queryset)
 
-    properties_categories = PropertyCategory.objects.filter(
-        product_categories__name__iexact='Mobile phones').values_list()
-    properties_categories_ids = tuple(map(lambda x: x[0], properties_categories))
-    properties = Property.objects.filter(
-        category_property__id__in=properties_categories_ids,
-        product__category__name__iexact='Mobile Phones').distinct().values('name',
-                                                                           'text_value',
-                                                                           'numeric_value',
-                                                                           'units',
-                                                                           'category_property__name',
-                                                                           'category_property__pk')
+    all_props = cache.get(f'category_{slugify(products_category)}_props')  # получение queryset с кеша
+    if not all_props:
+        properties_categories = PropertyCategory.objects.prefetch_related('product_categories')
+        lookup &= Q(category_property__in=properties_categories, product__category__name__iexact=products_category)
+        all_props = Property.objects.select_related('category_property').filter(lookup)
+        cache.set(f'category_{slugify(products_category)}_props', all_props)  # сохранение queryset в кеш
+
+    if prods_queryset:
+        rest_props = all_props.filter(lookup)  # оставшиеся свойства, для отфильтрованных товаров
+
     # отбор нужных категорий и свойств для отображения поиска
-    result = [p for p in properties if p['category_property__name'] in needed_props
-              and p['name'] in needed_props[p['category_property__name']]]
+    result = {}
+    for prop in (rest_props or all_props).select_related('category_property').values('name',
+                                                                                     'text_value',
+                                                                                     'numeric_value',
+                                                                                     'units').annotate(
+            category_property=F('category_property__name'),
+            category_property_pk=F('category_property_id'),
+            item_count=Count('name')).order_by('category_property'):
+        if prop['category_property'] in necessary_props and prop['name'] in necessary_props[prop['category_property']]:
+            result.setdefault(prop['category_property'], []).append(prop)
 
-    # сортировка результатов по имени категории свойств, затем имени свойства
-    return sorted(result, key=lambda x: (x['category_property__name'], x['name']))
-
-
-def get_property_for_laptops() -> list:
-    """
-    Функция получает необходимые для поиска свойства
-    ноутбуков
-    """
-
-    # необходимые свойства товара для фильтра
-    needed_props = (
-        {'Display': ('Diagonal', 'Resolution', 'Type'),
-         'CPU': ('Cores', 'Model'),
-         'Camera': ('Resolution',),
-         'Communications': ('Bluetooth', 'HDMI', 'LAN'),
-         'Battery': ('Work time',),
-         'Internal Memory': ('Volume', 'Type'),
-         'Software': ('OS',),
-         'RAM Memory': ('Volume',),
-         'Body': ('Color', 'Material'),
-         'Video': ('Form Factor', 'Model', 'Volume')}
-    )
-
-    # получаем категории свойств, характерных для ноутбуков
-    # получаем id этих категорий
-    # получаем значения свойств в виде списка словарей с определенными значениями
-
-    properties_categories = PropertyCategory.objects.filter(
-        product_categories__name__iexact='Laptops').values_list()
-    properties_categories_ids = tuple(map(lambda x: x[0], properties_categories))
-    properties = Property.objects.filter(
-        category_property__id__in=properties_categories_ids,
-        product__category__name__iexact='Laptops').distinct().values('name',
-                                                                     'text_value',
-                                                                     'numeric_value',
-                                                                     'units',
-                                                                     'category_property__name',
-                                                                     'category_property__pk')
-    # отбор нужных категорий и свойств для отображения поиска
-    result = [p for p in properties if p['category_property__name'] in needed_props
-              and p['name'] in needed_props[p['category_property__name']]]
-
-    # сортировка результатов по имени категории свойств, затем имени свойства
-    return sorted(result, key=lambda x: (x['category_property__name'], x['name']))
+    return result

@@ -25,6 +25,7 @@ $(document).ready(function() {
 			action = $(this).next('input[name=action]').attr('value'); //нужное действие в скрытом поле
 		} else if ($(this).attr('id').startsWith('remove-')) {
 			product_id = this.id.slice(11); //получение id товара
+			action = $(this).data('action');
 		}
 
 		var url = $(this).data('url');
@@ -62,7 +63,11 @@ $(document).ready(function() {
 			},
 
 			error: function(jqXHR, textStatus, errorThrown) {
-				console.log(textStatus, errorThrown);
+				//переход на страницу для входа в систему, если статус ответа 401
+				if(errorThrown === 'Unauthorized') {
+					var login_url = jqXHR.responseJSON['login_page_url'];
+					window.open(login_url, '_self');
+				}
 			},
 		})
 		//функция возвращает нужное действие, которое находится в тексте кнопки
@@ -102,7 +107,11 @@ $(document).ready(function() {
 				}
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				console.log(textStatus, errorThrown);
+				//переход на страницу для входа в систему, если статус ответа 401
+				if(errorThrown === 'Unauthorized') {
+					var login_url = jqXHR.responseJSON['login_page_url'];
+					window.open(login_url, '_self');
+				}
 			},
 		})
 	})

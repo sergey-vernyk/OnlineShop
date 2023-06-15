@@ -20,13 +20,15 @@ $(document).ready(function() {
                 var currentProductCart = parentForm.closest('.cart-item').find('.item-price');
                 var currentProductCost = response['added_prod_cost']; //текущая стоимость товара после изменения кол-ва
                 var currentProductsInCart = response['cart_len'];
+                var totalPriceDiscounts = response['total_price_discounts'];
                 const isPluralAmount = currentProductsInCart === 1 ? false : true; //множественное или единичное кол-во товаров
+
                 $('.amount-cart').text(currentProductsInCart); //кол-во товара в корзине
                 $('.amount-items > div:nth-child(1) > span:nth-child(2)').text(isPluralAmount ? 'products': 'product');
-                $('.total-price').text('$' + response['total_price_discounts']); //окончательная цена товаров в header
+                $('.total-price').text(totalPriceDiscounts > 0 ? `$${totalPriceDiscounts}`: 'Free'); //окончательная цена товаров в header
                 currentProductCart.text('$' + currentProductCost);
                 $('.amount-items > div:nth-child(1) > span:nth-child(1)').text(response['cart_len']);
-                $('.amount-items > span:nth-child(2)').text('$' + response['total_price_discounts']);
+                $('.amount-items > span:nth-child(2)').text(totalPriceDiscounts > 0 ? `$${totalPriceDiscounts}`: 'Free');
                 $('.discount-value').text('-$' + response['total_discount']); //общая сумма скидки
                 $('.without-value').text('$' + response['total_price']); //общая стоимость товаров без скидки
             },

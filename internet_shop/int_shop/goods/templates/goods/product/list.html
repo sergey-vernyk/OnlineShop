@@ -5,24 +5,24 @@
 {% block title %}OnlineShop{% endblock %}
 {% block styles %}
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,300,0,0" />
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/goods.css' %}">
 {% endblock %}
 {% block content %}
 <main id="main-list">
-    <div class="container-md pt-4">
-        <div class="row row-col-3 m-2">
-            <div class="col-sm-2 mx-1 text-center border shadow-sm rounded filter-prod">
+    <h3 class="mainlist-header">Online Shop products</h3>
+    <div class="container-md">
+        <div class="mainlist-row">
+            <div class="filter-prod-column">
                 {% if category %}
                     {% include 'filters_menu.html' %}  <!--Добавление боковой панели слева с фильтрами-->
                 {% endif %}
             </div>
-            <div class="col border px-0 mb-4 rounded" style="border-color: #ced4da !important; border-top: 0 !important;">
+            <div class="prod-list-column">
                 {% include 'products_navs.html' with category=category %}
                 <div class="d-flex justify-content-between pb-1 my-2">
-                    <div class="breadcrumbs">
-                        For breadcrumbs
-                    </div>
-                {% include 'sorting.html' with place='mainlist' %} <!--шаблон с выпадающим меню для сортировки товаров-->
+                    <div class="breadcrumbs"></div>
+                    {% include 'sorting.html' with place=place %} <!--шаблон с выпадающим меню для сортировки товаров-->
                 </div>
                 <div class="d-inline-flex flex-wrap mx-4 mb-4 p-2" style="gap: 55px;">
                     {% for product in products %}
@@ -33,24 +33,23 @@
                         </div>
                     {% endfor %}
                 </div>
+                <!--Пагинация-->
+                {% if is_paginated %}
+                    <div class="row">
+                        <div class="d-flex justify-content-center py-2 px-0 w-100">
+                            {% include 'paginator.html' with place=place sorting=is_sorting %}
+                        </div>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>
-    <!--Пагинация-->
-    {% if is_paginated %}
-        <div class="row">
-            <div class="d-flex justify-content-center my-2">
-                {% include 'paginator.html' with place='mainlist' sorting=is_sorting %}
-            </div>
-        </div>
-    {% endif %}
-    <!--Появление/исчезновение меню фильтра для главной страницы-->
     <script src="{% static 'js/slide_filters.js' %}"></script>
-    <!--Сортировка товаров-->
     <script src="{% static 'js/ordering_products.js' %}"></script>
-    <!--Добавление товара в корзину-->
     <script src="{% static 'js/add_to_cart.js' %}"></script>
-    <!--Добавление/удаление товара в/из избранное-->
     <script src="{% static 'js/add_remove_favorite.js' %}" type="module"></script>
+    <script src="{% static 'js/collapse_expand_filter_items.js' %}"></script>
+    <script src="{% static 'js/up_down_price_values_filter.js' %}"></script>
+    <script src="{% static 'js/nav_tab_as_active.js' %}"></script>
 </main>
 {% endblock %}

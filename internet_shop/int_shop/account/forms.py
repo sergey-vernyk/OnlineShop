@@ -6,7 +6,6 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from .models import Profile
-from datetime import datetime
 
 help_messages = ('Your password must contain at least 8 characters and can’t be entirely numeric.',
                  'Enter the same password as before, for verification.')

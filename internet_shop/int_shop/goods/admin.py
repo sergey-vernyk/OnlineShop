@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from goods.models import Product, Category, Manufacturer, Comment, Property, Favorite, PropertyCategory
 from django.utils.html import mark_safe
+from django_summernote.admin import SummernoteModelAdmin
 
 
 class CommentInline(admin.StackedInline):
@@ -20,12 +21,13 @@ class CommentInline(admin.StackedInline):
 
 
 @admin.register(Property)
-class PropertyAdmin(admin.ModelAdmin):
+class PropertyAdmin(SummernoteModelAdmin):
     list_display = ['name', 'text_value', 'numeric_value', 'units', 'category_property', 'product']
     ordering = ['category_property', 'product', 'name']
     search_fields = ['product__name', 'category_property__name']
     list_per_page = 15
-    list_filter = ['product', 'category_property']
+    list_filter = ['product', 'category_property', 'name']
+    summernote_fields = ('detail_description',)
 
 
 @admin.register(PropertyCategory)
@@ -38,22 +40,20 @@ class PropertyCategoryAdmin(admin.ModelAdmin):
 class PropertyInline(admin.StackedInline):
     model = Property
     extra = 0
-    readonly_fields = ['category_property']
     fieldsets = (
         ('Property', {
             'classes': ('collapse',),
-            'fields': (('name', 'text_value', 'numeric_value', 'units', 'category_property'),),
+            'fields': (('name', 'text_value',
+                        'numeric_value', 'units',
+                        'category_property', 'detail_description'),),
         }),
     )
 
 
 @admin.register(Product)
-class ProductAdmin(admin.ModelAdmin):
-    """
-    Товары
-    """
+class ProductSummernoteAdmin(SummernoteModelAdmin):
     list_display = ['name', 'pk', 'manufacturer',
-                    'price', 'created', 'updated',
+                    'price', 'promotional_price', 'created', 'updated',
                     'available', 'promotional', 'rating']
     readonly_fields = ['image_tag']
     list_editable = ['price', 'available']
@@ -63,6 +63,7 @@ class ProductAdmin(admin.ModelAdmin):
     inlines = [CommentInline, PropertyInline]
     save_on_top = True
     exclude = ('star',)
+    summernote_fields = ('description',)
 
     @admin.display(description='Image')
     def image_tag(self, obj):

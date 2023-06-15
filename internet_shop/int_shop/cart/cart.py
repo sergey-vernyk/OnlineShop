@@ -9,6 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from present_cards.models import PresentCard
 from .forms import CartQuantityForm
+from django.db.models import Case, When, Value
 
 
 class Cart:
@@ -21,9 +22,9 @@ class Cart:
         """
         Возвращает объект купона или None
         """
-        try:
+        if self.coupon_id:
             coupon = Coupon.objects.get(id=self.coupon_id)
-        except ObjectDoesNotExist:
+        else:
             return None
         return coupon
 
@@ -32,9 +33,9 @@ class Cart:
         """
         Возвращает объект подарочной карты или None
         """
-        try:
+        if self.present_card_id:
             present_card = PresentCard.objects.get(id=self.present_card_id)
-        except ObjectDoesNotExist:
+        else:
             return None
         return present_card
 
@@ -53,7 +54,7 @@ class Cart:
         """
         product_id = str(product.pk)
         if product_id not in self.cart:
-            self.cart[product_id] = {'price': str(product.price),
+            self.cart[product_id] = {'price': str(product.promotional_price or product.price),
                                      'quantity': quantity}
         elif self.cart[product_id]['quantity'] != quantity:
             self.cart[product_id]['quantity'] = quantity
@@ -71,7 +72,9 @@ class Cart:
         Перебор всех товаров из корзины
         """
         products_ids = [pk for pk in self.cart]
-        products = Product.objects.filter(id__in=products_ids)
+        products_ids_ordered = Case(*[When(pk=pk, then=Value(position)) for position, pk in enumerate(products_ids)])
+        # получение товаров в порядке их id в products_ids
+        products = Product.objects.filter(id__in=products_ids).order_by(products_ids_ordered)
         cart = deepcopy(self.cart)
 
         for pk, prod in zip(products_ids, products):

@@ -31,7 +31,7 @@ $(document).ready(function() {
                      //переход на предыдущую страницу, с которой был переход в корзину
                      window.open(response['prev_url'], '_self');
                 } else {
-                    $('.total-price, .amount-items > span:nth-child(2)').text('$' + totalPriceDiscount);
+                    $('.total-price, .amount-items > span:nth-child(2)').text(totalPriceDiscount > 0 ? `$${totalPriceDiscount}` : 'Free');
                     $('.discounts-total > .discount-value').text('-$' + totalDiscount);
                     $('.without-discounts > .without-value').text('$' + totalPrice);
                 }

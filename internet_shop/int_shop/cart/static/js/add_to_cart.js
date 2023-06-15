@@ -24,9 +24,11 @@ $(document).ready(function() {
                 //установка значений кол-ва товаров в корзине и их общей стоимости
                 $('.amount-cart').text(response['cart_len']);
                 $('.total-price').text('$' + response['total_price']);
+                $('.cart-button').css('pointer-events', 'all'); //включить возможность перейти в корзину
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 console.log(textStatus, errorThrown);
+                
             },
 
         })

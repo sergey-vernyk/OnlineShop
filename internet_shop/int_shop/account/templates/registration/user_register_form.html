@@ -5,7 +5,7 @@
 {% block styles %}
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="stylesheet" href="{% static 'css/account.css' %}">
 {% endblock %}
 {% block content %}
@@ -32,9 +32,9 @@
                             <!--итерация по значениям радио кнопки-->
                             <div class="gender-choice">
                                 {% for radio in field %}
-                                <div class="radio-gender">
-                                    {{ radio.choice_label }} {{ radio.tag }}
-                                </div>
+                                    <div class="radio-gender">
+                                        {{ radio.choice_label }} {{ radio.tag }}
+                                    </div>
                                 {% endfor %}
                             </div>
                     {% else %}
@@ -43,13 +43,16 @@
                                 {% if field.field.required %}<span class="required-field">*</span>{% endif %}
                         </label>
                         {{ field }}
+                        {% if field.label == 'Password' or field.label == 'Confirm password'  %}
+                            <span class="material-symbols-outlined">visibility_off</span>
+                        {% endif %}
                     {% endif %}
                     {% if field.help_text %}
                         <p class="help">{{ field.help_text }}</p>
                     {% endif %}
                     <ul class="errorlist">
                         {% for error in field.errors %}
-                        <li>{{ error }}</li>
+                            <li>{{ error }}</li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -61,4 +64,5 @@
         </button>
     </div>
 </div>
+<script src="{% static 'js/toggle_password_visibility.js' %}"></script>
 {% endblock %}

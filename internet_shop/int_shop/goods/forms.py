@@ -33,13 +33,15 @@ class CommentProductForm(forms.ModelForm):
                                           'placeholder': 'Type your review...'}),
         }
 
+        error_messages = {field: {'required': 'This field must not be empty'} for field in fields}
+
 
 class FilterByPriceForm(forms.Form):
     """
     Форма для фильтра товаров по цене
     """
-    price_min = forms.CharField(widget=forms.TextInput(attrs={'style': 'width:100px'}))
-    price_max = forms.CharField(widget=forms.TextInput(attrs={'style': 'width:100px'}))
+    price_min = forms.CharField(widget=forms.TextInput(attrs={'class': 'min-price'}))
+    price_max = forms.CharField(widget=forms.TextInput(attrs={'class': 'max-price'}))
 
 
 class FilterByManufacturerForm(forms.Form):
@@ -47,7 +49,7 @@ class FilterByManufacturerForm(forms.Form):
     Форма для выбора одного или нескольких производителей
     """
     manufacturer = forms.ModelMultipleChoiceField(
-        widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'check-field-filter'}),
         queryset=Manufacturer.objects.all()
     )
 
@@ -60,11 +62,12 @@ class SortByPriceForm(forms.Form):
         ('default', 'Price: Default'),
         ('p_asc', 'Price: Low To High'),
         ('p_desc', 'Price: High To Low'),
-    ), widget=forms.Select(attrs={'class': 'form-select'}))
+    ), widget=forms.Select(attrs={'class': 'sorting-select'}))
 
 
 class SearchForm(forms.Form):
     """
     Форма для поиска товаров на сайте
     """
-    query = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'What find?'}))
+    query = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'What find?',
+                                                          'class': 'search-field-input'}))

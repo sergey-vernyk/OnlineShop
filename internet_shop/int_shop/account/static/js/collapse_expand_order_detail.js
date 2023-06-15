@@ -1,31 +1,21 @@
 $(document).ready(function() {
+    const expand = 'expand_more';
+    const collapse = 'expand_less';
+
     $('[id^=expander]').click(function(){
         var order_id = this.id.slice(9); //достаем id заказа из нажатой кнопки
-        var currentAttr = $(this).find('img').attr('src'); //получение значения пути к иконке
-        var src = replaceIconPath(currentAttr, order_id);
-        $(`#expander-${order_id} > img`).attr('src', src);
+        var currentSign = $(this).children();  //внутренний блок со значком
+        var currentAction = $(currentSign).text() == expand ? 'expand' : 'collapse';
         $(`#order-detail-${order_id}`).slideToggle();
-    });
 
-    function replaceIconPath(src, order_id) {
-        var addrParts = src.split('/');  //делим адрес по '/'
-        var indexLast = addrParts.length - 1;  //поиск индекса с названием иконки
-        var last = addrParts[indexLast]; //получение названия текущей иконки
-
-        //установка имени нужной иконки
-        if(last === 'chevron-down.svg') {
-            addrParts[indexLast] = 'chevron-up.svg';
+        if(currentAction === 'expand') {
+            $(currentSign).text(collapse);
             $(`#total-cost-${order_id}, #items-images-${order_id}`).hide();
             $(`#expander-${order_id}`).parent().css('border-bottom', '1px solid #ced4da');
-        } else {
-            addrParts[indexLast] = 'chevron-down.svg';
+        } else if(currentAction === 'collapse') {
+            $(currentSign).text(expand);
             $(`#total-cost-${order_id}, #items-images-${order_id}`).show();
             $(`#expander-${order_id}`).parent().css('border-bottom', '0px solid #ced4da');
-
         }
-
-        var src = addrParts.join('/'); //создание нового адреса
-
-        return src;
-    }
+    });
 })

@@ -1,43 +1,60 @@
+{% load get_value_from_dict %}
 <!--Меню для выбора фильтра слева на странице списка товаров определенной категории-->
 
 <!--Фильтры-->
-<span class="fs-4">Filters</span>
-<hr>
-<form method="get" action="{% url 'goods:filter_results_list' category.slug page_obj.number %}">
+<div class="filter-header">
+    <span class="material-symbols-outlined">filter_alt</span>
+    Filters
+</div>
+<form id="filters-form" method="get" action="{% url 'goods:filter_results_list' category.slug page_obj.number %}">
     <!--По цене-->
-    <span class="d-block text-decoration-underline fs-6 fst-italic my-2">Price</span>
-    <div class="filter-item p-2 border shadow-sm">
-        <div class="d-flex justify-content-between">
-            <span class="fw-bold">Min</span>
-            <span class="fw-bold">Max</span>
-        </div>
-        <div class="d-flex justify-content-between">
-            <span class="fs-6">{{ filter_price.price_min }}</span>
-            <span id="counter" class="fs-6">{{ filter_price.price_max }}</span>
+    <div class="title-filters">
+        <div>Price</div>
+        <span class="material-symbols-outlined">expand_less</span>
+    </div>
+    <div class="filter-items">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="adjust-min-price">
+                <span class="material-symbols-outlined">arrow_drop_up</span>
+                <span class="material-symbols-outlined">arrow_drop_down</span>
+            </div>
+            <span class="price-min-filter">{{ filter_price.price_min }}</span>
+            <span class="price-max-filter">{{ filter_price.price_max }}</span>
+            <div class="adjust-max-price">
+                <span class="material-symbols-outlined">arrow_drop_up</span>
+                <span class="material-symbols-outlined">arrow_drop_down</span>
+            </div>
         </div>
     </div>
     <!--По производителю-->
-    <span class="d-block text-decoration-underline fs-6 fst-italic my-2">Manufacturer</span>
-    <div class="d-flex justify-content-start filter-item border shadow-sm p-2">
-        <div class="d-inline">
-            {% for checkbox in filter_manufacturers.manufacturer %}
-            <div class="d-block">{{ checkbox.tag }} {{ checkbox.choice_label }}</div>
-            {% endfor %}
-        </div>
+    <div class="title-filters">
+        <div>Brand</div>
+        <span class="material-symbols-outlined">expand_less</span>
+    </div>
+    <div class="filter-items">
+        {% for checkbox in filter_manufacturers.manufacturer %}
+            <div class="form-check-filter">
+                <div class="form-field-filter">{{ checkbox.tag }}</div>
+                <label class="form-label-filter" for="{{ checkbox.id_for_label }}">{{ checkbox.choice_label }}</label>
+                <div class="count-items-filter">({{ manufacturers_prod_qnty|get_dict_item:checkbox.choice_label }})</div>
+            </div>
+        {% endfor %}
     </div>
     <!--По свойствам-->
-    <span class="d-block text-decoration-underline fs-6 fst-italic my-2">Properties</span>
-    <!--Если категория с мобильными телефонами-->
-    {% if category.slug == 'mobile-phones' %}
-        {% include 'props/mobile_phones.html' %}
-    <!--Если категория с ноутбуками-->
-    {% elif category.slug == 'laptops' %}
-        {% include 'props/laptops.html' %}
-    {% endif %}
-    <div class="d-inline">
-        <button class="btn btn-primary btn-sm m-2" type="submit">Apply</button>
+    <div class="title-filters">
+        <div>Properties</div>
+        <span class="material-symbols-outlined">expand_less</span>
     </div>
-    <div class="d-inline">
-        <button class="btn btn-warning btn-sm m-2" type="reset">Reset</button>
-    </div>
+    <!--Меню со свойствами для выбранной категории товаров-->
+    {% include 'filter_properties.html' with properties=category_properties %}
 </form>
+<div class="filter-buttons">
+    <button form="filters-form" class="filter-apply-btn" type="submit">
+        <span class="material-symbols-outlined">filter_alt</span>
+        Apply
+    </button>
+    <button form="filters-form" class="filter-reset-btn" type="reset">
+        <span class="material-symbols-outlined">restart_alt</span>
+        Reset
+    </button>
+</div>

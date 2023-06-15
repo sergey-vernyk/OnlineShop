@@ -39,40 +39,30 @@ class Order(models.Model):
     def __str__(self):
         return f'id: {self.pk} - {self.first_name} {self.last_name}'
 
-    def get_total_cost(self) -> Decimal:
+    def get_total_values(self) -> dict:
         """
-        Общая сумма товаров в заказе
+        Метод возвращает словарь с суммарными значениями
+        общей стоимости заказа без скидок, со скидками и сумму самой скидки
         """
-        return sum(item.get_cost() for item in self.items.all())
+        totals = {
+            'total_cost': sum(item.get_cost() for item in self.items.all()),
+            'total_cost_with_discounts': Decimal('0.00'),
+            'total_discounts': Decimal('0.00')
+        }
 
-    def get_total_discount(self) -> Decimal:
-        """
-        Общая сумма скидки
-        """
-        total_cost = self.get_total_cost()
         coupon, present_card = self.coupon, self.present_card
-        total_discount = Decimal('0')
 
-        if coupon:
-            total_discount += (total_cost * (coupon.discount / Decimal(100))).quantize(Decimal('0.01'))
-        if present_card:
-            total_discount += present_card.amount
+        if coupon and present_card:
+            totals['total_cost_with_discounts'] = totals['total_cost'] - (
+                    (totals['total_cost'] * coupon.discount / 100) + present_card.amount)
+        elif coupon:
+            totals['total_cost_with_discounts'] = totals['total_cost'] - (totals['total_cost'] * coupon.discount / 100)
+        elif present_card:
+            totals['total_cost_with_discounts'] = totals['total_cost'] - present_card.amount
 
-        return total_discount
+        totals['total_discounts'] = totals['total_cost'] - totals['total_cost_with_discounts']
 
-    # def get_total_discount(self) -> dict:
-    #     """
-    #     Общая сумма скидки
-    #     """
-    #     discounts_values = {'coupon': None, 'present_card': None}
-    #     coupon, present_card = self.coupon, self.present_card
-    #
-    #     if coupon:
-    #         discounts_values['coupon'] = coupon.discount / Decimal(100)
-    #     if present_card:
-    #         discounts_values['present_card'] = present_card.amount
-    #
-    #     return discounts_values
+        return {k: v.quantize(Decimal('0.01')) for k, v in totals.items()}  # округление результатов до двух знаков
 
     class Meta:
         ordering = ('-created',)
@@ -99,7 +89,7 @@ class Delivery(models.Model):
     last_name = models.CharField(max_length=30)
     service = models.CharField(choices=DELIVERY_SERVICES, max_length=15, blank=True)
     method = models.CharField(choices=DELIVERY_METHOD, max_length=20)
-    office_number = models.IntegerField(default=1, blank=True, null=True, validators=[MinValueValidator(1)])
+    office_number = models.IntegerField(default=1, blank=True, validators=[MinValueValidator(1)])
     delivery_date = models.DateField()
 
     def __str__(self):
