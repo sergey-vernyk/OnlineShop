@@ -95,7 +95,7 @@ class UserRegisterView(CreateView):
             new_user.save()  # сохраняем пользователя в базе
             # получаем домен и тип соединения для тела email
             # для отправки на почту пользователю для активации аккаунта
-            domain = get_current_site(request).domain
+            domain = request.site.domain
             is_secure = request.is_secure()
             # передача задачи по отправке письма в celery
             activate_account.delay({'domain': domain, 'is_secure': is_secure}, new_user.pk, new_user.email)

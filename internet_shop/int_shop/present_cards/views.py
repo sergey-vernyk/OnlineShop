@@ -4,6 +4,7 @@ from present_cards.models import PresentCard
 from common.decorators import ajax_required
 from django.views.decorators.http import require_POST
 from django.http.response import JsonResponse
+from django.shortcuts import reverse
 
 
 @ajax_required
@@ -17,8 +18,18 @@ def apply_present_card(request):
     if card_form.is_valid():
         code = card_form.cleaned_data.get('code')
         present_card = PresentCard.objects.get(code=code)
-        request.session['present_card_id'] = present_card.pk
-        Profile.objects.get(user=request.user).profile_cards.add(present_card)
+        # попытка добавить карту пользователю в профиль
+        # или переход на страницу для входа в систему
+        try:
+            Profile.objects.get(user=request.user).profile_cards.add(present_card)
+            request.session['present_card_id'] = present_card.pk
+        except TypeError:
+            return JsonResponse(
+                {'success': False,
+                 'login_page_url': f'{reverse("login")}?next={reverse("cart:cart_detail")}'},
+                status=401
+            )
+
         return JsonResponse({'success': True,
                              'card_amount': present_card.amount})
     else:

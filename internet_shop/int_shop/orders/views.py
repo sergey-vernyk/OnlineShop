@@ -8,7 +8,6 @@ from .forms import OrderCreateForm, DeliveryCreateForm
 from orders.models import Order, OrderItem
 from orders.tasks import order_created
 from django.http.response import HttpResponseRedirect
-from django.contrib.sites.shortcuts import get_current_site
 
 
 class OrderCreateView(LoginRequiredMixin, FormView):
@@ -53,7 +52,7 @@ class OrderCreateView(LoginRequiredMixin, FormView):
             self.create_order_items_from_cart(order)  # создание элементов заказа в базе
             self.request.session['order_id'] = order.pk
 
-            domain = get_current_site(request).domain
+            domain = request.site.domain
             is_secure = request.is_secure()
             # отправка сообщения о завершении заказа на почту
             order_created.delay(data={'domain': domain, 'is_secure': is_secure},
