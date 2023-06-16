@@ -5,9 +5,10 @@ from .models import Coupon
 from django.views.decorators.http import require_POST
 from django.http.response import JsonResponse
 from decimal import Decimal
-from django.shortcuts import reverse
+from common.decorators import auth_profile_required
 
 
+@auth_profile_required
 @ajax_required
 @require_POST
 def apply_coupon(request):
@@ -19,17 +20,7 @@ def apply_coupon(request):
     if coupon_form.is_valid():
         code = coupon_form.cleaned_data.get('code')
         coupon = Coupon.objects.get(code=code)
-        # попытка добавить купон пользователю в профиль
-        # и переход на страницу для входа в систему
-        try:
-            Profile.objects.get(user=request.user).coupons.add(coupon)
-            request.session['coupon_id'] = coupon.pk
-        except TypeError:
-            return JsonResponse(
-                {'success': False,
-                 'login_page_url': f'{reverse("login")}?next={reverse("cart:cart_detail")}'},
-                status=401
-            )
+        Profile.objects.get(user=request.user).coupons.add(coupon)
 
         return JsonResponse({'success': True,
                              'coupon_discount': coupon.discount / Decimal(100)})

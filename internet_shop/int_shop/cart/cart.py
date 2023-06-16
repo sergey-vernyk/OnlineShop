@@ -5,7 +5,6 @@ from django.conf import settings
 
 from coupons.models import Coupon
 from goods.models import Product
-from django.core.exceptions import ObjectDoesNotExist
 
 from present_cards.models import PresentCard
 from .forms import CartQuantityForm

@@ -27,7 +27,6 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from .tokens import activation_account_token
 from django.shortcuts import redirect
-from django.contrib.sites.shortcuts import get_current_site
 from django.views.generic import DetailView
 from django.db.models import QuerySet
 from datetime import datetime
@@ -105,8 +104,8 @@ class UserRegisterView(CreateView):
                                              photo=user_photo,
                                              gender=form.cleaned_data.get('gender'))
             Favorite.objects.create(profile=profile)  # создание объекта избранного для профиля
-            messages.success(request, f'Please, check your email! '
-                                      f'You have to receive email with instruction for activate account')
+            messages.success(request, 'Please, check your email! '
+                                      'You have to receive email with instruction for activate account')
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
@@ -268,8 +267,8 @@ class ForgotPasswordView(PasswordResetView, FormMixin):
     template_name = 'registration/password_reset_form.html'
     success_url = reverse_lazy('password_reset')
     html_email_template_name = 'registration/password_reset_email_html.html'
-    message = (f"We've emailed you instructions for setting your password. "
-               f"If you don't receive an email, please make sure you've entered the address you registered with")
+    message = ("We've emailed you instructions for setting your password. "
+               "If you don't receive an email, please make sure you've entered the address you registered with")
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()

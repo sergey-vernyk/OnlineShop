@@ -39,10 +39,10 @@ class OrderAdmin(admin.ModelAdmin):
     @admin.display(description='Apply discount')
     def get_discount(self, obj):
         if obj.coupon:
-            coupon_url = reverse(f'admin:coupons_coupon_change', args=(obj.coupon.pk,))
+            coupon_url = reverse('admin:coupons_coupon_change', args=(obj.coupon.pk,))
             return mark_safe(f'<a href="{coupon_url}">Coupon</a>')
         if obj.present_card:
-            card_url = reverse(f'admin:present_cards_presentcard_change', args=(obj.present_card.pk,))
+            card_url = reverse('admin:present_cards_presentcard_change', args=(obj.present_card.pk,))
             return mark_safe(f'<a href="{card_url}">Present Card</a>')
 
 

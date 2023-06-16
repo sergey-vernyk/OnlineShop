@@ -2,7 +2,6 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.core.cache import cache
 from goods.models import Product, Property, PropertyCategory
-from django.utils.text import slugify
 
 
 @receiver(signal=[post_save, post_delete], sender=Product)

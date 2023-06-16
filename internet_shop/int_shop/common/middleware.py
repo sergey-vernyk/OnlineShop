@@ -16,7 +16,7 @@ def previous_and_current_urls_middleware(get_response):
 
         if urls['current_url'] is None:
             urls.update(current_url=f'{protocol}://{domain}')
-            
+
         current_url = request.build_absolute_uri()  # получения текущего полного URI
         split_url = current_url.split('/')
         if urls['current_url'] != current_url and ('ajax' not in current_url and split_url[3] in (

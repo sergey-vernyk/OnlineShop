@@ -28,7 +28,7 @@ from .utils import (
     get_collections_with_manufacturers_info,
     get_products_sorted_by_views
 )
-from common.decorators import ajax_required
+from common.decorators import ajax_required, auth_profile_required
 from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models import Q, QuerySet
 from django.conf import settings
@@ -98,16 +98,21 @@ class ProductListView(ListView):
 
         return super().get_queryset()
 
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Установка в атрибут profile гостевого или аутентифицированного пользователя
+        """
+        if request.user.is_authenticated:
+            self.profile = Profile.objects.get(user=request.user)
+        else:
+            self.profile = Profile.objects.get(user__username='guest_user')
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request, *args, **kwargs):
         """
         Метод используется для поиска по сайту
         и для обычной загрузки главной страницы сайта
         """
-        if request.user.is_authenticated:
-            self.profile = Profile.objects.get(user=self.request.user)  # получение текущего профиля
-        else:
-            self.profile = Profile.objects.get(user__username='guest_user')
-
         query = request.GET.get('query')
         category_slug = self.kwargs.get('category_slug')
 
@@ -170,6 +175,7 @@ class ProductDetailView(DetailView, FormMixin):
             self.profile = Profile.objects.get(user=request.user)
         else:
             self.profile = Profile.objects.get(user__username='guest_user')
+
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -213,6 +219,7 @@ class ProductDetailView(DetailView, FormMixin):
         return {'liked_comments': [c.pk for c in liked_comments],
                 'unliked_comments': [c.pk for c in unliked_comments]}
 
+    @auth_profile_required
     def post(self, request, *args, **kwargs):
         # если AJAX запрос
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -221,31 +228,31 @@ class ProductDetailView(DetailView, FormMixin):
             comment = Comment.objects.get(pk=comment_id)
             # попытка получить профиль того, кто оценивает комментарий
             # иначе перенаправление на страницу авторизации
-            try:
-                profile = Profile.objects.get(user=request.user)
-            except TypeError:
-                reverse_url = (f'{reverse("login")}?next='
-                               f'{reverse("goods:product_detail", args=(comment.product.pk, comment.product.slug))}')
-                return JsonResponse({'success': False,
-                                     'login_page_url': reverse_url}, status=401)
+            # try:
+            #     profile = Profile.objects.get(user=request.user)
+            # except TypeError:
+            #     reverse_url = (f'{reverse("login")}?next='
+            #                    f'{reverse("goods:product_detail", args=(comment.product.pk, comment.product.slug))}')
+            #     return JsonResponse({'success': False,
+            #                          'login_page_url': reverse_url}, status=401)
 
-            liked_comments = profile.comments_liked.all()
-            unliked_comments = profile.comments_unliked.all()
+            liked_comments = self.profile.comments_liked.all()
+            unliked_comments = self.profile.comments_unliked.all()
 
             # установка like/dislike для комментария
             if action == 'like':
                 if comment in liked_comments:
-                    comment.profiles_likes.remove(profile)
+                    comment.profiles_likes.remove(self.profile)
                 else:
-                    comment.profiles_likes.add(profile)
-                    comment.profiles_unlikes.remove(profile)
+                    comment.profiles_likes.add(self.profile)
+                    comment.profiles_unlikes.remove(self.profile)
 
             elif action == 'unlike':
                 if comment in unliked_comments:
-                    comment.profiles_unlikes.remove(profile)
+                    comment.profiles_unlikes.remove(self.profile)
                 else:
-                    comment.profiles_unlikes.add(profile)
-                    comment.profiles_likes.remove(profile)
+                    comment.profiles_unlikes.add(self.profile)
+                    comment.profiles_likes.remove(self.profile)
 
             new_count_likes = comment.profiles_likes.count()
             new_count_unlikes = comment.profiles_unlikes.count()
@@ -289,6 +296,7 @@ class ProductDetailView(DetailView, FormMixin):
         return super().get(request, *args, **kwargs)
 
 
+@auth_profile_required
 @require_POST
 @ajax_required
 def add_or_remove_product_favorite(request) -> JsonResponse:
@@ -299,25 +307,15 @@ def add_or_remove_product_favorite(request) -> JsonResponse:
     action = request.POST.get('action')
     product = Product.objects.get(pk=product_id)
 
-    # попытка получить профиль того, кто хочет добавить товар в избранное
-    # иначе перенаправление на страницу авторизации
-    try:
-        profile = Profile.objects.get(user=request.user)
-    except TypeError:
-        reverse_url = f'{reverse("login")}?next={reverse("goods:product_detail", args=(product.pk, product.slug))}'
-        return JsonResponse(
-            {'success': False,
-             'login_page_url': reverse_url},
-            status=401
-        )
+    profile = Profile.objects.get(user=request.user)
 
     if action == 'add':
-        Favorite.objects.get(profile=profile).product.add(product)
+        profile.profile_favorite.product.add(product)
     elif action == 'remove':
-        Favorite.objects.get(profile=profile).product.remove(product)
+        profile.profile_favorite.product.remove(product)
 
     # кол-во товаров в избранном для текущего profile
-    amount_prods = Favorite.objects.get(profile=profile).product.prefetch_related().count()
+    amount_prods = profile.profile_favorite.product.all().count()
 
     return JsonResponse({'success': True,
                          'amount_prods': amount_prods})
