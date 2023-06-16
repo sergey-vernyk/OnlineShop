@@ -1,7 +1,7 @@
 from django.http import HttpResponseBadRequest
 from functools import wraps
 from django.http.response import JsonResponse
-from django.shortcuts import reverse, get_object_or_404
+from django.shortcuts import reverse
 from django.urls import resolve
 from urllib.parse import urlparse
 from django.http.request import HttpRequest

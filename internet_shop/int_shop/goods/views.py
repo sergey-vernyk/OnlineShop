@@ -226,15 +226,6 @@ class ProductDetailView(DetailView, FormMixin):
             comment_id = request.POST.get('comment_id')
             action = request.POST.get('action')  # like/unlike
             comment = Comment.objects.get(pk=comment_id)
-            # попытка получить профиль того, кто оценивает комментарий
-            # иначе перенаправление на страницу авторизации
-            # try:
-            #     profile = Profile.objects.get(user=request.user)
-            # except TypeError:
-            #     reverse_url = (f'{reverse("login")}?next='
-            #                    f'{reverse("goods:product_detail", args=(comment.product.pk, comment.product.slug))}')
-            #     return JsonResponse({'success': False,
-            #                          'login_page_url': reverse_url}, status=401)
 
             liked_comments = self.profile.comments_liked.all()
             unliked_comments = self.profile.comments_unliked.all()
