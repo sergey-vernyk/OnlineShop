@@ -34,11 +34,11 @@ from django.db.models import Q, QuerySet
 from django.conf import settings
 
 # инициализация Redis
-r = redis.Redis(host=settings.REDIS_DB_HOST,
-                port=settings.REDIS_DB_PORT,
+r = redis.Redis(host=settings.REDIS_HOST,
+                port=settings.REDIS_PORT,
                 db=settings.REDIS_DB_NUM,
-                username=settings.REDIS_DB_USER,
-                password=settings.REDIS_DB_PASSWORD)
+                username=settings.REDIS_USER,
+                password=settings.REDIS_PASSWORD)
 
 
 class ProductListView(ListView):

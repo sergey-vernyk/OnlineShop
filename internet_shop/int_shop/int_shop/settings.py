@@ -194,20 +194,20 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # длительность валидности ссылки для сброса пароля
 PASSWORD_RESET_TIMEOUT = 14400
 
+# конфигурация Redis в качестве БД
+REDIS_PORT = env('REDIS_PORT')
+REDIS_HOST = env('REDIS_HOST')
+REDIS_DB_NUM = env('REDIS_DB_NUM')
+REDIS_USER = env('REDIS_USER')
+REDIS_PASSWORD = env('REDIS_PASSWORD')
+
 # конфигурация кеша на основе Redis
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379',
+        'LOCATION': f'redis://{REDIS_USER}:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/{env("REDIS_CACHE_NUM")}',
     }
 }
-
-# конфигурация Redis в качестве БД
-REDIS_DB_PORT = env('REDIS_DB_PORT')
-REDIS_DB_HOST = env('REDIS_DB_HOST')
-REDIS_DB_NUM = env('REDIS_DB_NUM')
-REDIS_DB_USER = env('REDIS_DB_USER')
-REDIS_DB_PASSWORD = env('REDIS_DB_PASSWORD')
 
 
 # Модели аутентификации пользователей

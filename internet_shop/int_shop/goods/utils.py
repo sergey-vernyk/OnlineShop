@@ -8,11 +8,11 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage, Page
 from goods.models import Manufacturer, Product
 
 # инициализация Redis
-r = redis.Redis(host=settings.REDIS_DB_HOST,
-                port=settings.REDIS_DB_PORT,
+r = redis.Redis(host=settings.REDIS_HOST,
+                port=settings.REDIS_PORT,
                 db=settings.REDIS_DB_NUM,
-                username=settings.REDIS_DB_USER,
-                password=settings.REDIS_DB_PASSWORD)
+                username=settings.REDIS_USER,
+                password=settings.REDIS_PASSWORD)
 
 
 def distribute_properties_from_request(properties: list) -> dict:
