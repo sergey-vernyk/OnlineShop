@@ -1,0 +1,51 @@
+version: "3.8"
+
+services:
+  web:
+    build:
+      context: .
+    container_name: web_app
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/code
+    env_file: # файл с переменными окружения
+      - docker.env
+    command: >
+      sh -c "python manage.py runserver 0.0.0.0:5000"
+    depends_on:
+      - db
+      - redis_db
+
+  db:
+    image: postgres:14.6-alpine
+    container_name: postgres_db
+    user: "1000:1000" # назначение пользователя для volumes с UID:GID
+    environment:
+       - POSTGRES_DB=postgres
+       - POSTGRES_USER=postgres
+       - POSTGRES_PASSWORD=postgres
+       - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - shop_db_data:/var/lib/postgresql/data
+    ports:
+      - "5431:5432"  # host:docker
+    restart: always
+
+  redis_db:
+    image: redis:7-alpine3.16
+    container_name: redis_db
+    restart: on-failure
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - ./redis_conf/db/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf  # использование кастомного конфига
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+
+volumes:
+  shop_db_data:
+  redis_data:
+#  code:

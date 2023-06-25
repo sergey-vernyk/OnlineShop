@@ -21,6 +21,7 @@ def apply_coupon(request):
         code = coupon_form.cleaned_data.get('code')
         coupon = Coupon.objects.get(code=code)
         Profile.objects.get(user=request.user).coupons.add(coupon)
+        request.session['coupon_id'] = coupon.pk
 
         return JsonResponse({'success': True,
                              'coupon_discount': coupon.discount / Decimal(100)})

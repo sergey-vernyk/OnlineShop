@@ -10,9 +10,11 @@ from django.utils import timezone
 
 from account.models import Profile
 
-r = redis.Redis(host=settings.REDIS_HOST,
-                port=settings.REDIS_PORT,
-                db=settings.REDIS_DB)
+r = redis.Redis(host=settings.REDIS_DB_HOST,
+                port=settings.REDIS_DB_PORT,
+                db=settings.REDIS_DB_NUM,
+                username=settings.REDIS_DB_USER,
+                password=settings.REDIS_DB_PASSWORD)
 
 
 def product_image_path(instance, filename):

@@ -104,6 +104,7 @@ WSGI_APPLICATION = 'int_shop.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
+        'HOST': '172.17.0.1',
         'NAME': env('DATABASE_NAME'),
         'USER': env('DATABASE_USER'),
         'PORT': env('DATABASE_PORT'),
@@ -190,7 +191,7 @@ EMAIL_PORT = '2525'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-#  длительность валидности ссылки для сброса пароля
+# длительность валидности ссылки для сброса пароля
 PASSWORD_RESET_TIMEOUT = 14400
 
 # конфигурация кеша на основе Redis
@@ -202,9 +203,12 @@ CACHES = {
 }
 
 # конфигурация Redis в качестве БД
-REDIS_PORT = 6379
-REDIS_HOST = '127.0.0.1'
-REDIS_DB = 2
+REDIS_DB_PORT = env('REDIS_DB_PORT')
+REDIS_DB_HOST = env('REDIS_DB_HOST')
+REDIS_DB_NUM = env('REDIS_DB_NUM')
+REDIS_DB_USER = env('REDIS_DB_USER')
+REDIS_DB_PASSWORD = env('REDIS_DB_PASSWORD')
+
 
 # Модели аутентификации пользователей
 AUTHENTICATION_BACKENDS = (
