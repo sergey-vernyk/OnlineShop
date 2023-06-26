@@ -372,7 +372,7 @@ class FilterResultsView(ListView):
         if 'props' in self.kwargs:
             properties = self.kwargs.get('props')
             props_dict = distribute_properties_from_request(properties)
-
+        # TODO fix
         # получение в queryset только уникальных результатов
         result_queryset = Product.objects.distinct().filter(
             lookups,

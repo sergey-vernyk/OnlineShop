@@ -201,6 +201,8 @@ REDIS_DB_NUM = env('REDIS_DB_NUM')
 REDIS_USER = env('REDIS_USER')
 REDIS_PASSWORD = env('REDIS_PASSWORD')
 
+CELERY_BROKER_URL = env('CELERY_BROKER_URL')
+
 # конфигурация кеша на основе Redis
 CACHES = {
     'default': {

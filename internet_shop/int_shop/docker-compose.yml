@@ -11,8 +11,7 @@ services:
       - .:/code
     env_file: # файл с переменными окружения
       - docker.env
-    command: >
-      sh -c "python manage.py runserver 0.0.0.0:5000"
+    command: python manage.py runserver 0.0.0.0:5000
     depends_on:
       - db
       - redis_db
@@ -45,7 +44,32 @@ services:
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
 
+  rabbitmq:
+    image: rabbitmq:3.10-alpine
+    user: "rabbitmq"
+    container_name: rabbitmq_broker
+    volumes:
+      - rabbitmq_db:/var/lib/rabbitmq/
+      - rabbitmq_conf:/etc/rabbitmq/
+
+  celery:
+    build:
+      context: .
+    container_name: celery_tasks
+    env_file:
+      docker.env
+    volumes:
+      - .:/code
+    command: celery -A int_shop worker -l INFO
+    depends_on:
+      - db
+      - rabbitmq
+      - web
+
+
 volumes:
   shop_db_data:
   redis_data:
+  rabbitmq_db:
+  rabbitmq_conf:
 #  code:
