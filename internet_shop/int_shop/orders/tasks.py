@@ -6,7 +6,7 @@ from orders.models import Order
 
 
 @shared_task
-def order_created(data: dict, order_id: int, profile_username: int) -> str:
+def order_created(data: dict, order_id: int, profile_username: str) -> str:
     """
     Задача отправляет сообщение на электронную почту
     пользователю, который сделал заказ

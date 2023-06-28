@@ -5,10 +5,12 @@ services:
     build:
       context: .
     container_name: web_app
+    image: django_web:1.0
     ports:
       - "5000:5000"
     volumes:
       - .:/code
+      - postgres_socket:/var/run/postgresql  # volume для подключения БД через сокет
     env_file: # файл с переменными окружения
       - docker.env
     command: python manage.py runserver 0.0.0.0:5000
@@ -19,17 +21,20 @@ services:
   db:
     image: postgres:14.6-alpine
     container_name: postgres_db
-    user: "1000:1000" # назначение пользователя для volumes с UID:GID
-    environment:
-       - POSTGRES_DB=postgres
-       - POSTGRES_USER=postgres
-       - POSTGRES_PASSWORD=postgres
-       - PGDATA=/var/lib/postgresql/data/pgdata
+    env_file:
+      - docker.env
     volumes:
       - shop_db_data:/var/lib/postgresql/data
+      - postgres_socket:/var/run/postgresql  # использование подключения через сокет
     ports:
-      - "5431:5432"  # host:docker
+      - "5431:5431"  # host:docker
     restart: always
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-p", "5431", "-d", "shop_db", "-U", "admin_shop" ]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
 
   redis_db:
     image: redis:7-alpine3.16
@@ -51,25 +56,39 @@ services:
     volumes:
       - rabbitmq_db:/var/lib/rabbitmq/
       - rabbitmq_conf:/etc/rabbitmq/
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "check_running" ]
 
   celery:
-    build:
-      context: .
+    image: django_web:1.0
     container_name: celery_tasks
     env_file:
       docker.env
     volumes:
       - .:/code
+      - postgres_socket:/var/run/postgresql  # volume для подключения БД через сокет
     command: celery -A int_shop worker -l INFO
     depends_on:
       - db
       - rabbitmq
       - web
 
+  payment:
+    image: stripe/stripe-cli
+    container_name: stripe_payments
+    env_file:
+      - docker.env
+    command: listen --forward-to web:5000/payment/webhook/
+    depends_on:
+      - db
+      - web
+      - celery
+      - rabbitmq
 
 volumes:
   shop_db_data:
   redis_data:
   rabbitmq_db:
   rabbitmq_conf:
+  postgres_socket:
 #  code:

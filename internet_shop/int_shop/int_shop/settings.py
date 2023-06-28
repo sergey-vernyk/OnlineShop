@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-#3zoxjm74+ulis&afz#b@*15&6u1eq3t48mi1)jxwcv&r63v4!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['onlineshopproj.com', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['onlineshopproj.com', '127.0.0.1', 'localhost', 'web']
 INTERNAL_IPS = ['127.0.0.1']
 
 # Application definition
@@ -104,7 +104,7 @@ WSGI_APPLICATION = 'int_shop.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'HOST': '172.17.0.1',
+        'HOST': '/var/run/postgresql',
         'NAME': env('DATABASE_NAME'),
         'USER': env('DATABASE_USER'),
         'PORT': env('DATABASE_PORT'),
@@ -202,6 +202,7 @@ REDIS_USER = env('REDIS_USER')
 REDIS_PASSWORD = env('REDIS_PASSWORD')
 
 CELERY_BROKER_URL = env('CELERY_BROKER_URL')
+CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND')
 
 # конфигурация кеша на основе Redis
 CACHES = {
@@ -210,7 +211,6 @@ CACHES = {
         'LOCATION': f'redis://{REDIS_USER}:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/{env("REDIS_CACHE_NUM")}',
     }
 }
-
 
 # Модели аутентификации пользователей
 AUTHENTICATION_BACKENDS = (
