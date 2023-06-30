@@ -11,9 +11,10 @@ services:
     volumes:
       - .:/code
       - postgres_socket:/var/run/postgresql  # volume для подключения БД через сокет
+      - wsgi_socket:/var/run/wsgi  # volume для подключения nginx через сокет
     env_file: # файл с переменными окружения
       - docker.env
-    command: python manage.py runserver 0.0.0.0:5000
+    command: ["uwsgi", "--ini", "/code/config/uwsgi/uwsgi.ini"]
     depends_on:
       - db
       - redis_db
@@ -66,7 +67,7 @@ services:
       docker.env
     volumes:
       - .:/code
-      - postgres_socket:/var/run/postgresql  # volume для подключения БД через сокет
+      - postgres_socket:/var/run/postgresql  # использование подключения через к БД через сокет
     command: celery -A int_shop worker -l INFO
     depends_on:
       - db
@@ -78,12 +79,24 @@ services:
     container_name: stripe_payments
     env_file:
       - docker.env
-    command: listen --forward-to web:5000/payment/webhook/
+    command: listen --forward-to web/payment/webhook/ # TODO think how to check webhooks
     depends_on:
       - db
       - web
       - celery
       - rabbitmq
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx_static
+    restart: always
+    volumes:
+      - .:/code
+      - ./config/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - wsgi_socket:/var/run/wsgi
+    ports:
+      - "80:80"
+      - "443:443"
 
 volumes:
   shop_db_data:
@@ -91,4 +104,5 @@ volumes:
   rabbitmq_db:
   rabbitmq_conf:
   postgres_socket:
+  wsgi_socket:
 #  code:

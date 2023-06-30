@@ -1,15 +1,16 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Page Not Found (404) | OnlineShop{% endblock %}
 
 {% block styles %}
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
 {% endblock %}
 {% block content %}
     <div class="container">
         <div class="page404-content">
             <img src="{% static 'img/404_not_found.png' %}" alt="">
-            <div class="err-code">404</div>
             <div class="err-message">
                 Page Not Found
             </div>

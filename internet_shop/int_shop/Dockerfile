@@ -9,12 +9,15 @@ WORKDIR /code
 ARG user=shop_admin
 
 # пакеты для подключения postgresql
-RUN apk update && apk add postgresql-client build-base postgresql-dev nano
-RUN mkdir -p /var/run/postgresql
+RUN apk update && apk add postgresql-client build-base postgresql-dev linux-headers nano
+# папка для сокета postgresql и сокета uwsgi сервера
+RUN mkdir -p /var/run/postgresql /var/run/wsgi
 RUN chown postgres:postgres /var/run/postgresql/
 
 # создание и назначения пользователя от которого будут запускаться команды в контейнере
 RUN adduser -D $user
+RUN addgroup $user www-data
+RUN chown $user:www-data /var/run/wsgi
 USER $user
 
 # установка зависимостей

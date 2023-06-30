@@ -24,10 +24,10 @@ SITE_ID = 1
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-#3zoxjm74+ulis&afz#b@*15&6u1eq3t48mi1)jxwcv&r63v4!'
+SECRET_KEY = env('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['onlineshopproj.com', '127.0.0.1', 'localhost', 'web']
 INTERNAL_IPS = ['127.0.0.1']
@@ -152,10 +152,10 @@ DATE_INPUT_FORMATS = ('%d-%m-%Y',)
 
 STATIC_URL = 'static/'
 # (python manage.py collectstatic - собирает все статические файлы проекта и сохраняет их по этому пути)
-STATIC_ROOT = os.path.join(BASE_DIR, 'assets/')
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+# STATICFILES_DIRS = [
+#     BASE_DIR / "static",
+# ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
