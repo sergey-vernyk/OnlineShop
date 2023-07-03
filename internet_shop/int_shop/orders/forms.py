@@ -107,3 +107,5 @@ class DeliveryCreateForm(forms.ModelForm):
 
         if date < date_now:
             raise ValidationError('Date must be grater or equal than today date')
+
+        return date

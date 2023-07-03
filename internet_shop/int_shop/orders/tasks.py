@@ -15,7 +15,7 @@ def order_created(data: dict, order_id: int, profile_username: str) -> str:
     order = Order.objects.get(pk=order_id)
     order_totals = order.get_total_values()
 
-    subject = 'Order confirmed'
+    subject = 'OnlineShop - Order confirmed'
     body = render_to_string('account/emails/order_created_email.html',
                             {
                                 'order_id': order_id,

@@ -18,19 +18,13 @@ env = environ.Env()
 environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SITE_ID = 1
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('DJANGO_SECRET_KEY')
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-
-ALLOWED_HOSTS = ['onlineshopproj.com', '127.0.0.1', 'localhost', 'web']
-INTERNAL_IPS = ['127.0.0.1']
 
 # Application definition
 
@@ -151,11 +145,6 @@ DATE_INPUT_FORMATS = ('%d-%m-%Y',)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
-# (python manage.py collectstatic - собирает все статические файлы проекта и сохраняет их по этому пути)
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
-# STATICFILES_DIRS = [
-#     BASE_DIR / "static",
-# ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -169,27 +158,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')  # путь, по которому
 LOGIN_REDIRECT_URL = 'goods:product_list'
 LOGOUT_REDIRECT_URL = 'login'
 LOGIN_URL = 'login'
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # вывод всех сообщений с почты в shell (без SMTP)
 CART_SESSION_ID = 'cart'
 
 STRIPE_PUBLISHABLE_KEY = env('STRIPE_PUBLISHABLE_KEY')
 STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET = env('STRIPE_WEBHOOK_SECRET')
 
-# EMAIL_HOST = env('EMAIL_HOST')
-# EMAIL_HOST_USER = env('EMAIL_HOST_USER')
-# EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
-# EMAIL_PORT = env('EMAIL_PORT')
-# EMAIL_USE_SSL = False
-# EMAIL_USE_TLS = True
 FROM_EMAIL = env('FROM_EMAIL')
-
-EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
-EMAIL_HOST_USER = '46817091728879'
-EMAIL_HOST_PASSWORD = '1110aaff92a1c8'
-EMAIL_PORT = '2525'
-
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # длительность валидности ссылки для сброса пароля
 PASSWORD_RESET_TIMEOUT = 14400

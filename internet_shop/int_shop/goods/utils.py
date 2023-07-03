@@ -1,18 +1,9 @@
 from typing import Union, Generator, Tuple
-import redis
-from django.conf import settings
 from django.db.models import QuerySet
 from decimal import Decimal
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage, Page
-
+from common.moduls_init import redis
 from goods.models import Manufacturer, Product
-
-# инициализация Redis
-r = redis.Redis(host=settings.REDIS_HOST,
-                port=settings.REDIS_PORT,
-                db=settings.REDIS_DB_NUM,
-                username=settings.REDIS_USER,
-                password=settings.REDIS_PASSWORD)
 
 
 def distribute_properties_from_request(properties: list) -> dict:
@@ -83,7 +74,7 @@ def get_products_sorted_by_views(list_ids: list) -> Tuple[list, dict]:
     products_views = {}
     for product in products:
         products_views[product.pk] = {
-            'views': int(r.hget(f'product_id:{product.pk}', 'views') or 0),
+            'views': int(redis.hget(f'product_id:{product.pk}', 'views') or 0),
             'category': product.category.slug
         }
 

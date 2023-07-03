@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contacts | OnlineShop{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200&amp;display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h2 class="header-contacts">Contact information</h2>
+        <div class="contacts-list">
+            <div class="contact-info-emails">
+                <h3>Emails</h3>
+                <div>
+                    <span>Info:</span> <a href="mailto:info@onlineshop.com">info@onlineshop.com</a>
+                </div>
+                <div>
+                    <span>Sales:</span> <a href="mailto:sales@onlineshop.com">sales@onlineshop.com</a>
+                </div>
+                <div>
+                    <span>Cooperation:</span> <a href="mailto:cooperation@onlineshop.com">cooperation@onlineshop.com</a>
+                </div>
+            </div>
+            <div class="contact-info-phones">
+                <h3>Phone Numbers</h3>
+                <div>
+                    <span>Customer Support:</span> <span>+38 (096) 12 345 67</span>
+                </div>
+                <div>
+                    <span>Sales Inquiries:</span> <span>+38 (099) 123 45 67</span>
+                </div>
+                <div>
+                    <span>About Cooperation:</span> <span>+38 (093) 123 45 67</span>
+                </div>
+            </div>
+        </div>
+        <div class="social-contacts">
+            <div>
+                <span>Also you can ask your questions us in our social accounts</span>
+                <ul>
+                    <li>
+                        <img src="{% static 'img/Telegram_logo.svg' %}" width="40" height="40">
+                        <a href="https://t.me/+38096134567">Telegram</a>
+                    </li>
+                    <li>
+                        <img src="{% static 'img/whatsapp-icon.png' %}" width="40" height="40">
+                        <a href="https://wa.me/+38096134567">What's up</a>
+                    </li>
+                    <li>
+                        <img src="{% static 'img/Viber_logo.svg' %}" width="40" height="40">
+                        <a href="viber://contact?number %2B38096134567">Viber</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}

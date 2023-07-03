@@ -1,4 +1,3 @@
-import redis as redis
 from django.contrib.auth.views import (
     LoginView,
     PasswordChangeView,
@@ -6,7 +5,6 @@ from django.contrib.auth.views import (
     PasswordResetConfirmView
 )
 from django.views.generic import CreateView
-from django.conf import settings
 
 from coupons.models import Coupon
 from goods.models import Product, Favorite
@@ -35,14 +33,7 @@ import requests
 from django.views.generic.edit import FormMixin
 from django.contrib.messages.views import messages
 from django.utils.safestring import mark_safe
-
-# инициализация Redis
-r = redis.Redis(host=settings.REDIS_HOST,
-                port=settings.REDIS_PORT,
-                db=settings.REDIS_DB_NUM,
-                username=settings.REDIS_USER,
-                password=settings.REDIS_PASSWORD)
-
+from common.moduls_init import redis
 
 
 class LoginUserView(LoginView):
@@ -173,7 +164,7 @@ class DetailUserView(DetailView):
             context['present_cards'] = self.object.profile_cards.select_related('category', 'order')
         elif location == 'watched':
             # товары, просмотренные пользователем self.object
-            products_ids = (int(pk) for pk in r.smembers(f'profile_id:{self.object.pk}'))
+            products_ids = (int(pk) for pk in redis.smembers(f'profile_id:{self.object.pk}'))
             context['watched'] = Product.objects.filter(pk__in=products_ids)
 
         return context

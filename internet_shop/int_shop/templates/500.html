@@ -3,9 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <title>Server Error (500) | OnlineShop</title>
-    <link rel="stylesheet" href="{% static 'css/base.css' %}" type="text/css">
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300&display=swap" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@40,300,0,0" />
+    <style type="text/css" rel="stylesheet">
+        .err-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .err-message {
+            font-size: 3.5rem;
+            margin: 0.5rem 0;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .err-code {
+            font-size: 6rem;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .additional-err-text {
+            font-size: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .additional-err-text ul { list-style: none; }
+
+        .additional-err-text li {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .additional-err-text ul > li:nth-child(1) > .material-symbols-outlined { cursor: pointer; }
+
+        .additional-err-text li .material-symbols-outlined { margin-right: 8px; }
+
+    </style>
 </head>
 <body>
     <div class="err-content">
@@ -16,11 +57,13 @@
                     Internal Server Error
                 </div>
                 <div class="additional-err-text">
-                    Sorry, something went wrong our end. We are currently trying to fix the problem.
-                    In the meantime you can:
+                    <p>
+                        Sorry, something went wrong our end. We are currently trying to fix the problem.
+                        In the meantime you can:
+                    </p>
                     <ul>
                         <li>
-                            <span class="material-symbols-outlined">refresh</span>
+                            <span class="material-symbols-outlined" onclick="makeRefresh()">refresh</span>
                             Refresh this page
                         </li>
                         <li>
@@ -33,6 +76,13 @@
         </div>
     </div>
 </body>
+<script>
+    $(document).ready(function() {
+        makeRefresh = function() {
+            window.location.reload();
+        }
+    })
+</script>
 </html>
 
 

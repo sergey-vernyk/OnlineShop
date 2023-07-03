@@ -18,6 +18,7 @@ from django.urls import path, include
 
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.generic import TemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,6 +31,8 @@ urlpatterns = [
     path('payment/', include('payment.urls')),
     path('__debug__/', include('debug_toolbar.urls')),
     path('summernote/', include('django_summernote.urls')),
+    path('delivery/', TemplateView.as_view(template_name='./delivery.html'), name='delivery_services'),
+    path('contacts/', TemplateView.as_view(template_name='./contacts.html'), name='contacts'),
 ]
 
 if settings.DEBUG:  # сохранение файлов по этому адресу будет происходить только в режиме разработки

@@ -3,7 +3,7 @@
 <html>
 <head>
     <title>{% block title %}{% endblock %}</title>
-    <link rel = "icon" href="{% static '/img/logo.jpg' %}" type = "image/x-icon">
+    <link rel="shortcut icon" href="{% static 'img/logo.jpg' %}" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200&display=swap" rel="stylesheet">
     <link href="{% static 'css/base.css' %}" rel="stylesheet">
@@ -58,7 +58,7 @@
                             </a>
                         {% elif c.name == 'Audio Video' %}
                             <a href="{{ c.get_absolute_url }}">
-                                <span class="material-symbols-outlined">play_circle</span>
+                                <span class="material-symbols-outlined">"play_circle</span>
                                 {{ c.name }}
                             </a>
                         {% endif %}
@@ -67,10 +67,10 @@
             </ul>
             <ul class="additional-menu-items">
                 <li>
-                    <a href="#">Delivery</a>
+                    <a href="{% url 'delivery_services' %}">Delivery</a>
                 </li>
                 <li>
-                    <a href="#">Contacts</a>
+                    <a href="{% url 'contacts' %}">Contacts</a>
                 </li>
             </ul>
             <!--Форма поиска-->
@@ -126,6 +126,22 @@
                     </div>
                 {% endwith %}
             </div>
+            <div class="we-in-social">
+                <ul>
+                    <li>
+                        <a href="https://t.me/+38096134567">
+                            <img src="{% static 'img/Telegram_logo.svg' %}" width="30" height="30"></a>
+                    </li>
+                    <li>
+                        <a href="https://wa.me/+38096134567">
+                            <img src="{% static 'img/whatsapp-icon.png' %}" width="30" height="30"></a>
+                    </li>
+                    <li>
+                        <a href="viber://contact?number %2B38096134567">
+                            <img src="{% static 'img/Viber_logo.svg' %}" width="30" height="30"></a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
     <div class="content">
@@ -141,19 +157,19 @@
                         <div>
                             <img src="{% static 'img/vodafone-logo.svg' %}" height="35" width="35" style="border-radius: 50%;">
                         </div>
-                        <div>+380991234567</div>
+                        <div>+38 (099) 123 45 67</div>
                     </li>
                     <li>
                         <div>
                             <img src="{% static 'img/kyivstar-logo.svg' %}" height="35" width="35" style="border-radius: 50%;">
                         </div>
-                        <div>+380961234567</div>
+                        <div>+38 (096) 12 345 67</div>
                     </li>
                     <li>
                         <div>
                             <img src="{% static 'img/lifecell-logo.png' %}" height="35" width="35" style="border-radius: 50%;">
                         </div>
-                        <div>+380931234567</div>
+                        <div>+38 (093) 123 45 67</div>
                     </li>
                 </ul>
             </div>
@@ -196,6 +212,9 @@
                         </li>
                         <li>
                             <div>cooperation@onlineshop.com</div>
+                        </li>
+                        <li>
+                            <div>sales@onlineshop.com</div>
                         </li>
                     </ul>
                 </div>

@@ -80,6 +80,8 @@ services:
     env_file:
       - docker.env
     command: listen --forward-to web/payment/webhook/ # TODO think how to check webhooks
+    volumes:
+      - wsgi_socket:/var/run/wsgi
     depends_on:
       - db
       - web

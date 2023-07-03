@@ -1,5 +1,4 @@
 {% load static %}
-{% load subtract %}
 
 <div class="personal-info">
     <h3>Orders</h3>
@@ -195,6 +194,8 @@
             <h4 class="d-inline">There are no orders yet</h4>
         </div>
     {% endfor %}
-    <div class="show-all-orders">Show another {{ orders.count|add:"-4" }} orders</div>
-    <div class="hide-another-orders">Hide another {{ orders.count|add:"-4" }} orders</div>
+    {% if orders.count > 4 %}
+        <div class="show-all-orders">Show another {{ orders.count|add:"-4" }} orders</div>
+        <div class="hide-another-orders">Hide another {{ orders.count|add:"-4" }} orders</div>
+    {% endif %}
 </div>

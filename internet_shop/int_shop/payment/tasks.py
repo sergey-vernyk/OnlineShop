@@ -15,7 +15,7 @@ def order_paid(data: dict, order_id: int, amount_total: Decimal) -> str:
 
     to_email = Order.objects.get(pk=order_id).email
 
-    subject = 'Order paid'
+    subject = 'OnlineShop - Order paid'
     body = render_to_string('account/emails/order_paid_email.html',
                             {
                                 'order_id': order_id,

@@ -104,6 +104,6 @@ class CommentAdmin(admin.ModelAdmin):
     readonly_fields = ['user_name', 'user_email', 'product', 'profile']
 
 
-admin.site.site_header = 'InterShop Admin'
-admin.site.site_title = 'InterShop Admin'
-admin.site.index_title = 'Administration content shop'
+admin.site.site_header = 'OnlineShop Admin'
+admin.site.site_title = 'OnlineShop Admin'
+admin.site.index_title = 'Administration Shop content'

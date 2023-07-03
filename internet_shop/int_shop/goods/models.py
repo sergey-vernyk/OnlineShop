@@ -1,6 +1,5 @@
 import os
 
-import redis
 from django.conf import settings
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -9,12 +8,7 @@ from decimal import Decimal
 from django.utils import timezone
 
 from account.models import Profile
-
-r = redis.Redis(host=settings.REDIS_HOST,
-                port=settings.REDIS_PORT,
-                db=settings.REDIS_DB_NUM,
-                username=settings.REDIS_USER,
-                password=settings.REDIS_PASSWORD)
+from common.moduls_init import redis
 
 
 def product_image_path(instance, filename):
@@ -74,7 +68,7 @@ class Product(models.Model):
             os.makedirs(os.path.join(settings.MEDIA_ROOT, f'products_{self.name}', 'Detail_photos'))
         except FileExistsError:
             pass
-        r.sadd('products_ids', self.pk)
+        redis.sadd('products_ids', self.pk)
 
     def delete(self, **kwargs):
         """
@@ -84,7 +78,7 @@ class Product(models.Model):
         Возвращает кол-во удаленных записей из БД (ожидается 1)
         """
         os.removedirs(os.path.join(settings.MEDIA_ROOT, f'products_{self.name}', 'Detail_photos'))
-        r.srem('products_ids', self.pk)
+        redis.srem('products_ids', self.pk)
         super().delete(**kwargs)
 
     def get_absolute_url(self):

@@ -1,4 +1,3 @@
-import redis
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import FormMixin
@@ -31,14 +30,7 @@ from .utils import (
 from common.decorators import ajax_required, auth_profile_required
 from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models import Q, QuerySet
-from django.conf import settings
-
-# инициализация Redis
-r = redis.Redis(host=settings.REDIS_HOST,
-                port=settings.REDIS_PORT,
-                db=settings.REDIS_DB_NUM,
-                username=settings.REDIS_USER,
-                password=settings.REDIS_PASSWORD)
+from common.moduls_init import redis
 
 
 class ProductListView(ListView):
@@ -141,7 +133,7 @@ class ProductListView(ListView):
 
         product_ids = [product.pk for product in products]
         # кол-во просмотров найденных товаров и сортировка их id по уменьшению просмотров
-        product_views = [int(r.hget(f'product_id:{pk}', 'views')) for pk in product_ids]
+        product_views = [int(redis.hget(f'product_id:{pk}', 'views')) for pk in product_ids]
         sorted_ids_by_views = [pk for pk, views in sorted(zip(product_ids, product_views), key=lambda x: -x[1])]
         return products.in_bulk(sorted_ids_by_views)
 
@@ -283,9 +275,9 @@ class ProductDetailView(DetailView, FormMixin):
         # увеличение кол-ва просмотров товара на 1 при его просмотре
         # задание времени жизни ключа из Redis - удаление товаров из просмотренных пользователем через 7 дней
         # добавление товара в множество просмотренных товаров пользователем
-        r.hincrby(f'product_id:{object_pk}', 'views', 1)
-        r.expire(f'profile_id:{self.profile.pk}', time=604800, nx=True)
-        r.sadd(f'profile_id:{self.profile.pk}', object_pk)
+        redis.hincrby(f'product_id:{object_pk}', 'views', 1)
+        redis.expire(f'profile_id:{self.profile.pk}', time=604800, nx=True)
+        redis.sadd(f'profile_id:{self.profile.pk}', object_pk)
         return super().get(request, *args, **kwargs)
 
 
@@ -356,7 +348,6 @@ class FilterResultsView(ListView):
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        props_dict = {}
         lookups = Q(category__slug=self.kwargs['category_slug'])
 
         # отбор товаров по цене
@@ -372,15 +363,13 @@ class FilterResultsView(ListView):
         if 'props' in self.kwargs:
             properties = self.kwargs.get('props')
             props_dict = distribute_properties_from_request(properties)
-        # TODO fix
+            lookups &= Q(properties__category_property__id__in=props_dict['ids'],
+                         properties__name__in=props_dict['names'],
+                         properties__text_value__in=props_dict['text_values'],
+                         properties__numeric_value__in=props_dict['numeric_values'])
+
         # получение в queryset только уникальных результатов
-        result_queryset = Product.objects.distinct().filter(
-            lookups,
-            properties__category_property__id__in=props_dict['ids'],
-            properties__name__in=props_dict['names'],
-            properties__text_value__in=props_dict['text_values'],
-            properties__numeric_value__in=props_dict['numeric_values'],
-        )
+        result_queryset = Product.objects.distinct().filter(lookups)
 
         self.queryset_filter = result_queryset  # сохранение queryset в property
         return result_queryset
@@ -453,7 +442,7 @@ def new_list(request, category_slug: str = None):
     lookup = Q(created__gt=diff, category__slug=category_slug) if category_slug else Q(created__gt=diff)
 
     products = Product.objects.filter(lookup)
-    r.hset('new_prods', 'ids', ','.join(str(prod.pk) for prod in products))  # сохранение id новых товаров в redis
+    redis.hset('new_prods', 'ids', ','.join(str(prod.pk) for prod in products))  # сохранение id новых товаров в redis
     page = request.GET.get('page')  # получаем текущую страницу из запроса
     page_obj = get_page_obj(per_pages=1, page=page, queryset=products)
 
@@ -478,7 +467,7 @@ def popular_list(request, category_slug: str = None):
     category = None
     page = request.GET.get('page')  # текущая страница из запроса
 
-    products_ids = [int(pk) for pk in r.smembers('products_ids')]  # id всех товаров на сайте
+    products_ids = [int(pk) for pk in redis.smembers('products_ids')]  # id всех товаров на сайте
     products_ids_sorted, products = get_products_sorted_by_views(products_ids)
 
     if category_slug:  # фильтр товаров по категории
@@ -496,7 +485,7 @@ def popular_list(request, category_slug: str = None):
     sorting_by_price = SortByPriceForm()
 
     # сохранение id популярных товаров в redis
-    r.hset('popular_prods', 'ids',
+    redis.hset('popular_prods', 'ids',
            ','.join(str(prod.pk) for prod in product_list))
 
     return render(request, 'goods/product/navs_categories_list.html', {'products': products,
@@ -526,10 +515,10 @@ def product_ordering(request, place: str, category_slug: str = 'all', page: int 
     product_ids_promotion = []
 
     product_ids_popular = (
-        r.hget('popular_prods', 'ids').decode('utf-8').split(',') if place == 'popular' else []
+        redis.hget('popular_prods', 'ids').decode('utf-8').split(',') if place == 'popular' else []
     )
     product_ids_new = (
-        r.hget('new_prods', 'ids').decode('utf-8').split(',') if place == 'new' else []
+        redis.hget('new_prods', 'ids').decode('utf-8').split(',') if place == 'new' else []
     )
     if place == 'promotion':
         lookup = Q(category__slug=category_slug, promotional=True) if category_slug != 'all' else Q(promotional=True)
@@ -549,11 +538,11 @@ def product_ordering(request, place: str, category_slug: str = 'all', page: int 
                             _connector='OR')
                 products = Product.objects.filter(lookups).order_by(*asc_sort if sort == 'p_asc' else desc_sort)
             else:
-                lookups = Q(id__in=product_ids_popular or product_ids_new or product_ids_promotion or r.smembers(
+                lookups = Q(id__in=product_ids_popular or product_ids_new or product_ids_promotion or redis.smembers(
                     'products_ids'))
                 products = Product.objects.filter(lookups).order_by(*asc_sort if sort == 'p_asc' else desc_sort)
         else:
-            lookups = Q(id__in=product_ids_popular or product_ids_new or product_ids_promotion or r.smembers(
+            lookups = Q(id__in=product_ids_popular or product_ids_new or product_ids_promotion or redis.smembers(
                 'products_ids'))
             products = Product.objects.filter(lookups)
 
