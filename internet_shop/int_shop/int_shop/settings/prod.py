@@ -4,7 +4,7 @@ from .base import MIDDLEWARE, BASE_DIR, env
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['onlineshopproj.com']
+ALLOWED_HOSTS = env('ALLOWED_HOSTS').split(',')
 
 SESSION_COOKIE_SECURE = True  # избежание случайной передачи сеанса файла cookie по HTTP
 SECURE_SSL_REDIRECT = True  # перенаправление всех запросов на протокол HTTPS

@@ -92,17 +92,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'int_shop.wsgi.application'
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'HOST': '/var/run/postgresql',
-#         'NAME': env('DATABASE_NAME'),
-#         'USER': env('DATABASE_USER'),
-#         'PORT': env('DATABASE_PORT'),
-#         'PASSWORD': env('DATABASE_PASSWORD'),
-#     }
-# }
-
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 

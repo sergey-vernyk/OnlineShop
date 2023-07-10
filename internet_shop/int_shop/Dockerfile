@@ -1,4 +1,5 @@
 FROM python:3.9-alpine3.16
+LABEL maintainer="volt.awp@gmail.com"
 
 # переменные нужны для работы с python
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -9,15 +10,24 @@ WORKDIR /code
 ARG user=shop_admin
 
 # пакеты для подключения postgresql
-RUN apk update && apk add postgresql-client build-base postgresql-dev linux-headers nano
-# папка для сокета postgresql и сокета uwsgi сервера
-RUN mkdir -p /var/run/postgresql /var/run/wsgi
-RUN chown postgres:postgres /var/run/postgresql/
+RUN apk update && \
+    apk add --update --no-cache postgresql-client \
+        build-base postgresql-dev linux-headers nano
 
 # создание и назначения пользователя от которого будут запускаться команды в контейнере
-RUN adduser -D $user
-RUN addgroup $user www-data
-RUN chown $user:www-data /var/run/wsgi
+RUN adduser -D $user && \
+    addgroup $user www-data
+
+# папки для сокетов, файл лога
+# установка владельца для созданных папоки файла лога
+RUN mkdir -p /var/run/postgresql && \
+    mkdir -p /var/run/wsgi && \
+    touch /code/main_log.log && \
+    chmod -R 755 /code/main_log.log && \
+    chown -R $user:$user /code/main_log.log && \
+    chown -R postgres:postgres /var/run/postgresql && \
+    chown -R $user:www-data /var/run/wsgi
+
 USER $user
 
 # установка зависимостей
