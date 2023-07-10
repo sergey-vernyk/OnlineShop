@@ -485,8 +485,7 @@ def popular_list(request, category_slug: str = None):
     sorting_by_price = SortByPriceForm()
 
     # сохранение id популярных товаров в redis
-    redis.hset('popular_prods', 'ids',
-           ','.join(str(prod.pk) for prod in product_list))
+    redis.hset('popular_prods', 'ids', ','.join(str(prod.pk) for prod in product_list))
 
     return render(request, 'goods/product/navs_categories_list.html', {'products': products,
                                                                        'page_obj': page_obj,
