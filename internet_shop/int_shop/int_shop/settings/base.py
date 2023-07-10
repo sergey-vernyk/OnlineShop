@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-import os
 from pathlib import Path
 import environ
 
@@ -44,6 +43,7 @@ INSTALLED_APPS = [
     'social_django',
     'rest_framework.authtoken',
     'django_summernote',
+    'storages',
 
     'goods.apps.GoodsConfig',
     'orders.apps.OrdersConfig',
@@ -92,19 +92,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'int_shop.wsgi.application'
 
-# Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'HOST': '/var/run/postgresql',
-        'NAME': env('DATABASE_NAME'),
-        'USER': env('DATABASE_USER'),
-        'PORT': env('DATABASE_PORT'),
-        'PASSWORD': env('DATABASE_PASSWORD'),
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'HOST': '/var/run/postgresql',
+#         'NAME': env('DATABASE_NAME'),
+#         'USER': env('DATABASE_USER'),
+#         'PORT': env('DATABASE_PORT'),
+#         'PASSWORD': env('DATABASE_PASSWORD'),
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -141,19 +138,10 @@ DATETIME_FORMAT = 'd/m/y l H:i:s'  # формат времени 24 часа (д
 
 DATE_INPUT_FORMATS = ('%d-%m-%Y',)
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.1/howto/static-files/
-
-STATIC_URL = 'static/'
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# пути для сохранения пользовательских файлов с сайта
-MEDIA_URL = '/media/'  # файлы загружены пользователем
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')  # путь, по которому находятся эти файлы
 
 LOGIN_REDIRECT_URL = 'goods:product_list'
 LOGOUT_REDIRECT_URL = 'login'

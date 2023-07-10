@@ -17,20 +17,40 @@ ADMINS = (
 
 # отправка email на почту пользователям из списка, когда происходят ошибки ссылок на страницы 404
 # когда у запроса есть Referer
-MANAGERS = (
-    ('John Doe', 'sergey.vernyk@petalmail.com'),
-)
+# MANAGERS = (
+#     ('John Doe', 'sergey.vernyk@petalmail.com'),
+# )
+
 
 # middleware для списка MANAGERS
 MIDDLEWARE.insert(0, 'django.middleware.common.BrokenLinkEmailsMiddleware')
 # почта с которой будут отправляться письма для списка ADMINS
 SERVER_EMAIL = 'errors@onlineshop.com'
+EMAIL_SUBJECT_PREFIX = ['Django Onlineshopproj']
 
 # (python manage.py collectstatic - собирает все статические файлы проекта и сохраняет их по этому пути)
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+STATIC_ROOT = os.path.join(BASE_DIR, 'assets/')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')  # путь, по которому находятся эти файлы
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+
+# автоматическое добавление статических файлов в S3 bucket, когда запускается команда collectstatic
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+DEFAULT_FILE_STORAGE = 'common.storage_backends.MediaStorage'
+
+AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME')
+AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
+AWS_DEFAULT_ACL = env('AWS_DEFAULT_ACL')
+
+AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+AWS_LOCATION = 'static'
+PUBLIC_MEDIA_LOCATION = 'media'
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+
+STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-
 EMAIL_HOST = env('EMAIL_HOST')
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
@@ -55,4 +75,15 @@ LOGGING = {
         }
     }
 
+}
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'HOST': '/var/run/postgresql',
+        'NAME': env('DATABASE_NAME'),
+        'USER': env('DATABASE_USER'),
+        'PORT': env('DATABASE_PORT'),
+        'PASSWORD': env('DATABASE_PASSWORD'),
+    }
 }

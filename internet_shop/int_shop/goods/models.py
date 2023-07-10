@@ -5,7 +5,6 @@ from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.urls import reverse
 from decimal import Decimal
-from django.utils import timezone
 
 from account.models import Profile
 from common.moduls_init import redis
@@ -15,8 +14,7 @@ def product_image_path(instance, filename):
     """
     Возвращает путь сохранения изображений для каждого товара
     """
-    now = timezone.now()
-    return f'products_{instance.name}/{now.strftime("%Y-%m-%d")}/{filename}'
+    return f'products/product_{instance.name}/{filename}'
 
 
 class Product(models.Model):
@@ -55,7 +53,7 @@ class Product(models.Model):
         """
         Метод возвращает имена всех фото товара в виде списка
         """
-        return os.listdir(os.path.join(settings.MEDIA_ROOT, f'products_{self.name}', 'Detail_photos'))
+        return os.listdir(os.path.join(settings.MEDIA_ROOT, f'products/product_{self.name}', 'Detail_photos'))
 
     def save(self, *args, **kwargs):
         """
@@ -65,21 +63,10 @@ class Product(models.Model):
         """
         super().save(*args, **kwargs)
         try:
-            os.makedirs(os.path.join(settings.MEDIA_ROOT, f'products_{self.name}', 'Detail_photos'))
+            os.makedirs(os.path.join(settings.MEDIA_ROOT, f'products/product_{self.name}', 'Detail_photos'))
         except FileExistsError:
             pass
         redis.sadd('products_ids', self.pk)
-
-    def delete(self, **kwargs):
-        """
-        Переопределение метода, что бы удалить товар вместе с id этого
-        товара из множества со всеми id товаров, которые хранятся в БД Redis
-        и удалить каталоги для хранения фото товара.
-        Возвращает кол-во удаленных записей из БД (ожидается 1)
-        """
-        os.removedirs(os.path.join(settings.MEDIA_ROOT, f'products_{self.name}', 'Detail_photos'))
-        redis.srem('products_ids', self.pk)
-        super().delete(**kwargs)
 
     def get_absolute_url(self):
         return reverse('goods:product_detail', args=(self.pk, self.slug))

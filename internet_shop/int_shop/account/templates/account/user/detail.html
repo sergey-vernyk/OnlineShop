@@ -22,7 +22,7 @@
                     {% if customer.photo %}
                         <img src="{{ customer.photo.url }}" width="80" height="80" alt="user-photo" style="border-radius: 50%">
                     {% else %}
-                        <img src="{% static 'img/no_user_photo.png' %}" width="80" height="80" alt="user-photo">
+                        <img src="{% static 'img/no_user_photo.jpg' %}" width="80" height="80" alt="user-photo">
                     {% endif %}
                     <span id="customer-full-name">
                         <!--имя профиля также находится и в request-->

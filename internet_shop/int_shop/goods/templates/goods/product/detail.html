@@ -30,7 +30,7 @@
                     {% with photos=product.get_all_product_photos %}
                         {% if photos %}
                             {% for photo in photos %}
-                                <img src="{% get_media_prefix %}products_{{ product.name }}/Detail_photos/{{ photo }}" width="400" height="400"/>
+                                <img src="{% get_media_prefix %}products/product_{{ product.name }}/Detail_photos/{{ photo }}" width="400" height="400"/>
                             {% endfor %}
                         {% else %}
                             {% for i in '12'|make_list %}
