@@ -8,7 +8,7 @@ RUN mkdir -p /etc/ssl_cert/ && \
 
 # копирование конфига и сертификатов
 COPY ./nginx.conf /etc/nginx/nginx.conf
-COPY ./onlineshopproj.crt ./onlineshopproj.key /etc/ssl_cert/
+COPY ./onlineshopproj.pp.ua.crt ./onlineshopproj.pp.ua.key /etc/ssl_cert/
 
 # установка владельца для файла конфига, папки с кешем и pid файла
 RUN chown -R nginx:www-data /etc/nginx/nginx.conf && \
