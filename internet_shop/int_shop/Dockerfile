@@ -37,5 +37,6 @@ RUN pip install -r requirements.txt
 
 # добавление пути в PATH местонахождения приложений, установленных через pip
 ENV PATH "$PATH:/home/$user/.local/bin"
+ENV SERVER_NAME=ec2-3-65-196-170.eu-central-1.compute.amazonaws.com
 
 COPY . /code

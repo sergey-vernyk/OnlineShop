@@ -14,7 +14,10 @@ services:
       - wsgi_socket:/var/run/wsgi  # volume для подключения nginx через сокет
     env_file: # файл с переменными окружения
       - ./int_shop/settings/.env
-    command: ["uwsgi", "--ini", "/code/config/uwsgi/uwsgi.ini"]
+    command:
+      sh -c "python manage.py collectstatic --noinput && \
+              python manage.py migrate && \
+              uwsgi --ini /code/config/uwsgi/uwsgi.ini"
     depends_on:
       - db
       - redis_db
@@ -45,7 +48,7 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
-      - ./redis_conf/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./config/redis/redis.conf:/usr/local/etc/redis/redis.conf
     command: redis-server /usr/local/etc/redis/redis.conf  # использование кастомного конфига
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
@@ -56,7 +59,7 @@ services:
     container_name: rabbitmq_broker
     volumes:
       - rabbitmq_db:/var/lib/rabbitmq/
-      - rabbitmq_conf:/etc/rabbitmq/
+      - ./config/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
     healthcheck:
       test: [ "CMD", "rabbitmq-diagnostics", "check_running" ]
 
@@ -104,7 +107,6 @@ volumes:
   shop_db_data:
   redis_data:
   rabbitmq_db:
-  rabbitmq_conf:
   postgres_socket:
   wsgi_socket:
   code:
