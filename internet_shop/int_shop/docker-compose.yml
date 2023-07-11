@@ -82,7 +82,7 @@ services:
     container_name: stripe_payments
     env_file:
       - ./int_shop/settings/.env
-    command: listen --forward-to web/payment/webhook/ # TODO think how to check webhooks
+    command: listen --forward-to web/payment/webhook/
     volumes:
       - wsgi_socket:/var/run/wsgi
     depends_on:
