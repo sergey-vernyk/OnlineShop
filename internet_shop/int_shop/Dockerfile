@@ -18,13 +18,12 @@ RUN apk update && \
 RUN adduser -D $user && \
     addgroup $user www-data
 
-# папки для сокетов, файл лога
-# установка владельца для созданных папоки файла лога
-RUN mkdir -p /var/run/postgresql && \
-    mkdir -p /var/run/wsgi && \
-    touch /code/main_log.log && \
-    chmod -R 755 /code/main_log.log && \
-    chown -R $user:$user /code/main_log.log && \
+# папки для сокетов, файл лога, файл результат хеша файлов медиа
+# установка владельца для созданных папок и файлов
+RUN mkdir -p /var/run/postgresql /var/run/wsgi /vol/web/static /vol/web/media /code/scripts && \
+    touch /code/main_log.log /code/scripts/result_hash.txt && \
+    chmod -R 755 /code/main_log.log /code/scripts/result_hash.txt /vol && \
+    chown -R $user:$user /vol /code/main_log.log /code/scripts/result_hash.txt && \
     chown -R postgres:postgres /var/run/postgresql && \
     chown -R $user:www-data /var/run/wsgi
 
@@ -37,6 +36,5 @@ RUN pip install -r requirements.txt
 
 # добавление пути в PATH местонахождения приложений, установленных через pip
 ENV PATH "$PATH:/home/$user/.local/bin"
-ENV SERVER_NAME=ec2-3-65-196-170.eu-central-1.compute.amazonaws.com
 
 COPY . /code

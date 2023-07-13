@@ -12,10 +12,13 @@ services:
       - code:/code
       - postgres_socket:/var/run/postgresql  # volume для подключения БД через сокет
       - wsgi_socket:/var/run/wsgi  # volume для подключения nginx через сокет
+      - static_data:/vol/web/static
+      - media_data:/vol/web/media
     env_file: # файл с переменными окружения
       - ./int_shop/settings/.env
     command:
       sh -c "python manage.py collectstatic --noinput && \
+              python manage.py runscript copy_media_files --chdir /code/scripts --script-args result_hash.txt && \
               python manage.py migrate && \
               uwsgi --ini /code/config/uwsgi/uwsgi.ini"
     depends_on:
@@ -99,9 +102,16 @@ services:
     restart: always
     volumes:
       - wsgi_socket:/var/run/wsgi
+      - static_data:/vol/web/static
+      - media_data:/vol/web/media
     ports:
       - "80:80"
       - "443:443"
+#    healthcheck:
+#      test: [ "CMD", "curl", "--fail", "https://onlineshopproj.com" ]
+#      interval: 1m30s
+#      timeout: 10s
+#      retries: 3
 
 volumes:
   shop_db_data:
@@ -110,3 +120,5 @@ volumes:
   postgres_socket:
   wsgi_socket:
   code:
+  static_data:
+  media_data:

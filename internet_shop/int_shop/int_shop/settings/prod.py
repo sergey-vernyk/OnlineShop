@@ -29,13 +29,19 @@ SERVER_EMAIL = 'errors@onlineshop.com'
 EMAIL_SUBJECT_PREFIX = ['Django Onlineshopproj']
 
 # (python manage.py collectstatic - собирает все статические файлы проекта и сохраняет их по этому пути)
-STATIC_ROOT = os.path.join(BASE_DIR, 'assets/')
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')  # путь, по которому находятся эти файлы
+STATIC_ROOT = os.path.join(BASE_DIR, '/vol/web/static')
+MEDIA_ROOT = os.path.join(BASE_DIR, '/vol/web/media')  # путь, по которому находятся эти файлы
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 
+# настройки для хранения файлов в AWS облаке (пока не используются)
+# STATIC_ROOT = os.path.join(BASE_DIR, 'assets/')
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')  # путь, по которому находятся эти файлы
+
+
+# места сохранения файлов в AWS облаке (пока не используются)
 # автоматическое добавление статических файлов в S3 bucket, когда запускается команда collectstatic
-STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-DEFAULT_FILE_STORAGE = 'common.storage_backends.MediaStorage'
+# STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# DEFAULT_FILE_STORAGE = 'common.storage_backends.MediaStorage'
 
 AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME')
 AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
@@ -47,8 +53,12 @@ AWS_LOCATION = 'static'
 PUBLIC_MEDIA_LOCATION = 'media'
 AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 
-STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
-MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/'
+# URL для AWS (пока не используются)
+# STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
+# MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/'
+
+STATIC_URL = 'static/'
+MEDIA_URL = 'media/'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = env('EMAIL_HOST')
