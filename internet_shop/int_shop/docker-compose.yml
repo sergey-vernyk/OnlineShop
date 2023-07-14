@@ -18,9 +18,10 @@ services:
       - ./int_shop/settings/.env
     command:
       sh -c "python manage.py collectstatic --noinput && \
-              python manage.py runscript copy_media_files --chdir /code/scripts --script-args result_hash.txt && \
-              python manage.py migrate && \
-              uwsgi --ini /code/config/uwsgi/uwsgi.ini"
+      python manage.py runscript copy_media_files --chdir /code/scripts --script-args result_hash.txt && \
+      python manage.py migrate && \
+      uwsgi --ini /code/config/uwsgi/uwsgi.ini"
+    restart: always
     depends_on:
       - db
       - redis_db
@@ -58,6 +59,7 @@ services:
 
   rabbitmq:
     image: rabbitmq:3.10-alpine
+    restart: always
     user: "rabbitmq"
     container_name: rabbitmq_broker
     volumes:
@@ -104,14 +106,29 @@ services:
       - wsgi_socket:/var/run/wsgi
       - static_data:/vol/web/static
       - media_data:/vol/web/media
+      - certbot_web:/vol/www
+      - proxy_dhparams:/vol/proxy
+      - certbot_certs:/etc/letsencrypt/
+    env_file:
+      - ./int_shop/settings/.env
     ports:
       - "80:80"
       - "443:443"
-#    healthcheck:
-#      test: [ "CMD", "curl", "--fail", "https://onlineshopproj.com" ]
-#      interval: 1m30s
-#      timeout: 10s
-#      retries: 3
+    depends_on:
+      - web
+
+  # используется только для возобновления сертификата и ключа для HTTPS
+  certbot:
+    build:
+      context: ./config/certbot
+    command: echo "Skipping..."
+    env_file:
+      - ./int_shop/settings/.env
+    volumes:
+      - certbot-web:/vol/www
+      - certbot_certs:/etc/letsencrypt
+    depends_on:
+      - nginx
 
 volumes:
   shop_db_data:
@@ -122,3 +139,6 @@ volumes:
   code:
   static_data:
   media_data:
+  certbot-web:
+  proxy_dhparams:
+  certbot_certs:
