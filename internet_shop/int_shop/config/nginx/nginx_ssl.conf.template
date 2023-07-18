@@ -1,5 +1,5 @@
 # текущий пользователь и группа для выполнения процессов
-user shop_admin www-data;
+# user shop_admin www-data;
 
 # расположение журнала ошибок и минимальная серьезность для регистрации сообщенний
 error_log /var/log/nginx/error.log warn;
@@ -30,7 +30,7 @@ http {
     server {
         # незащищенный протокол с переадресаций на протокол с ssl
         listen 80;
-        server_name ${SERVER_NAME} www.${SERVER_NAME};
+        server_name ${DOMAIN} www.${DOMAIN};
 
         # директория для поиска challenge файла для завершения аутенификации
         location /.well-known/acme-challenge/ {
@@ -46,8 +46,8 @@ http {
         # защищенный протокол ssl с адресами к ключу и сертификату
         listen 443 ssl;
         # certbot будет сохранять ключ и файл сертификата по адресу /etc/letsencrypt/live/...
-        ssl_certificate         /etc/letsencrypt/live/${SERVER_NAME}/fullchain.pem;
-        ssl_certificate_key     /etc/letsencrypt/live/${SERVER_NAME}/privkey.pem;
+        ssl_certificate         /home/nginx/letsencrypt/live/${DOMAIN}/fullchain.pem;
+        ssl_certificate_key     /home/nginx/letsencrypt/live/${DOMAIN}/privkey.pem;
 
         # базовая конфигурация сервера с ssl для использования с certbot
         include         /etc/nginx/options-ssl-nginx.conf;
@@ -57,7 +57,7 @@ http {
         add_header      Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 
 
-        server_name     ${SERVER_NAME} www.${SERVER_NAME};
+        server_name    ${DOMAIN} www.${DOMAIN};
         # запрещает отображать версию nginx’а в поле Server в Header Response
         server_tokens off;
         include /etc/nginx/mime.types;

@@ -4,7 +4,7 @@
 
 set -e
 
-until nc -z nginx_static 80; do
+until nc -z nginx 80; do
   echo "Waiting for proxy..."
   sleep 5s &
   wait ${!}
@@ -15,8 +15,11 @@ echo "Getting certificate..."
 certbot certonly \
   --webroot \
   --webroot-path "/vol/www/" \
-  -d "$SERVER_NAME" \
+  -d "$DOMAIN,www.$DOMAIN" \
   --email "$EMAIL" \
   --rsa-key-size 4096 \
   --agree-tos \
-  --noninteractive
+  --noninteractive \
+  --config-dir "/home/nginx/letsencrypt/" \
+  --work-dir "/home/nginx/lib/letsencrypt/" \
+  --logs-dir "/home/nginx/log/letsencrypt/"

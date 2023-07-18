@@ -1,0 +1,14 @@
+server {
+        # незащищенный протокол с переадресаций на протокол с ssl
+        listen 80;
+        server_name ${DOMAIN} www.${DOMAIN};
+
+        # директория для поиска challenge файла для завершения аутенификации
+        location /.well-known/acme-challenge/ {
+            root /vol/www/;
+        }
+
+        location / {
+            return 301 https://$host$request_uri;
+        }
+    }

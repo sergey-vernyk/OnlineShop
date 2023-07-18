@@ -87,7 +87,7 @@ services:
     container_name: stripe_payments
     env_file:
       - ./int_shop/settings/.env
-    command: listen --forward-to web/payment/webhook/
+    command: listen --forward-to https://onlineshopproj.pp.ua/payment/webhook/
     volumes:
       - wsgi_socket:/var/run/wsgi
     depends_on:
@@ -108,7 +108,7 @@ services:
       - media_data:/vol/web/media
       - certbot_web:/vol/www
       - proxy_dhparams:/vol/proxy
-      - certbot_certs:/etc/letsencrypt/
+      - certbot_certs:/home/nginx/letsencrypt
     env_file:
       - ./int_shop/settings/.env
     ports:
@@ -125,8 +125,8 @@ services:
     env_file:
       - ./int_shop/settings/.env
     volumes:
-      - certbot-web:/vol/www
-      - certbot_certs:/etc/letsencrypt
+      - certbot_web:/vol/www
+      - certbot_certs:/home/nginx/letsencrypt
     depends_on:
       - nginx
 
@@ -139,6 +139,6 @@ volumes:
   code:
   static_data:
   media_data:
-  certbot-web:
+  certbot_web:
   proxy_dhparams:
   certbot_certs:
