@@ -6,8 +6,12 @@ DEBUG = False
 
 ALLOWED_HOSTS = env('ALLOWED_HOSTS').split(',')
 
+# django доверяет заголовку X-Forwarded-Proto, который исходит от прокси
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+CSRF_TRUSTED_ORIGINS = env('CSRF_TRUSTED_ORIGINS').split(',')
+
 SESSION_COOKIE_SECURE = True  # избежание случайной передачи сеанса файла cookie по HTTP
-SECURE_SSL_REDIRECT = True  # перенаправление всех запросов на протокол HTTPS
+# SECURE_SSL_REDIRECT = True  # перенаправление всех запросов на протокол HTTPS
 CSRF_COOKIE_SECURE = True  # браузеры будут передавать куки только через HTTPS
 
 # отправка email на почту пользователям из списка, когда происходят ошибки сервера

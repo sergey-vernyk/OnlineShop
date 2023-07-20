@@ -25,20 +25,18 @@
         </ul>
         <div class="top-info-row">
             <div class="photos-column">
-                <div class="product-photos">
-                    <!--Отображение двух фото в большем разрешении-->
-                    {% with photos=product.get_all_product_photos %}
-                        {% if photos %}
-                            {% for photo in photos %}
-                                <img src="{% get_media_prefix %}products/product_{{ product.name }}/Detail_photos/{{ photo }}" width="400" height="400"/>
-                            {% endfor %}
-                        {% else %}
-                            {% for i in '12'|make_list %}
-                                <img class="d-inline" src="{% static 'img/no_image_product_detail.jpg' %}" width="400" height="400">
-                            {% endfor %}
-                        {% endif %}
-                    {% endwith %}
-                </div>
+                <!--Отображение двух фото в большем разрешении-->
+                {% with photos=product.get_all_product_photos %}
+                    {% if photos %}
+                        {% for photo in photos %}
+                            <img src="{% get_media_prefix %}products/product_{{ product.name }}/Detail_photos/{{ photo }}" width="400" height="400"/>
+                        {% endfor %}
+                    {% else %}
+                        {% for i in '12'|make_list %}
+                            <img class="d-inline" src="{% static 'img/no_image_product_detail.jpg' %}" width="400" height="400">
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
             </div>
             <div class="buttons-column">
                 <!--Добавление товара в избранное-->

@@ -163,17 +163,18 @@ def webhook(request) -> HttpResponse:
         session = event.data.object
         # если режим сессии оплата и статус оплачено - отправка email пользователю, что заказ был оплачен
         if session.mode == 'payment' and session.payment_status == 'paid':
-            total_amount = Decimal(session.amount_total)
+            total_amount = (Decimal(session.amount_total or
+                                    session.amount_subtotal) / Decimal('100')).quantize(Decimal('0.01'))
             order_id = session.client_reference_id  # client_reference_id соответствует id заказа
             order = Order.objects.get(pk=order_id)
             order.stripe_id = session.payment_intent  # присвоение заказу id paymentIntent
             order.save(update_fields=['stripe_id'])
 
-            domain = request.site.domain.domain
+            domain = request.site.domain
             is_secure = request.is_secure()
             # отправка email об оплате заказа
             order_paid.delay(data={'domain': domain, 'is_secure': is_secure},
                              order_id=order.pk,
-                             total_amount=total_amount)
+                             amount_total=total_amount)
 
     return HttpResponse(status=200)
