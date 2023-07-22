@@ -149,6 +149,8 @@ body {
     font-size: 1.8rem;
     display: flex;
     min-width: 110px;
+    height: 50px;
+    align-items: center;
 }
 
 /*панель пользователя на navbar*/
@@ -227,6 +229,7 @@ body {
     position: relative;
     display: inline;
     margin-left: 20px;
+    min-width: 160px;
 }
 
 .authorization #login-button {
@@ -259,7 +262,6 @@ body {
 .dropdwn {
     position: absolute;
     left: 200px;
-    top: 23px;
     list-style: none;
     padding-left: 0;
     width: 193px;
@@ -313,11 +315,26 @@ body {
 
 
 /*Дополнительные пункты меню главного навбара*/
+.header-block-links-1 {
+    display: flex;
+    flex: 1 0 22%;
+    margin: 10px;
+}
+
+.header-block-links-2 {
+    max-width: 300px;
+    flex: 1 0 12%;
+    margin: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
 .additional-menu-items {
     display: flex;
     position: relative;
     align-items: center;
-    margin-left: 200px;
+    margin-left: 180px;
     margin-bottom: 0;
     padding-left: 0;
 }
@@ -342,9 +359,11 @@ body {
     display: flex;
     align-items: center;
     position: relative;
-    padding: 10px;
+    padding: 10px 10px 10px 20px;
     margin-left: 10px;
     margin-right: 10px;
+    flex: 1 1 20%;
+    justify-content: center;
 }
 
 #search-btn {
@@ -364,11 +383,26 @@ body {
 #search-btn:hover { background-color: #268833; }
 
 .we-in-social ul {
-    display: inline-flex;
     list-style: none;
     margin-bottom: 0;
     padding-left: 0;
-    margin-left: 3rem;
+    justify-content: center;
+    display: flex;
+}
+
+.we-in-social p {
+    color: white;
+    margin-bottom: 0;
+    margin-right: 0.5rem;
+    text-align: center;
+}
+
+.we-in-social {
+    flex: 1 0 10%;
+    justify-content: center;
+    display: flex;
+    margin: 10px;
+    align-items: center;
 }
 
 .we-in-social li a img {
@@ -376,11 +410,12 @@ body {
 }
 
 .search-field-input {
-    width: 350px;
+    max-width: 350px;
     padding: 0 1.2rem;
     border: 1px solid;
     border-radius: 8px;
     height: 38px;
+    flex: 1 0 10%;
 }
 
 .rating-star [id^="star-"] {

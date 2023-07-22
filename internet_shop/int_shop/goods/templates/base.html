@@ -21,7 +21,7 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-md" id="main-navbar">
-        <div class="container-fluid align-items-center" style="justify-content: normal;">
+        <div class="container-fluid align-items-center" style="justify-content: normal; flex-wrap: wrap;min-width: 840px;">
             <a class="navbar-brand" href="{% url 'goods:product_list' %}">
                 <img src="{% static 'img/logo.jpg' %}" alt="Intershop" style="width:50px;" class="rounded-pill">
             </a>
@@ -29,50 +29,52 @@
                 <div class="shop-name">Online Shop</div>
             </a>
             <!--Список с выпадающими категориями товара-->
-            <ul class="dropdwn">
-                <li id="main-nav-item">
-                    Categories<span class="material-symbols-outlined">arrow_drop_down</span>
-                </li>
-                <li class="dropdwn-item">
-                    <a href="{% url 'goods:product_list' %}">
-                        <span class="material-symbols-outlined">dataset</span>
-                        All
-                    </a>
-                </li>
-                {% for c in categories %}
+            <div class="header-block-links-1">
+                <ul class="dropdwn">
+                    <li id="main-nav-item">
+                        Categories<span class="material-symbols-outlined">arrow_drop_down</span>
+                    </li>
+                    <li class="dropdwn-item">
+                        <a href="{% url 'goods:product_list' %}">
+                            <span class="material-symbols-outlined">dataset</span>
+                            All
+                        </a>
+                    </li>
+                    {% for c in categories %}
                     <li class="dropdwn-item">
                         {% if c.name == 'Mobile phones' %}
-                            <a href="{{ c.get_absolute_url }}">
-                                <span class="material-symbols-outlined">smartphone</span>
-                                {{ c.name }}
-                            </a>
+                        <a href="{{ c.get_absolute_url }}">
+                            <span class="material-symbols-outlined">smartphone</span>
+                            {{ c.name }}
+                        </a>
                         {% elif c.name == 'Laptops' %}
-                            <a href="{{ c.get_absolute_url }}">
-                                <span class="material-symbols-outlined">laptop_windows</span>
-                                {{ c.name }}
-                            </a>
+                        <a href="{{ c.get_absolute_url }}">
+                            <span class="material-symbols-outlined">laptop_windows</span>
+                            {{ c.name }}
+                        </a>
                         {% elif c.name == 'Smart Gadgets' %}
-                            <a href="{{ c.get_absolute_url }}">
-                                <span class="material-symbols-outlined">devices_other</span>
-                                {{ c.name }}
-                            </a>
+                        <a href="{{ c.get_absolute_url }}">
+                            <span class="material-symbols-outlined">devices_other</span>
+                            {{ c.name }}
+                        </a>
                         {% elif c.name == 'Audio Video' %}
-                            <a href="{{ c.get_absolute_url }}">
-                                <span class="material-symbols-outlined">"play_circle</span>
-                                {{ c.name }}
-                            </a>
+                        <a href="{{ c.get_absolute_url }}">
+                            <span class="material-symbols-outlined">play_circle</span>
+                            {{ c.name }}
+                        </a>
                         {% endif %}
                     </li>
-                {% endfor %}
-            </ul>
-            <ul class="additional-menu-items">
-                <li>
-                    <a href="{% url 'delivery_services' %}">Delivery</a>
-                </li>
-                <li>
-                    <a href="{% url 'contacts' %}">Contacts</a>
-                </li>
-            </ul>
+                    {% endfor %}
+                </ul>
+                <ul class="additional-menu-items">
+                    <li>
+                        <a href="{% url 'delivery_services' %}">Delivery</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'contacts' %}">Contacts</a>
+                    </li>
+                </ul>
+            </div>
             <!--Форма поиска-->
             <form id="search-form" action="{% url 'goods:product_list' %}" method="get">
                 {{ search_form.query }}
@@ -82,65 +84,70 @@
                 </button>
             </form>
             <!--Панель с именем пользователя и кнопками регистрации или авторизации-->
-            {% if request.user.is_authenticated %}
-                <div class="user-panel">
-                    <a href="{% url 'customer_detail' request.user.username 'about' %}">
-                        {{ request.user.first_name.0 }}
-                    </a>
-                </div>
-            {% else %}
-                <div class="authorization" role="toolbar">
-                    <a id="login-button" role="button" href="{% url 'login' %}">Sign in</a>
-                    <span style="color: white;">|</span>
-                    <div class="register">
-                        <a id="register-button" href="{% url 'register_user' %}">Register</a>
+            <div style="display: flex;flex: 1 1 auto;align-items: center;">
+                <div class="header-block-links-2">
+                    {% if request.user.is_authenticated %}
+                    <div class="user-panel">
+                        <a href="{% url 'customer_detail' request.user.username 'about' %}">
+                            {{ request.user.first_name.0 }}
+                        </a>
                     </div>
-                </div>
-            {% endif %}
-            <!--Корзина-->
-            <div class="cart-panel">
-                <div class="cart-button">
-                    <a type="button" href="{% url 'cart:cart_detail' %}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
-                             class="bi bi-cart3" viewBox="0 0 16 16">
-                            <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1
+                    {% else %}
+                    <div class="authorization" role="toolbar">
+                        <a id="login-button" role="button" href="{% url 'login' %}">Sign in</a>
+                        <span style="color: white;">|</span>
+                        <div class="register">
+                            <a id="register-button" href="{% url 'register_user' %}">Register</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <!--Корзина-->
+                    <div class="cart-panel">
+                        <div class="cart-button">
+                            <a type="button" href="{% url 'cart:cart_detail' %}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                                     class="bi bi-cart3" viewBox="0 0 16 16">
+                                    <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1
                              .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5
                               0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479
                                9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1
                                 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-                        </svg>
-                        <div class="amount-cart">
-                            {{ cart|length }}
+                                </svg>
+                                <div class="amount-cart">
+                                    {{ cart|length }}
+                                </div>
+                            </a>
                         </div>
-                    </a>
-                </div>
-                {% with discount_price=cart.get_total_price_with_discounts %}
-                    <div class="total-price">
-                        {% if cart %}
+                        {% with discount_price=cart.get_total_price_with_discounts %}
+                        <div class="total-price">
+                            {% if cart %}
                             {% if discount_price < 0 %}
-                                Free
+                            Free
                             {% else %}
-                                ${{ cart.get_total_price_with_discounts }}
+                            ${{ cart.get_total_price_with_discounts }}
                             {% endif %}
-                        {% endif %}
+                            {% endif %}
+                        </div>
+                        {% endwith %}
                     </div>
-                {% endwith %}
-            </div>
-            <div class="we-in-social">
-                <ul>
-                    <li>
-                        <a href="https://t.me/+38096134567">
-                            <img src="{% static 'img/Telegram_logo.svg' %}" width="30" height="30"></a>
-                    </li>
-                    <li>
-                        <a href="https://wa.me/+38096134567">
-                            <img src="{% static 'img/whatsapp-icon.png' %}" width="30" height="30"></a>
-                    </li>
-                    <li>
-                        <a href="viber://contact?number %2B38096134567">
-                            <img src="{% static 'img/Viber_logo.svg' %}" width="30" height="30"></a>
-                    </li>
-                </ul>
+                </div>
+                <div class="we-in-social">
+                    <p>We are in messengers</p>
+                    <ul>
+                        <li>
+                            <a href="https://t.me/+38096134567">
+                                <img src="{% static 'img/Telegram_logo.svg' %}" width="30" height="30"></a>
+                        </li>
+                        <li>
+                            <a href="https://wa.me/+38096134567">
+                                <img src="{% static 'img/whatsapp-icon.png' %}" width="30" height="30"></a>
+                        </li>
+                        <li>
+                            <a href="viber://contact?number %2B38096134567">
+                                <img src="{% static 'img/Viber_logo.svg' %}" width="30" height="30"></a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </nav>
