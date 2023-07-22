@@ -25,13 +25,13 @@ input[type="text"] {
 }
 
 .block-cart-items {
-    width: 800px;
     padding: 0 0.6rem;
     border: 1px solid gainsboro;
     border-radius: 8px;
     background-color: white;
     width: 60% !important;
     min-width: 575px;
+    flex: 1 1 50%;
 }
 
 .cart-item {
@@ -100,14 +100,13 @@ input[type="text"] {
 }
 
 .block-totals {
-    width: 30% !important;
-    margin-left: 0.8rem;
     padding: 1rem !important;
     border: 1px solid gainsboro;
     background-color: white;
     border-radius: 8px;
     min-height: 120px;
-    min-width: 350px;
+    margin-bottom: 1rem;
+    flex: 1 1 10%
 }
 
 .block-summary {

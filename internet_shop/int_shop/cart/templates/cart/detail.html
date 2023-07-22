@@ -13,7 +13,7 @@
     <!--верхняя строка корзины-->
     <div class="cart-top">
         <h2 class="mb-1 d-block">Shopping cart</h2>
-        <div class="d-block align-self-center" style="margin-right: calc(10% - 0.8rem);">
+        <div class="d-block align-self-center">
             <a class="back-link" href="{{ request.session.urls.previous_url }}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
                      class="bi bi-arrow-left-short" viewBox="0 0 16 16">
@@ -24,7 +24,7 @@
             </a>
         </div>
     </div>
-    <div class="row flex-nowrap align-items-start">
+    <div class="row align-items-start gap-3">
         <div class="block-cart-items">
             <!--карточки добавленных товаров-->
             {% for item in cart %}
