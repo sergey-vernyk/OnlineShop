@@ -9,9 +9,10 @@ input[type="text"], input[type="email"], textarea {
     margin-bottom: 10px;
     background-color: white;
     border-radius: 5px;
-    min-width: 966px;
+    min-width: 720px;
 }
 
+/*вертикальный вид меню*/
 .sidebar-customer {
     padding: 0px 10px !important;
     margin-right: 10px;
@@ -26,7 +27,7 @@ input[type="text"], input[type="email"], textarea {
     padding: 0px 10px !important;
     background-color: white;
     width: 64.2% !important;
-    min-width: 620px;
+    min-width: 720px;
     border-radius: 5px;
     position: relative;
     min-height: 604px;
@@ -93,7 +94,7 @@ input[type="text"], input[type="email"], textarea {
     padding: 20px 7px 20px 50px;
     border-bottom: solid 1px #E1E0E0;
     text-align: left;
-    font-size: 23px;
+    font-size: 20px;
     font-family: 'Montserrat', sans-serif;
     font-weight: 600;
 }
@@ -191,7 +192,7 @@ input[type="text"], input[type="email"], textarea {
 
 #order-state .not-done {
     color: red;
-    font-size: 1.2em;
+    font-size: 1rem;
 }
 
 .personal-info [id^="total-cost-"] {
@@ -243,7 +244,6 @@ input[type="text"], input[type="email"], textarea {
     position: relative;
     padding: 1rem 2rem 1rem 1rem !important;
     min-height: 94px;
-    min-width: 555px;
 }
 
 .collapse-order { display: none; }
@@ -276,7 +276,7 @@ input[type="text"], input[type="email"], textarea {
     text-decoration: none;
     align-items: center;
     color: green;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-family: 'Merriweather', serif;
 }
 
@@ -288,7 +288,8 @@ input[type="text"], input[type="email"], textarea {
 }
 
 .quantity {
-    width: 12%;
+    width: 5%;
+    margin-right: 5px;
 }
 
 .product-name {
@@ -296,13 +297,14 @@ input[type="text"], input[type="email"], textarea {
     text-align: center;
     width: 270px;
     font-family: 'Montserrat', sans-serif;
+    margin-right: 5px;
  }
 
 .product-name a {
     margin: 0;
     text-decoration: none;
     color: black;
-    font-size: 1.1rem;
+    font-size: 1rem;
     flex-shrink: 2;
     flex-grow: 1;
     word-break: break-word;
@@ -1157,3 +1159,37 @@ input[type="text"], input[type="email"], textarea {
     margin: 5px 0;
     color: darkgray;
 }
+
+/*горизонтальный вид меню*/
+.sidebar-customer-horizontal {
+    display: flex;
+    flex-direction: row;
+    background-color: white;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    min-width: 720px;
+    padding: 10px;
+}
+
+.sidebar-customer-horizontal .sidebar-item {
+    font-size: 1rem;
+    padding: 0.5rem;
+    border-bottom: 0;
+}
+
+.sidebar-customer-horizontal .sidebar-item .material-symbols-outlined { margin-right: 5px !important;}
+.sidebar-customer-horizontal .sidebar-item .material-icons { margin-right: 5px !important;}
+
+.sidebar-customer-horizontal .sidebar-item a {
+    text-decoration: none;
+    color: black;
+}
+
+.sidebar-customer-horizontal .sidebar-item a:hover { color: #0a58ca; }
+
+/*классы для изменения ширины блока content-customer через JavaScript*/
+.content-customer-width-h { width: 100% !important; }
+
+.content-customer-width-v { min-width: 64.2% !important; }

@@ -89,6 +89,8 @@ input[type="text"] {
 
 .item-remove {
     margin: 0.7rem;
+    width: 100px;
+    text-align: end;
 }
 
 .item-remove path {
