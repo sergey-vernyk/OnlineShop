@@ -8,11 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300&display=swap" rel="stylesheet">
 {% endblock %}
 {% block content %}
-<div class="container p-3">
+<div class="container-xl p-3">
     <h1 class="my-3 d-block">Checkout</h1>
     <div class="row flex-nowrap align-items-start">
         <div class="block-order-info">
-            <form method="post" style="width: 600px; padding: 10px;">
+            <form method="post" style="padding: 10px;">
                 <!--Общие данные о заказе-->
                 <h4 class="my-3 text-center">General information</h4>
                 <hr>
@@ -20,13 +20,15 @@
                 {% for field in form %}
                     <div class="order-form-fields">
                         {% if field.label == 'Call confirm' %}
+                        <div class="d-inline-block">
                             <label class="call-confirm-order-label"
-                               for="{{ field.id_for_label }}">{{ field.label }}
-                                {% if field.field.required %}<span class="required-field">*</span>{% endif %}
-                            </label>
+                                  for="{{ field.id_for_label }}">{{ field.label }}
+                            {% if field.field.required %}<span class="required-field">*</span>{% endif %}
+                        </label>
                             <div class="call-confirm-order-field">
                                 {{ field }}
                             </div>
+                        </div>
                         {% else %}
                             <label class="order-label"
                                for="{{ field.id_for_label }}">{{ field.label }}
