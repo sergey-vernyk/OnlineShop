@@ -38,10 +38,10 @@ class OrderCreateView(LoginRequiredMixin, FormView):
 
         if all([order_valid, delivery_valid]):
             order = order_form.save(commit=False)
-            # если в корзине есть валидный купон и/или подарочная карта, присваиваем к заказу
+            # если в корзине есть валидный купон или подарочная карта, присваиваем к заказу
             if cart.coupon:
                 order.coupon = cart.coupon
-            if cart.present_card:
+            elif cart.present_card:
                 order.present_card = cart.present_card
 
             delivery = delivery_form.save()
@@ -57,7 +57,7 @@ class OrderCreateView(LoginRequiredMixin, FormView):
             # отправка сообщения о завершении заказа на почту
             order_created.delay(data={'domain': domain, 'is_secure': is_secure},
                                 order_id=order.pk,
-                                profile_username=profile.user.username)
+                                profile_username=self.request.user.username)
             return HttpResponseRedirect(self.success_url)
         else:  # возврат форм с ошибками
             return self.render_to_response(context={'form': order_form,
@@ -78,6 +78,9 @@ class OrderCreateView(LoginRequiredMixin, FormView):
 
 
 class OrderConfirmedView(TemplateView):
+    """
+    Представление для отображения страницы созданного заказа
+    """
     template_name = 'orders/order_created.html'
 
     def get_context_data(self, **kwargs):

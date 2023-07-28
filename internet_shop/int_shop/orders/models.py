@@ -52,10 +52,7 @@ class Order(models.Model):
 
         coupon, present_card = self.coupon, self.present_card
 
-        if coupon and present_card:
-            totals['total_cost_with_discounts'] = totals['total_cost'] - (
-                    (totals['total_cost'] * coupon.discount / 100) + present_card.amount)
-        elif coupon:
+        if coupon:
             totals['total_cost_with_discounts'] = totals['total_cost'] - (totals['total_cost'] * coupon.discount / 100)
         elif present_card:
             totals['total_cost_with_discounts'] = totals['total_cost'] - present_card.amount
