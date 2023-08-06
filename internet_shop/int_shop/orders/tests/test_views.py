@@ -18,6 +18,7 @@ from present_cards.models import Category as PresentCard_Category
 from django.contrib.sites.shortcuts import get_current_site
 
 from present_cards.models import PresentCard
+from random import randint
 
 
 class OrderCreateTest(TestCase):
@@ -33,37 +34,41 @@ class OrderCreateTest(TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         super().setUpClass()
-
         # выполнение задач celery локально, не передавая их в брокер
         settings.CELERY_TASK_ALWAYS_EAGER = True
+        random_number = randint(1, 50)
 
         cls.user = User.objects.create_user(username='User', password='password')
         cls.profile = Profile.objects.create(user=cls.user)
 
-        category_phone = Category.objects.create(name='Mobile phones', slug='mobile-phones')
-        category_laptop = Category.objects.create(name='Laptops', slug='laptops')
+        category_1 = Category.objects.create(name='Category1', slug='category1')
+        category_2 = Category.objects.create(name='category2', slug='category2')
 
-        manufacturer1 = Manufacturer.objects.create(name='Lenovo', slug='lenovo', description='Description')
+        manufacturer1 = Manufacturer.objects.create(name=f'Manufacturer_{random_number}',
+                                                    slug=f'manufacturer_{random_number}',
+                                                    description='Description')
 
-        manufacturer2 = Manufacturer.objects.create(name='Huawei', slug='huawei', description='Description')
+        manufacturer2 = Manufacturer.objects.create(name=f'Manufacturer_{random_number + 1}',
+                                                    slug=f'manufacturer_{random_number + 1}',
+                                                    description='Description')
 
-        cls.product1 = Product.objects.create(name='Huawei Nova 5t',
-                                              slug='huawei-nova-5t',
+        cls.product1 = Product.objects.create(name=f'Product_{random_number}',
+                                              slug=f'product_{random_number}',
                                               manufacturer=manufacturer1,
                                               price=Decimal('300.25'),
                                               description='Description',
-                                              category=category_phone)
+                                              category=category_1)
 
-        cls.product2 = Product.objects.create(name='Lenovo ThinkBook 15',
-                                              slug='lenovo-thinkbook-15',
+        cls.product2 = Product.objects.create(name=f'Product_{random_number + 1}',
+                                              slug=f'product_{random_number + 1}',
                                               manufacturer=manufacturer2,
                                               price=Decimal('650.45'),
                                               description='Description',
-                                              category=category_laptop)
+                                              category=category_2)
 
         category_coupon = Coupon_Category.objects.create(name='For men', slug='for-men')
 
-        cls.coupon = Coupon.objects.create(code='coupon_code',
+        cls.coupon = Coupon.objects.create(code=f'coupon_code_{random_number + 5}',
                                            valid_from=timezone.now(),
                                            valid_to=timezone.now() + timezone.timedelta(days=10),
                                            discount=20,
@@ -71,7 +76,7 @@ class OrderCreateTest(TestCase):
 
         category_card = PresentCard_Category.objects.create(name='For men', slug='for-men')
 
-        cls.card = PresentCard.objects.create(code='card_code',
+        cls.card = PresentCard.objects.create(code=f'card_code_{random_number + 5}',
                                               valid_from=timezone.now(),
                                               valid_to=timezone.now() + timezone.timedelta(days=10),
                                               amount=250,

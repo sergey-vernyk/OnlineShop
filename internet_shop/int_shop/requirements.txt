@@ -67,3 +67,5 @@ Werkzeug==2.3.2
 uWSGI==2.0.21
 django-storages==1.13.2
 boto3==1.27.0
+coverage==7.2.7
+mock==5.1.0

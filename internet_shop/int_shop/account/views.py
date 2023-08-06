@@ -34,6 +34,7 @@ from django.views.generic.edit import FormMixin
 from django.contrib.messages.views import messages
 from django.utils.safestring import mark_safe
 from common.moduls_init import redis
+from django.conf import settings
 
 
 class LoginUserView(LoginView):
@@ -229,18 +230,22 @@ def save_social_user_to_profile(backend, user, response, *args, **kwargs):
 
             # получение информации пользователя с api (пол и дата рождения)
             user_info = requests.get(
-                url=('https://people.googleapis.com/v1/people/'
-                     'me?personFields=genders%2Cbirthdays&key=AIzaSyDGwpM8rcsPoUZMMplrsU1BTGq-90wZbik'),
+                url=(f'https://people.googleapis.com/v1/people/'
+                     f'me?personFields=genders%2Cbirthdays&key={settings.API_KEY_GOOGLE}'),
                 headers=headers)
 
             json_info = user_info.json()
 
-            gender = json_info['genders'][0]['formattedValue']
-            bd = json_info['birthdays'][0]['date']
-            date_of_birth = datetime.strptime(
-                '/'.join(str(bd[k]) for k in bd), '%Y/%m/%d'
-            )
-            account_id = json_info['resourceName'].split('/')[1]
+            gender = date_of_birth = ''
+            if 'genders' in json_info:
+                gender = json_info['genders'][0]['formattedValue']
+            if 'birthdays' in json_info:
+                bd = json_info['birthdays'][0]['date']
+                date_of_birth = datetime.strptime(
+                    '/'.join(str(bd[k]) for k in bd), '%Y/%m/%d'
+                )
+
+            account_id = response['sub']
             photo_name = f'google_{account_id}_photo.jpeg'
 
             # создание профиля с полученных данных
@@ -267,7 +272,7 @@ class ForgotPasswordView(PasswordResetView, FormMixin):
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         if form.is_valid():
-            messages.success(request, mark_safe(self.message))  # вывод сообщения внизу формы
+            messages.success(request, mark_safe(self.message))  # вывод сообщения
 
         return super().post(request, *args, **kwargs)
 

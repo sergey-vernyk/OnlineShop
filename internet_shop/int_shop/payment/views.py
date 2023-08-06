@@ -67,7 +67,7 @@ def create_checkout_session(request) -> Union[redirect, str]:
 
     if order.coupon:
         discount_type_value = ('coupon', order.coupon.discount)
-    if order.present_card:
+    elif order.present_card:
         discount_type_value = ('present_card', order.present_card.amount)
 
     discount_instance = create_discounts(*discount_type_value)  # создание экземпляра купона
@@ -77,6 +77,7 @@ def create_checkout_session(request) -> Union[redirect, str]:
 
     try:
         checkout_session = stripe.checkout.Session.create(**session_params)
+        request.session['stripe_checkout_session_id'] = checkout_session['id']
     except Exception as e:
         return str(e)
 
@@ -110,7 +111,7 @@ def payment_success(request):
     Представление успешного завершения оплаты
     """
     # достаем сессию по её id и смотрим статус оплаты заказа с order_id
-    session_id = stripe.checkout.Session.list().data[0].stripe_id
+    session_id = request.session['stripe_checkout_session_id']
     session = stripe.checkout.Session.retrieve(session_id)
     order_id = request.session.get('order_id')
     order = Order.objects.get(pk=order_id)

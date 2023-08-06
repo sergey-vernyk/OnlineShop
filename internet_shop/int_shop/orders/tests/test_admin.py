@@ -49,7 +49,7 @@ class TestOrdersAdmin(TestCase):
                                      coupon=self.coupon)
 
         self.assertEqual(self.instance_order.get_discount(order),
-                         '<a href="/admin/coupons/coupon/1/change/">Coupon</a>')
+                         f'<a href="/admin/coupons/coupon/{self.coupon.pk}/change/">Coupon</a>')
 
     def test_get_discount_for_present_card(self):
         """
@@ -64,7 +64,7 @@ class TestOrdersAdmin(TestCase):
                                      present_card=self.card)
 
         self.assertEqual(self.instance_order.get_discount(order),
-                         '<a href="/admin/present_cards/presentcard/2/change/">Present Card</a>')
+                         f'<a href="/admin/present_cards/presentcard/{self.card.pk}/change/">Present Card</a>')
 
     def test_get_full_name_order_customer(self):
         """

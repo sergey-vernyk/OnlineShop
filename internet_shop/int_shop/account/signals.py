@@ -22,7 +22,8 @@ def delete_profile_with_relative_user(sender, instance: Profile, *args, **kwargs
         client = boto3.client('s3')
         client.delete_object(Bucket=aws_s3_bucket, Key=aws_image_key)
     else:
-        # удаление папки с фото профиля с файловой системы
+        # удаление папки с фото профиля с файловой системы, если пользователь добавлял свое фото при регистрации
         # удаление экземпляра пользователя встроенной модели User, связанной с профилем
-        shutil.rmtree(os.path.join(settings.MEDIA_ROOT, instance.photo.name))
+        if instance.photo.name:
+            shutil.rmtree(os.path.join(settings.MEDIA_ROOT, 'users', f'user_{instance.user.get_full_name()}'))
     instance.user.delete()

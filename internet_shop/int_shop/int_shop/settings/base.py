@@ -185,6 +185,7 @@ SOCIAL_AUTH_PIPELINE = (
 )
 
 # Facebook
+ACCESS_FACEBOOK_USER_TOKEN = env('ACCESS_FACEBOOK_USER_TOKEN')
 SOCIAL_AUTH_FACEBOOK_KEY = env('SOCIAL_AUTH_FACEBOOK_KEY')
 SOCIAL_AUTH_FACEBOOK_SECRET = env('SOCIAL_AUTH_FACEBOOK_SECRET')
 SOCIAL_AUTH_FACEBOOK_SCOPE = ['email', 'user_gender', 'user_birthday']  # дополнительные разрешения для авторизации
@@ -199,6 +200,8 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['https://www.googleapis.com/auth/user.gender.read',
                                    'https://www.googleapis.com/auth/user.birthday.read']
+API_KEY_GOOGLE = env('API_KEY_GOOGLE')
+BEARER_AUTHORIZATION_TOKEN_GOOGLE = env('BEARER_AUTHORIZATION_TOKEN_GOOGLE')
 
 # настройки summernote для редактирования поля Description в модели Product
 SUMMERNOTE_CONFIG = {
