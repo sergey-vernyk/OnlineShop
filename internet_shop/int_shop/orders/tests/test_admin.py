@@ -32,7 +32,7 @@ class TestOrdersAdmin(TestCase):
                                                amount=250.50,
                                                category=Card_category.objects.create(name='For men', slug='for-men'))
 
-        self.site = AdminSite
+        self.site = AdminSite()
         self.instance_order = OrderAdmin(model=Order, admin_site=self.site)
         self.instance_delivery = DeliveryAdmin(model=Delivery, admin_site=self.site)
 

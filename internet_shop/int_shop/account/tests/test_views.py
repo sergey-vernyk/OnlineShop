@@ -42,9 +42,9 @@ class TestAccountViews(TestCase):
     @classmethod
     def setUpClass(cls):
         settings.CELERY_TASK_ALWAYS_EAGER = True
-        redis_instance = redis.StrictRedis(host='0.0.0.0',
-                                           port=6379,
-                                           db=2,
+        redis_instance = redis.StrictRedis(host=settings.REDIS_HOST,
+                                           port=settings.REDIS_PORT,
+                                           db=settings.REDIS_DB_NUM,
                                            charset='utf-8',
                                            decode_responses=True,
                                            socket_timeout=30)
