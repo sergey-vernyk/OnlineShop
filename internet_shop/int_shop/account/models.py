@@ -3,7 +3,7 @@ from django.conf import settings
 from coupons.models import Coupon
 
 
-def profile_photo_path(instance, filename):
+def get_profile_photo_path(instance, filename):
     """
     Возвращает путь сохранения фото для каждого пользователя
     """
@@ -24,7 +24,7 @@ class Profile(models.Model):
     date_of_birth = models.DateField(blank=True, null=True)
     gender = models.CharField(choices=GENDER, max_length=6, blank=True)
     about = models.TextField(max_length=255, blank=True)
-    photo = models.ImageField(upload_to=profile_photo_path, blank=True, max_length=500)
+    photo = models.ImageField(upload_to=get_profile_photo_path, blank=True, max_length=500)
     phone_number = models.CharField(max_length=15, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     email_confirm = models.BooleanField(default=False)

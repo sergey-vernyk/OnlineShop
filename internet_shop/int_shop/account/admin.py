@@ -82,10 +82,10 @@ class ProfileAdmin(admin.ModelAdmin):
     """
     list_display = ['user', 'gender', 'email_confirm']
     fields = ('profile_full_name', 'user', 'date_of_birth',
-              'user_photo_tag', 'photo', 'phone_number', 'created',
+              'profile_photo_tag', 'photo', 'phone_number', 'created',
               'about', 'coupons')
     inlines = [FavoriteInline, CommentInline, PresentCardInline, OrdersInline]
-    readonly_fields = ['user_photo_tag', 'created', 'profile_full_name']
+    readonly_fields = ['profile_photo_tag', 'created', 'profile_full_name']
     filter_horizontal = ('coupons',)
 
     @admin.display(description='Username')  # отображение названия поля в шапке админ сайта модели
@@ -97,7 +97,7 @@ class ProfileAdmin(admin.ModelAdmin):
         return f'{obj.user.first_name} {obj.user.last_name}'
 
     @admin.display(description='Photo')
-    def user_photo_tag(self, obj):
+    def profile_photo_tag(self, obj):
         """
         Фото профиля пользователя
         """

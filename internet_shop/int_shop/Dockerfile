@@ -20,9 +20,9 @@ RUN adduser -D $user && \
 
 # папки для сокетов, файл лога, файл результат хеша файлов медиа
 # установка владельца для созданных папок и файлов
-RUN mkdir -p /var/run/postgresql /var/run/wsgi /vol/web/static /vol/web/media /code/scripts && \
+RUN mkdir -p /var/run/postgresql /var/run/wsgi /vol/web/static /vol/web/media /code/scripts /code/coverage && \
     touch /code/main_log.log /code/scripts/result_hash.txt && \
-    chmod -R 755 /code/main_log.log /code/scripts/result_hash.txt /vol && \
+    chmod -R 755 /code/main_log.log /code/scripts/result_hash.txt /vol /code/coverage && \
     chown -R $user:$user /vol /code/main_log.log /code/scripts/result_hash.txt && \
     chown -R postgres:postgres /var/run/postgresql && \
     chown -R $user:www-data /var/run/wsgi

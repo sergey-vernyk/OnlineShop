@@ -1,11 +1,17 @@
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, UserCreationForm, PasswordResetForm, \
+from django.contrib.auth.forms import (
+    AuthenticationForm,
+    PasswordChangeForm,
+    UserCreationForm,
+    PasswordResetForm,
     SetPasswordForm
+)
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from .models import Profile
+from typing import Union
 
 help_messages = ('Your password must contain at least 8 characters and can’t be entirely numeric.',
                  'Enter the same password as before, for verification.')
@@ -21,23 +27,12 @@ class LoginForm(AuthenticationForm):
     remember = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'check-auth-field'}),
                                   label='Remember?', required=False)
 
-    error_messages = {
-        'invalid_login':
-            'Please enter a correct %(username)s or password',
-        'inactive': 'This account is inactive',
-    }
-
-    def clean_username(self):
+    def clean_username(self) -> Union[str, ValidationError]:
         """
         Проверка существующего пользователя
         по введенному username или email
         """
-        cleaned_data = super().clean()
-        username_or_email = cleaned_data.get('username')
-
-        # если не было передано username или email
-        if not username_or_email:
-            raise ValidationError('Please, enter a correct username')
+        username_or_email = self.cleaned_data.get('username')
 
         if '@' in username_or_email:  # если был передан адрес электронной почты
             try:
@@ -47,24 +42,38 @@ class LoginForm(AuthenticationForm):
             else:
                 try:
                     user = User.objects.get(email=username_or_email)
+                    # пользователь не активен
+                    if not user.is_active:
+                        raise ValidationError('User with this email doesn\'t active', code='inactive_user')
                     return user.username
                 except ObjectDoesNotExist:
-                    raise ValidationError('User with this email doesn\'t exist')
+                    raise ValidationError('User with this email doesn\'t exists', code='No_exists_user')
         else:  # если было передано имя пользователя
             user = User.objects.filter(username=username_or_email).exists()
             if not user:
-                raise ValidationError('User with this username doesn\'t exist')
+                raise ValidationError('User with this username doesn\'t exist', code='No_exists_user')
+            # пользователь не активен
+            elif not User.objects.get(username=username_or_email).is_active:
+                raise ValidationError('User with this username doesn\'t active', code='inactive_user')
 
             return username_or_email
 
     def clean_password(self):
         """
-        Исключение, если не был передан пароль
+        Исключение, если переданный пароль не соответствует
+        переданному имени пользователя
         """
-        cleaned_data = super().clean()
-        password = cleaned_data.get('password')
-        if not password:
-            raise ValidationError('Please, enter a correct password')
+        password = self.cleaned_data.get('password')
+        username = self.cleaned_data.get('username')
+
+        user_exists = User.objects.filter(username=username).exists()
+        if user_exists:
+            user = User.objects.get(username=username)
+            # проверка соответствия полученного пароля и имени пользователя
+            password_correct = user.check_password(password)
+
+            if not password_correct:
+                raise ValidationError('Username with the input password are mismatch', code='wrong_password')
 
         return password
 
@@ -132,7 +141,7 @@ class RegisterUserForm(UserCreationForm):
         username = self.cleaned_data.get('username')
         user = User.objects.filter(username=username).exists()
         if user:
-            raise ValidationError('Username is already exist')
+            raise ValidationError('Username is already exist', code='exists_username')
 
         return username
 
@@ -144,7 +153,7 @@ class RegisterUserForm(UserCreationForm):
         email = self.cleaned_data.get('email')
         user = User.objects.filter(email=email).exists()
         if user:
-            raise ValidationError('Email is already register')
+            raise ValidationError('Email is already register', code='exists_email')
 
         return email
 
@@ -170,7 +179,7 @@ class ForgotPasswordForm(PasswordResetForm):
         try:
             received_email = next(user).email  # получение email пользователя
         except StopIteration:
-            raise ValidationError('Current email doesn\'t registered or user not active')
+            raise ValidationError('Current email doesn\'t registered or user not active', code='No_exists_user')
 
         return received_email
 
