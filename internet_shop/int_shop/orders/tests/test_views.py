@@ -1,40 +1,44 @@
-from django.test import TestCase, RequestFactory, Client
+import os
+import shutil
+from datetime import datetime
+from decimal import Decimal
+from random import randint
+
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import reverse
+from django.test import TestCase, RequestFactory, Client
+from django.utils import timezone
 from rest_framework import status
+
 from account.models import Profile
 from cart.cart import Cart
+from coupons.models import Category as Coupon_Category
 from coupons.models import Coupon
 from goods.models import Product, Category, Manufacturer
-from decimal import Decimal
-from django.utils import timezone
-from datetime import datetime
-from django.conf import settings
-
 from orders.models import Order, OrderItem
 from orders.views import OrderCreateView
-from coupons.models import Category as Coupon_Category
 from present_cards.models import Category as PresentCard_Category
-from django.contrib.sites.shortcuts import get_current_site
-
 from present_cards.models import PresentCard
-from random import randint
 
 
 class OrderCreateTest(TestCase):
     """
-    Проверка создания заказа
+    Creating order testing
     """
 
     profile = None
     order_create_view = None
     request = None
     user = None
+    product1 = None
+    product2 = None
 
     @classmethod
     def setUpClass(cls) -> None:
         super().setUpClass()
-        # выполнение задач celery локально, не передавая их в брокер
+        # doing celery task locally, not sent they to message broker
         settings.CELERY_TASK_ALWAYS_EAGER = True
         random_number = randint(1, 50)
 
@@ -93,13 +97,13 @@ class OrderCreateTest(TestCase):
         cls.request.session = client.session
         cls.request.user = cls.user
         cls.cart = Cart(cls.request)
-        # создание экземпляра view и установка ему атрибута request
+        # creating view instance and install request attribute for it
         cls.order_create_view = OrderCreateView()
         cls.order_create_view.setup(cls.request)
 
     def test_order_create_correct_filled_all_fields(self):
         """
-        Проверка создания заказа, когда все поля заполнены правильно
+        Checking creating an order, when all fields are filled correctly
         """
 
         self.cart.add(self.product1)
@@ -107,8 +111,8 @@ class OrderCreateTest(TestCase):
 
         self.client.login(username=self.user.username, password='password')
         data_order_form = {
-            'order_form-first_name': 'Sergey',
-            'order_form-last_name': 'Vernigora',
+            'order_form-first_name': 'Name',
+            'order_form-last_name': 'Surname',
             'order_form-email': 'example@mail.com',
             'order_form-address': 'Address',
             'order_form-phone': '+38 (099) 123 45 67',
@@ -116,8 +120,8 @@ class OrderCreateTest(TestCase):
             'order_form-comment': 'Some comment',
             'order_form-call_confirm': True,
 
-            'delivery_form-first_name': 'Sergey',
-            'delivery_form-last_name': 'Vernyk',
+            'delivery_form-first_name': 'Name2',
+            'delivery_form-last_name': 'Surname2',
             'delivery_form-service': 'New Post',
             'delivery_form-method': 'Self-delivery',
             'delivery_form-office_number': '1',
@@ -127,13 +131,13 @@ class OrderCreateTest(TestCase):
         }
 
         response = self.client.post(reverse('orders:order_create'), data=data_order_form)
-        # переадресация на страницу с инфо о созданном заказе
+        # redirecting to the page with info about created order
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertRedirects(response, reverse('orders:order_created'))
 
     def test_order_create_fields_empty(self):
         """
-        Проверка создания заказа, когда все поля не заполнены
+        Checking creating order, when not all fields are filled
         """
 
         self.cart.add(self.product1)
@@ -151,24 +155,24 @@ class OrderCreateTest(TestCase):
         delivery_form = response.context['delivery_form']
 
         for num, field in enumerate(fields, 1):
-            # поля, обязательные к заполнению
+            # fields, which must be fill
             if field.startswith('order_form') and num < 6:
                 self.assertFormError(order_form, field.split('-')[1], 'This field must not be empty')
-            # поля могут быть не заполнены
+            # fields, which may be left blank
             if field.startswith('order_form') and num > 5:
                 self.assertFormError(order_form, field.split('-')[1], [])
-            # поля, обязательные к заполнению
+            # fields, which must be fill
             if field.startswith('delivery_form') and num in (9, 10, 12, 14):
                 self.assertFormError(delivery_form, field.split('-')[1], 'This field must not be empty')
-            # поля могут быть не заполнены
+            # fields, which may be left blank
             if field.startswith('delivery_form') and num in (11, 13):
                 self.assertFormError(delivery_form, field.split('-')[1], [])
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)  # загрузка страницы с ошибками форм(ы)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)  # download page with form(s) errors
 
     def test_create_order_items_from_cart(self):
         """
-        Проверка создания единиц заказа из элементов в корзине
+        Checking creating order items from cart elements
         """
 
         self.cart.add(self.product1)
@@ -181,11 +185,11 @@ class OrderCreateTest(TestCase):
                                      pay_method='Online',
                                      profile=self.profile)
 
-        self.order_create_view.create_order_items_from_cart(order)  # вызов тестовой функции
-        # после выполнения функции должна удалиться корзина из сессии
+        self.order_create_view.create_order_items_from_cart(order)  # testing function call
+        # function must delete from session after it will be executed
         self.assertEqual('cart' in self.request.session, False)
 
-        # созданные единицы заказа после функции, проверка их кол-ва и соответствия
+        # checking quantity order items and their complience after calling function
         order_items = OrderItem.objects.filter(order=order)
         self.assertEqual(len(order_items), 2)
         self.assertEqual(order_items[0].product, self.product1)
@@ -193,19 +197,19 @@ class OrderCreateTest(TestCase):
 
     def test_get_context_data(self):
         """
-        Проверка правильных ключей в контексте view'а
+        Checking correct keys inside view's context
         """
         context = self.order_create_view.get_context_data()
         self.assertEqual(sorted(key for key in context), sorted(['form', 'delivery_form', 'view']))
 
     def test_orders_with_discounts(self):
         """
-        Проверка добавления скидки на заказ (купон или подарочная карта)
+        Checking adding discount to order (coupon or present card)
         """
 
         data_order_form = {
-            'order_form-first_name': 'Sergey',
-            'order_form-last_name': 'Vernigora',
+            'order_form-first_name': 'Name',
+            'order_form-last_name': 'Surname',
             'order_form-email': 'example@mail.com',
             'order_form-address': 'Address',
             'order_form-phone': '+38 (099) 123 45 67',
@@ -213,8 +217,8 @@ class OrderCreateTest(TestCase):
             'order_form-comment': 'Some comment',
             'order_form-call_confirm': True,
 
-            'delivery_form-first_name': 'Sergey',
-            'delivery_form-last_name': 'Vernyk',
+            'delivery_form-first_name': 'Name',
+            'delivery_form-last_name': 'Surname',
             'delivery_form-service': 'New Post',
             'delivery_form-method': 'Self-delivery',
             'delivery_form-office_number': '1',
@@ -223,12 +227,11 @@ class OrderCreateTest(TestCase):
             )
         }
 
-        # нужен свой запрос и клиент для отправки последнего в post метод тестируемого view
+        # needs own request and client for sending that request into post view's test method
         self.factory = RequestFactory()
         self.client = Client()
-
-        # создание запроса, добавление сессии и пользователя в запрос
-        # добавление текущего сайта в запрос для получения домена во view
+        # creating request, adding session and user into request
+        # adding current site into request for getting domen in view
         request = self.factory.post(reverse('orders:order_create'), data=data_order_form)
         request.session = self.client.session
         request.user = self.user
@@ -238,16 +241,16 @@ class OrderCreateTest(TestCase):
         discounts = {'coupon_id': self.coupon.pk, 'present_card_id': self.card.pk}
 
         for discount in ('coupon_id', 'present_card_id'):
-            request.session.update({discount: discounts[discount]})  # добавление в сессию id купона или карты
+            request.session.update({discount: discounts[discount]})  # adding into session coupon id or present card id
             cart = Cart(request)
             cart.add(self.product1)
             cart.add(self.product2)
-            self.order_create_view.setup(request)  # настройка передачи request во все view's
+            self.order_create_view.setup(request)  # set up transmitting request into all views
 
-            self.order_create_view.post(request)  # вызов метода POST в экземпляре тестируемого view
-            # после успешного создания заказа в сессии должен быть номер заказа
+            self.order_create_view.post(request)  # calling POST method in view instance view
+            # after successfully creating order, must be order number in the session
             self.assertTrue(request.session.get('order_id', False))
-            # проверка, что в заказе есть купон или карта
+            # checking, that there are coupon or present cart into order
             order = Order.objects.get(id=request.session.get('order_id'))
             self.assertEqual((order.coupon or order.present_card).pk, discounts[discount])
 
@@ -255,3 +258,5 @@ class OrderCreateTest(TestCase):
     def tearDownClass(cls):
         settings.CELERY_TASK_ALWAYS_EAGER = False
         super().tearDownClass()
+        shutil.rmtree(os.path.join(settings.MEDIA_ROOT, f'products/product_{cls.product1.name}'))
+        shutil.rmtree(os.path.join(settings.MEDIA_ROOT, f'products/product_{cls.product2.name}'))

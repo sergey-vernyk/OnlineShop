@@ -1,18 +1,18 @@
-from django.conf import settings
-from django.core.mail import EmailMessage
 from celery import shared_task
-from django.template.loader import render_to_string
+from django.conf import settings
 from django.contrib.auth.models import User
-from .tokens import activation_account_token
-from django.utils.http import urlsafe_base64_encode
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+
+from .tokens import activation_account_token
 
 
 @shared_task
 def activate_account(data: dict, user_id: int, user_email: str) -> str:
     """
-    Задача для отправки сообщения новому зарегистрированному
-    пользователю для подтверждения email и активации аккаунта
+    Task for sending message to new registered user for confirm email and activate accountа
     """
     user = User.objects.get(pk=user_id)
     subject = 'Activate your account'
@@ -31,7 +31,7 @@ def activate_account(data: dict, user_id: int, user_email: str) -> str:
                                  from_email=settings.FROM_EMAIL,
                                  to=(user_email,))
 
-    email_message.content_subtype = 'html'  # добавление html контента в письмо
+    email_message.content_subtype = 'html'  # add html content to the email
 
     status = email_message.send(fail_silently=False)
     return 'Successfully' if status else 'Not successfully'

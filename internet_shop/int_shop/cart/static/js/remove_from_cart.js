@@ -21,7 +21,7 @@ $(document).ready(function() {
                 $('.amount-cart').text(response['cart_len']);
                 $('.amount-items > div:nth-child(1) > span:nth-child(1)').text(response['cart_len']);
                 var totalPrice = response['total_price'];
-                var totalPriceDiscount = response['total_price_discount'];
+                var totalPriceDiscount = response['total_price_discounts'];
                 var totalDiscount = response['total_discount'];
                 //если все товары были удалены из корзины
                 if(totalPrice === 0 ) {

@@ -1,26 +1,29 @@
+import os
+import shutil
+from decimal import Decimal
+from random import randint
 from unittest import skip
 
-from django.test import TestCase, RequestFactory, Client
-
-from account.models import Profile
-from orders.models import Order, OrderItem
-from goods.models import Product, Category, Manufacturer
-from coupons.models import Category as Coupon_Category, Coupon
-from present_cards.models import Category as PresentCard_Category, PresentCard
-from django.contrib.auth.models import User
-from payment.views import create_checkout_session, create_discounts
-from decimal import Decimal
 import requests
 import stripe
-from rest_framework import status
-from django.utils import timezone
+from django.conf import settings
+from django.contrib.auth.models import User
 from django.shortcuts import reverse
-from random import randint
+from django.test import TestCase, RequestFactory, Client
+from django.utils import timezone
+from rest_framework import status
+
+from account.models import Profile
+from coupons.models import Category as Coupon_Category, Coupon
+from goods.models import Product, Category, Manufacturer
+from orders.models import Order, OrderItem
+from payment.views import create_checkout_session, create_discounts
+from present_cards.models import Category as PresentCard_Category, PresentCard
 
 
 class TestViewsPayment(TestCase):
     """
-    Проверка views для осуществления платежа через Stripe
+    Testing views for performing payment through Stripe
     """
 
     client = None
@@ -106,12 +109,12 @@ class TestViewsPayment(TestCase):
 
     def test_create_checkout_session(self):
         """
-        Проверка создания checkout сессии для оплаты
-        без применения скидок и с их применением
+        Testing creating checkout session for performing payment
+        without applying discounts and with discounts
         """
         client = Client()
         session = client.session
-        session.update({'order_id': self.order.pk})  # добавление в сессию id заказа
+        session.update({'order_id': self.order.pk})  # add order id into session
         session.save()
 
         request = self.factory.post(reverse('payment:create_checkout_session'))
@@ -119,20 +122,20 @@ class TestViewsPayment(TestCase):
         request.user = self.user
         response = create_checkout_session(request)
 
-        # общая сумма за товары без скидки с учетом их кол-ва
+        # total cost for goods taking into account their quantities and without discounts
         total_cost = (Decimal(self.order_item_1.price * self.order_item_1.quantity) +
                       Decimal(self.order_item_2.price * self.order_item_2.quantity)) * 100
 
-        # переадресация на страницу оплаты после успешно созданной сессии
+        # redirecting to paymant page after sucessfully created checkout session
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
-        # успешная загрузка страницы оплаты
+        # sucessfully loaded payment page
         self.assertEqual(requests.get(response.url).status_code, status.HTTP_200_OK)
-        # получение checkout сессии по ее id из сессии клиента
+        # getting checkout session by it id from client session
         checkout_session = stripe.checkout.Session.retrieve(request.session['stripe_checkout_session_id'])
-        # общая стоимость без скидок
+        # total cost without discounts
         self.assertEqual(checkout_session.amount_total, total_cost)
 
-        # добавление купона в заказ
+        # add coupon to the order
         self.order.coupon = self.coupon
         self.order.save()
 
@@ -144,7 +147,7 @@ class TestViewsPayment(TestCase):
         amount_total_with_discount = total_cost - (total_cost * self.coupon.discount / 100)
         self.assertEqual(checkout_session.amount_total, amount_total_with_discount)
 
-        # добавление подарочной карты в заказ
+        # add present card in the order
         self.order.coupon = None
         self.order.present_card = self.card
         self.order.save()
@@ -159,7 +162,7 @@ class TestViewsPayment(TestCase):
 
     def test_create_discount_success(self):
         """
-        Проверка успешного создания объекта скидки для stripe
+        Checking sucessfully creating discount object for stripe
         """
         coupon_obj = create_discounts(discount_type='coupon', discount_value=20)
         self.assertEqual(coupon_obj.object, 'coupon')
@@ -173,19 +176,19 @@ class TestViewsPayment(TestCase):
 
     def test_create_discount_return_none(self):
         """
-        Проверка возврата None при создании объекта скидки,
-        когда в заказе не используется какая-либо из скидок
+        Checking return None while creating discount object,
+        when doesn't uses whatever discount in an order
         """
         coupon_obj = create_discounts()
         self.assertIsNone(coupon_obj)
 
     def test_payment_success(self):
         """
-        Проверка использования правильного шаблона для страницы,
-        куда пользователь переходит после успешной оплаты заказа
-        и проверка переменных контекста и их значения
+        Checking using correct template for page, to where
+        user will follows up with successfully order complete, and
+        checking context variables and their values
         """
-        # создание запроса для проверки создания checkout сессии для оплаты
+        # creating request for check checkout session for payment
         request = self.factory.post(reverse('payment:create_checkout_session'))
         request.session = self.session
         request.user = self.user
@@ -195,15 +198,13 @@ class TestViewsPayment(TestCase):
         session.update({'order_id': self.order.pk})
         request.session = session
 
-        # создание checkout сессии
+        # create checkout session
         response = create_checkout_session(request)
-        self.assertEqual(response.status_code, status.HTTP_302_FOUND)  # проверка переадресации на страницу с оплатой
-
-        # сохранение id stripe сессии в сессии клиента и сохранение последней
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)  # check redirection to payment page
+        # save checkout session id into client session and save this session
         session.update({'stripe_checkout_session_id': request.session['stripe_checkout_session_id']})
         session.save()
-
-        # проверка использование правильного шаблона, переменных контекста и значение последних
+        # check whether using correct template, context variables and variables values
         resp = client.get(reverse('payment:payment_success'))
         self.assertTemplateUsed(resp, 'payment/success.html')
         self.assertIn('amount_total', resp.context)
@@ -213,8 +214,8 @@ class TestViewsPayment(TestCase):
 
     def test_payment_cancel(self):
         """
-        Проверка использования правильного шаблона для страницы,
-        куда пользователь переходит после неудачной оплаты заказа (оплата была отклонена)
+        Checking, whether using correct template for page,
+        when user will follows up with not sucessfully order payment (payment was dicline)
         """
         client = Client()
         response = client.get(reverse('payment:payment_cancel'))
@@ -224,9 +225,11 @@ class TestViewsPayment(TestCase):
     @skip
     def test_webhook(self):  # TODO
         """
-        Проверка обработки вебхука
+        Checking handling webhook
         """
 
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
+        shutil.rmtree(os.path.join(settings.MEDIA_ROOT, f'products/product_{cls.product1.name}'))
+        shutil.rmtree(os.path.join(settings.MEDIA_ROOT, f'products/product_{cls.product2.name}'))

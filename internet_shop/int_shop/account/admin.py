@@ -1,14 +1,16 @@
 from django.contrib import admin
+from django.utils.html import mark_safe
 
 from account.models import Profile
 from goods.models import Favorite, Comment
-from django.utils.html import mark_safe
-
 from orders.models import Order
 from present_cards.models import PresentCard
 
 
 class PresentCardInline(admin.StackedInline):
+    """
+    Displaying profile's present cards inline
+    """
     model = PresentCard
     extra = 0
     readonly_fields = ('valid_from', 'valid_to', 'category', 'code', 'amount')
@@ -23,6 +25,9 @@ class PresentCardInline(admin.StackedInline):
 
 
 class OrdersInline(admin.StackedInline):
+    """
+    Displaying profile's orders inline
+    """
     model = Order
     extra = 0
     fields = ('pay_method', 'is_paid', 'present_card', 'coupon', 'delivery', 'stripe_id', 'created', 'updated')
@@ -31,8 +36,7 @@ class OrdersInline(admin.StackedInline):
 
 class FavoriteInline(admin.StackedInline):
     """
-    Отображение избранных товаров
-    в профиле пользователя
+    Displaying favorite products in user's profile
     """
     model = Favorite
     filter_horizontal = ('product',)  # поиск по добавленным товарам пользователя
@@ -46,8 +50,7 @@ class FavoriteInline(admin.StackedInline):
 
 class CommentInline(admin.StackedInline):
     """
-    Отображение комментариев к товару
-    в профиле пользователя
+    Displaying product's comments in user profile
     """
     model = Comment
     extra = 1
@@ -63,14 +66,14 @@ class CommentInline(admin.StackedInline):
     @admin.display(description='Likes')
     def get_amount_profile_likes(self, obj):
         """
-        Возвращает кол-во лайков под комментарием obj
+        Returns likes count under comment obj
         """
         return obj.profiles_likes.count()
 
     @admin.display(description='Unlikes')
     def get_amount_profile_unlikes(self, obj):
         """
-        Возвращает кол-во дизлайков под комментарием obj
+        Returns dislikes count under comment obj
         """
         return obj.profiles_unlikes.count()
 
@@ -78,7 +81,7 @@ class CommentInline(admin.StackedInline):
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
     """
-    Профиль пользователя
+    User profile
     """
     list_display = ['user', 'gender', 'email_confirm']
     fields = ('profile_full_name', 'user', 'date_of_birth',
@@ -91,15 +94,14 @@ class ProfileAdmin(admin.ModelAdmin):
     @admin.display(description='Username')  # отображение названия поля в шапке админ сайта модели
     def profile_full_name(self, obj):
         """
-        Добавление имени и фамилии пользователя из встроенной модели
-        в модель профиля
+        Adding first name and last name from built-in user model to Profile model
         """
         return f'{obj.user.first_name} {obj.user.last_name}'
 
     @admin.display(description='Photo')
     def profile_photo_tag(self, obj):
         """
-        Фото профиля пользователя
+        Profile's photo
         """
         if obj.photo:
             return mark_safe(f'<img src="{obj.photo.url}" width="100" height="100"/>')

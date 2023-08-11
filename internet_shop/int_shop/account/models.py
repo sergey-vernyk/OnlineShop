@@ -1,18 +1,19 @@
-from django.db import models
 from django.conf import settings
+from django.db import models
+
 from coupons.models import Coupon
 
 
-def get_profile_photo_path(instance, filename):
+def get_profile_photo_path(instance, filename) -> str:
     """
-    Возвращает путь сохранения фото для каждого пользователя
+    Return path for save user's photo
     """
     return f'users/user_{instance.user.get_full_name()}/{filename}'
 
 
 class Profile(models.Model):
     """
-    Модель пользователя сайта
+    Custom user's site model
     """
 
     GENDER = (

@@ -3,8 +3,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 class ActivationAccountTokenGenerator(PasswordResetTokenGenerator):
     """
-    Генератор токенов для ссылки, которая используется для
-    активации аккаунта и подтверждения email
+    Token generator for confirmed link, which using for account activation and confirm email
     """
 
     def _make_hash_value(self, user, timestamp):

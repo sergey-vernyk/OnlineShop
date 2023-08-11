@@ -1,3 +1,5 @@
+import os
+import shutil
 from datetime import datetime
 from decimal import Decimal
 from random import randint
@@ -31,16 +33,19 @@ from goods.models import (
 )
 from orders.models import Order
 from present_cards.models import Category as PresentCard_Category, PresentCard
-from account.forms import ForgotPasswordForm
 
 
 class TestAccountViews(TestCase):
+    """
+    Testing account views
+    """
     instance = None
     request = None
     client = None
 
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
         settings.CELERY_TASK_ALWAYS_EAGER = True
         redis_instance = redis.StrictRedis(host=settings.REDIS_HOST,
                                            port=settings.REDIS_PORT,
@@ -58,7 +63,7 @@ class TestAccountViews(TestCase):
 
     def test_register_user_success(self):
         """
-        Проверка регистрации пользователя, когда все поля корректно заполнены
+        Checking profile registration, when all fields are filling correct
         """
         register_data = {
             'username': 'testuser',
@@ -75,7 +80,7 @@ class TestAccountViews(TestCase):
 
         response = self.client.post(reverse('register_user'), data=register_data)
         request = response.wsgi_request
-        self.assertRedirects(response, reverse('login'))  # переадресация на страницу входа в систему
+        self.assertRedirects(response, reverse('login'))  # redirecting to the login page
         profile = Profile.objects.filter(user__username='testuser').get()
         self.assertTrue(profile)
 
@@ -83,7 +88,7 @@ class TestAccountViews(TestCase):
             favorite = Favorite.objects.filter(profile=profile).exists()
             self.assertTrue(favorite)
 
-        # проверка выдачи сообщения пользователю после успешной регистрации
+        # checking getting message to user fronend after successfully registration
         messages = get_messages(request)
         for n, s in enumerate(messages, 1):
             if n == 1:
@@ -94,8 +99,8 @@ class TestAccountViews(TestCase):
 
     def test_register_user_fail(self):
         """
-        Проверка рендера страницы с ошибками формы,
-        когда какие-либо поля формы не заполнены корректно
+        Checking display page with form errors,
+        when whatever fields aren't filled correct
         """
         register_data = {
             'username': 'testuser',
@@ -113,14 +118,13 @@ class TestAccountViews(TestCase):
         response = self.client.post(reverse('register_user'), data=register_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(response.context['form'])
-        # поля должны быть обязательно заполнены
+        # fields must fill
         self.assertFormError(response.context['form'], 'email', ['This field is required.'])
         self.assertFormError(response.context['form'], 'password2', ['This field is required.'])
 
     def test_activate_user_account(self):
         """
-        Проверка активации аккаунта зарегистрированного пользователя
-        после перехода пользователя по ссылке в его email
+        Checking registred user's account activation after user followed to link in his/her email
         """
         register_data = {
             'username': 'testuser',
@@ -135,19 +139,20 @@ class TestAccountViews(TestCase):
             'gender': 'M',
         }
 
-        # тест с успешной активацией аккаунта
+        # csucessfully activation test
         register_response = self.client.post(reverse('register_user'), data=register_data)
         request = register_response.wsgi_request
-        self.assertRedirects(register_response, reverse('login'))  # переадресация на страницу входа в систему
+        self.assertRedirects(register_response, reverse('login'))  # redirecting to the login page
         user = Profile.objects.get(user__username='testuser').user
 
-        # данные для активации пользователя
+        # activation account data
         uid64 = urlsafe_base64_encode(force_bytes(user.pk))
         token = activation_account_token.make_token(user)
 
         activate_response = activate_user_account(request, uid64, token)
         activate_response.client = self.client
-        self.assertRedirects(activate_response, reverse('login'))  # переход на страницу входа после успешной активации
+        # redirecting to the login page after successfully activation
+        self.assertRedirects(activate_response, reverse('login'))
 
         user.refresh_from_db(fields=['is_active'])  # получение обновленных данных в БД
         self.assertTrue(user.is_active)
@@ -159,14 +164,14 @@ class TestAccountViews(TestCase):
                     s.message, 'Thank you for your email confirmation. Now you can login your account'
                 )
 
-        # тесты с безуспешной активацией (неверный токен или uidb64)
+        # tests with not sucessfully activation (wrong token or uidb64)
         user_activate_data = {
             'wrong_token': {
                 'uidb64': urlsafe_base64_encode(force_bytes(user.pk)),
-                'token': 'bvjowebvbwoevoweonhcfwow'  # рандомный токен
+                'token': 'bvjowebvbwoevoweonhcfwow'  # random token
             },
             'wrong_uidb64': {
-                'uidb64': urlsafe_base64_encode(force_bytes(154)),  # рандомный id пользователя
+                'uidb64': urlsafe_base64_encode(force_bytes(154)),  # random user id
                 'token': activation_account_token.make_token(user)
             }
         }
@@ -174,7 +179,7 @@ class TestAccountViews(TestCase):
         for data in user_activate_data.values():
             activate_response = activate_user_account(request, data['uidb64'], data['token'])
             activate_response.client = self.client
-            request.profile = self.guest_profile  # профиль гостевого пользователя для главной страницы
+            request.profile = self.guest_profile  # gest user profile for main page
             self.assertRedirects(activate_response, reverse('goods:product_list'))
 
             messages = get_messages(request)
@@ -186,7 +191,8 @@ class TestAccountViews(TestCase):
 
     def test_context_data_detail_user_view(self):
         """
-        Проверка данных в контексте для страниц с пользовательской информацией
+        Checking context data for pages with user information (orders, present cards,
+        coupons, watched products, comments, favorites products, personal info)
         """
         random_number = randint(1, 50)
 
@@ -254,20 +260,20 @@ class TestAccountViews(TestCase):
                                               user_email=self.profile.user.email,
                                               body='Body of comment')
 
-        # добавление профилю оцененного им комментария
-        # добавление профилю подарочной карты
-        # добавление профилю товара в избранное
+        # add a profile rated comment
+        # add present card to profile
+        # add product to profile's favarite
         self.profile.comments_liked.add(self.comment)
         self.card.profile = self.profile
         self.favorite.product.add(self.product1)
 
         self.instance = DetailUserView()
-        # настройка экземпляра view и добавление ему объекта профиля
+        # instance view setup and add to it profile instance
         self.instance.setup(self.request, **{'location': 'about'})
         setattr(self.instance, 'object', self.profile)
         context = self.instance.get_context_data()
 
-        # проверка содержания в контексте ключей словарей и содержимого этих словарей при location 'about'
+        # checking keys and checking content in context content using "about" location
         for key in ('favorites', 'orders', 'coupons', 'comments'):
             self.assertIn(key, context)
             if key == 'favorite':
@@ -279,7 +285,7 @@ class TestAccountViews(TestCase):
             elif key == 'comments':
                 self.assertIn(self.comment, context['comments'])
 
-        # добавление в redis id товаров, которые "просмотрел" пользователь "profile"
+        # add products ids to redis, which "watched" profile
         self.redis.sadd(f'profile_id:{self.profile.pk}', self.product1.pk)
         self.redis.sadd(f'profile_id:{self.profile.pk}', self.product2.pk)
 
@@ -287,61 +293,63 @@ class TestAccountViews(TestCase):
             self.instance.setup(self.request, **{'location': key})
             context = self.instance.get_context_data()
             self.assertIn(key, context)
-            # проверка содержимого словаря контекста
+            # checking content of content dict
             if key == 'present_cards':
                 self.assertIn(self.card, context['present_cards'])
             elif key == 'watched':
                 self.assertIn(self.product1, context['watched'])
                 self.assertIn(self.product2, context['watched'])
 
+        # delete directories, which were created in the file system while creating products
+        shutil.rmtree(os.path.join(settings.MEDIA_ROOT, f'products/product_{self.product1.name}'))
+        shutil.rmtree(os.path.join(settings.MEDIA_ROOT, f'products/product_{self.product2.name}'))
+
     def test_get_object_detail_user_view(self):
         """
-        Проверка объекта, полученного DetailUserView,
-        используя kwargs из URL
+        Checking object, received DetailUserView, using kwargs from URL
         """
         self.user = User.objects.create_user(username='testuser')
         self.profile = Profile.objects.create(user=self.user)
         self.instance = DetailUserView()
-        # настройка экземпляра view и добавление ему запись в kwargs
+        # setuping view instance and adding record to it kwargs
         self.instance.setup(self.request, **{'customer': f'{self.user.username}'})
         self.assertEqual(self.instance.get_object(), self.profile)
 
-    @tag('social_profiles')  # используя флаг --exclude-tag social_profiles -> этот тест запущен не будет
+    @tag('social_profiles')  # иsing flag --exclude-tag social_profiles -> this test won't be run
     def test_save_social_user_to_profile(self):
         """
-        Проверка сохранения профиля пользователя,
-        который вошел в систему через социальные сети
+        Checking whether profile instance, which login over social, was save
         """
 
         # Facebook
-        # получение данных будущего профиля в json виде с API Facebook
-        # ACCESS_FACEBOOK_USER_TOKEN user токен нужно периодически обновлять, когда срок его действия заканчивается
-        # https://developers.facebook.com/tools/explorer - ссылка для получения нового токена для тестов
+        # getting data for future profile in json from Facebook API
+        # ACCESS_FACEBOOK_USER_TOKEN have to refresh periodically, when its term was ended
+        # https://developers.facebook.com/tools/explorer - link from receive new token for test
         response = requests.post(f'https://graph.facebook.com/v16.0/me?fields=id%2Cname%2Cbirthday%2Cgender'
                                  f'%2Cpicture.width(80).height(80)%2Cemail&'
                                  f'access_token={settings.ACCESS_FACEBOOK_USER_TOKEN}').json()
-        # новый встроенный пользователь для профиля из данных ответа
+        # new build-in user for profile instance from response data
         new_user = User.objects.create_user(username=response['name'].replace(' ', ''),
                                             email=response['email'],
                                             first_name=response['name'].split()[0],
                                             last_name=response['name'].split()[1])
-        # проверяемая функция
+        # function being testing
         save_social_user_to_profile(backend=FacebookOAuth2, response=response, user=new_user, is_new=True)
         profile = get_object_or_404(Profile, user__username=new_user.username)
-        # проверка, что профиль был создан с соответствующими данными
+        # checking, that profile was created with appropriate data
         self.assertTrue(profile)
         self.assertEqual(profile.gender, response['gender'][0].title())
         self.assertTrue(profile.photo.url)
         self.assertEqual(profile.date_of_birth, datetime.strptime(response['birthday'], '%m/%d/%Y').date())
-        profile.delete()  # удаления профиля, для теста авторизации через Google
+        profile.delete()  # deleting profile, for an authorization test through the Google
 
         # Google
-        # BEARER_AUTHORIZATION_TOKEN_GOOGLE нужно периодически обновлять, когда срок его действия заканчивается
-        # https://developers.google.com/oauthplayground/ - ссылка для обновления Bearer токена для тестов
+        # BEARER_AUTHORIZATION_TOKEN_GOOGLE have to refresh periodically, when its term was ended
+        # https://developers.google.com/oauthplayground/ - link for refresh Berer token for tests
         response = requests.get('https://www.googleapis.com/oauth2/v2/userinfo',
                                 headers={
                                     'Authorization': f'Bearer {settings.BEARER_AUTHORIZATION_TOKEN_GOOGLE}'}).json()
-        # добавление в ответ токена авторизации и id аккаунта пользователя
+        # add authorization token and google account id to the response
         response.update(token_type='Bearer',
                         access_token=settings.BEARER_AUTHORIZATION_TOKEN_GOOGLE,
                         sub=response['id'])
@@ -350,10 +358,10 @@ class TestAccountViews(TestCase):
                                             email=response['email'],
                                             first_name=response['given_name'],
                                             last_name=response['family_name'])
-        # проверяемая функция
+        # function being testing
         save_social_user_to_profile(backend=GoogleOAuth2, response=response, user=new_user, is_new=True)
         profile = get_object_or_404(Profile, user__username=new_user.username)
-        # проверка, что профиль был создан с соответствующими данными
+        # checking, that profile was created with appropriate data
         self.assertTrue(profile)
         self.assertTrue(profile.photo.url)
         self.assertEqual(profile.user.email, response['email'])
@@ -361,7 +369,7 @@ class TestAccountViews(TestCase):
 
     def test_remember_me_checkbox_in_login_page(self):
         """
-        Проверка функции "запомнить меня" на странице входа в систему
+        Checking "remember me" function on login page
         """
         user = User.objects.create_user(username='testuser', password='password')
         user.set_password('password')
@@ -370,19 +378,18 @@ class TestAccountViews(TestCase):
 
         login_data = {'username': profile.user.username, 'password': 'password', 'remember': True}
         response = self.client.post(reverse('login'), data=login_data)
-        self.assertEqual(response.wsgi_request.session.get_expiry_age(), 1209600)  # время жизни сессии 14 дней
-        self.assertRedirects(response, reverse('goods:product_list'))  # после успешного входа в систему - переадресация
+        self.assertEqual(response.wsgi_request.session.get_expiry_age(), 1209600)  # session lifetime is 14 days
+        self.assertRedirects(response, reverse('goods:product_list'))  # redirection after sucessfully login
 
-        login_data.update(remember=False)  # "переключаем" checkbox Remember me
+        login_data.update(remember=False)  # "toggle" checkbox "Remeber me?"
         response = self.client.post(reverse('login'), data=login_data)
-        self.assertEqual(response.wsgi_request.session.get_expiry_age(), 1200)  # время жизни сессии 20 минут
+        self.assertEqual(response.wsgi_request.session.get_expiry_age(), 1200)  # session lifetime is 20 minutes
         self.assertRedirects(response, reverse('goods:product_list'))
 
     def test_display_massage_after_send_email_for_password_reset(self):
         """
-        Проверка вывода сообщения на страницу ввода email,
-        после успешной отправки введенного email на сервер
-        для сброса пароля учетной записи
+        Checking displaying message on frontend page with email field,
+        after successfully sent email address to reset account password
         """
         self.user = User.objects.create_user(username='testuser', email='example@example.com', password='password')
         response = self.client.post(reverse('password_reset'), data={'email': self.user.email})
@@ -399,3 +406,4 @@ class TestAccountViews(TestCase):
     @classmethod
     def tearDownClass(cls):
         settings.CELERY_TASK_ALWAYS_EAGER = False
+        super().tearDownClass()

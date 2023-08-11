@@ -1,30 +1,40 @@
-from django.test import TestCase
-from django.contrib.admin import AdminSite
-from goods.models import Comment, Product, Category, Manufacturer
-from account.models import Profile, get_profile_photo_path
-from django.contrib.auth.models import User
+import os
+import shutil
 from decimal import Decimal
+from random import randint
+
+from django.conf import settings
+from django.contrib.admin import AdminSite
+from django.contrib.auth.models import User
+from django.test import TestCase
+
 from account.admin import CommentInline, ProfileAdmin
+from account.models import Profile, get_profile_photo_path
+from goods.models import Comment, Product, Category, Manufacturer
 
 
 class TestAdminAccount(TestCase):
     """
-    Тестирование функций админ панели приложения account
+    Testing methods in admin panel
     """
 
     def setUp(self) -> None:
+        random_number = randint(1, 50)
         self.user = User.objects.create_user(username='testuser', first_name='Name', last_name='Surname')
         self.profile = Profile.objects.create(user=self.user)
 
-        # путь сохранения фото профиля и назначение этого пути атрибуту полю photo
+        # save path profile's photo and assign this path as photo field attribute
         path = get_profile_photo_path(self.profile, 'profile_picture.jpg')
         self.profile.photo = path
 
-        manufacturer = Manufacturer.objects.create(name='Manufacturer_1', slug='manufacturer-1')
-        category = Category.objects.create(name='Some_category', slug='some-category')
+        manufacturer = Manufacturer.objects.create(name=f'Manufacturer_{random_number}',
+                                                   slug=f'manufacturer-{random_number}')
 
-        self.product = Product.objects.create(name='Some_product',
-                                              slug='some-product',
+        category = Category.objects.create(name=f'Some_category_{random_number}',
+                                           slug=f'some-category-{random_number}')
+
+        self.product = Product.objects.create(name=f'product_{random_number}',
+                                              slug=f'product-{random_number}',
                                               manufacturer_id=manufacturer.pk,
                                               description='Description',
                                               price=Decimal('120.50'),
@@ -41,26 +51,25 @@ class TestAdminAccount(TestCase):
 
     def test_get_amount_profile_likes_for_comment(self):
         """
-        Проверка правильного кол-ва лайков под комментарием
+        Сhecking correct likes count under comments
         """
-        self.profile.comments_liked.add(self.comment_1)  # добавление к профилю понравившегося комментария
+        self.profile.comments_liked.add(self.comment_1)  # make comment liked by profile
         instance = CommentInline(parent_model=Comment, admin_site=self.site)
         self.assertEqual(instance.get_amount_profile_likes(self.comment_1), 1)
         self.assertEqual(self.comment_1, self.profile.comments_liked.first())
 
     def test_get_amount_profile_unlikes_for_comment(self):
         """
-        Проверка правильного кол-ва дизлайков под комментарием
+        Checking correct dislikes count under comments
         """
-        self.profile.comments_unliked.add(self.comment_2)  # добавление к профилю не понравившегося комментария
+        self.profile.comments_unliked.add(self.comment_2)  # make comment disliked by profile
         instance = CommentInline(parent_model=Comment, admin_site=self.site)
         self.assertEqual(instance.get_amount_profile_unlikes(self.comment_2), 1)
         self.assertEqual(self.comment_2, self.profile.comments_unliked.first())
 
     def test_profile_full_name_for_profile_admin(self):
         """
-        Проверка правильного отображения полного имени пользователя профиля
-        в меню изменения информации о профиле
+        Checking correct displaying full name of profile in change profile information menu
         """
         instance = ProfileAdmin(model=Profile, admin_site=self.site)
         self.assertEqual(instance.profile_full_name(self.profile),
@@ -68,9 +77,12 @@ class TestAdminAccount(TestCase):
 
     def test_profile_photo_tag_for_profile_admin(self):
         """
-        Проверка правильности формирования ссылки на фото профиля
-        в меню изменения информации о профиле
+        Checking correct making profile's photo link in change profile infiormation menu
         """
         instance = ProfileAdmin(model=Profile, admin_site=self.site)
         link = f'<img src="{self.profile.photo.url}" width="100" height="100"/>'
         self.assertEqual(instance.profile_photo_tag(self.profile), link)
+
+    def tearDown(self) -> None:
+        if self.product:
+            shutil.rmtree(os.path.join(settings.MEDIA_ROOT, f'products/product_{self.product.name}'))

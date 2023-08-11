@@ -5,14 +5,14 @@ from .models import Coupon, Category
 
 class ValidCouponListFilter(ValidDiscountsListFilter):
     """
-    Фильтр по валидности купона
+    Filter for coupon validity
     """
 
 
 @admin.register(Coupon)
 class CouponAdmin(admin.ModelAdmin):
     """
-    Купоны
+    Coupons
     """
     list_display = ['code', 'category', 'valid_from', 'valid_to', 'is_valid', 'discount']
     list_filter = [ValidCouponListFilter, 'category']
@@ -25,7 +25,7 @@ class CouponAdmin(admin.ModelAdmin):
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     """
-    Категории купонов
+    Coupons categories
     """
     list_display = ['name', 'slug']
     prepopulated_fields = {'slug': ('name',)}

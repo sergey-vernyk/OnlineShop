@@ -1,14 +1,14 @@
+from copy import deepcopy
 from decimal import Decimal
 from typing import NoReturn, Generator, Union
-from copy import deepcopy
+
 from django.conf import settings
+from django.db.models import Case, When, Value
 
 from coupons.models import Coupon
 from goods.models import Product
-
 from present_cards.models import PresentCard
 from .forms import CartQuantityForm
-from django.db.models import Case, When, Value
 
 
 class Cart:
@@ -96,7 +96,7 @@ class Cart:
 
     def clear(self) -> NoReturn:
         """
-        Очистка корзины с удалением купона и подарочной карты
+        Очистка корзины с удалением купона и подарочной карты из сессии
         """
         del self.session[settings.CART_SESSION_ID]
         if 'coupon_id' in self.session:
@@ -105,7 +105,7 @@ class Cart:
             del self.session['present_card_id']
         self.session.modified = True
 
-    def get_total_price(self) -> Decimal:
+    def get_total_price(self) -> int:
         """
         Получение общей стоимости всех товаров с учетом их кол-ва
         """
@@ -120,15 +120,12 @@ class Cart:
     def get_total_price_with_discounts(self) -> Decimal:
         """
         Расчет общей суммы заказа с учетом скидки от купона
-        и/или вычета фиксированной суммы от подарочной карты
+        или вычета фиксированной суммы от подарочной карты
         """
         price_without_discount = self.get_total_price()
         coupon, present_card = self.coupon, self.present_card
 
-        if coupon and present_card:
-            result_amount = price_without_discount - (
-                    (price_without_discount * coupon.discount / 100) + present_card.amount)
-        elif coupon:
+        if coupon:
             result_amount = price_without_discount - (price_without_discount * coupon.discount / 100)
         elif present_card:
             result_amount = price_without_discount - present_card.amount
@@ -139,6 +136,6 @@ class Cart:
 
     def get_total_discount(self) -> Decimal:
         """
-        Сумма скидки с учётом купона и/или подарочной карты
+        Сумма скидки с учётом купона или подарочной карты
         """
         return self.get_total_price() - self.get_total_price_with_discounts()

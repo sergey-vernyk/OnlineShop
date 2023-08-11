@@ -1,21 +1,22 @@
+from django.http.response import JsonResponse
 from django.shortcuts import render, get_object_or_404
-from .cart import Cart
-from common.decorators import ajax_required
+from django.views.decorators.http import require_POST
+
 from cart.forms import CartQuantityForm
+from common.decorators import ajax_required
 from coupons.forms import CouponApplyForm
 from coupons.models import Coupon
 from goods.models import Product
 from present_cards.forms import PresentCardApplyForm
 from present_cards.models import PresentCard
-from django.http.response import JsonResponse
-from django.views.decorators.http import require_POST
+from .cart import Cart
 
 
 @ajax_required
 @require_POST
 def cart_add(request):
     """
-    Добавление товара в корзину
+    Add product to cart
     """
 
     product_id = request.POST.get('product_id')
@@ -29,9 +30,8 @@ def cart_add(request):
 
     return JsonResponse({'success': True,
                          'cart_len': len(cart),
-                         'added_prod_cost': cart.cart[product_id]['quantity'] * (
-                                 product.promotional_price or product.price
-                         ),
+                         'added_prod_cost': cart.cart[product_id]['quantity'] * (product.promotional_price or
+                                                                                 product.price),
                          'total_price': cart.get_total_price(),
                          'total_price_discounts': cart.get_total_price_with_discounts(),
                          'total_discount': cart.get_total_discount()})
@@ -39,19 +39,18 @@ def cart_add(request):
 
 def cart_detail(request):
     """
-    Отображения корзины с товарами (если они там есть)
+    Dispaying cart with goods (if they are in cart)
     """
     coupon_code = None
     present_card_code = None
-
-    # если купон был применен, отобразить его код в форме
+    # if coupon was apppied - show its code in form
     if request.session.get('coupon_id'):
         coupon_code = Coupon.objects.get(id=request.session.get('coupon_id'))
 
-    # если подарочная карта была применена, отобразить ее код в форме
+    # if present card was applied - show its code in form
     if request.session.get('present_card_id'):
         present_card_code = PresentCard.objects.get(id=request.session.get('present_card_id'))
-    #  заполняем форму принятыми кодами купона, если они были применены
+    # filling form applied coupon code or present card code, if they were applied
     coupon_form = CouponApplyForm(initial={'code': coupon_code.code if coupon_code else ''})
     present_card_form = PresentCardApplyForm(initial={'code': present_card_code.code if present_card_code else ''})
     return render(request, 'cart/detail.html', {'cart': Cart(request),
@@ -63,18 +62,18 @@ def cart_detail(request):
 @require_POST
 def cart_remove(request):
     """
-    Удаление товара с корзины
+    Deleting product from cart
     """
     prev_url = None
     product_id = request.POST.get('product_id')
     cart = Cart(request)
     cart.remove(product_id)
-    if not cart:  # если больше нет товаров в корзине - удалить примененные купон или карту
+    if not cart:  # if there are no products in cart - delete applied coupon or present card
         cart.clear()
         prev_url = request.session.get('urls')['previous_url']
     return JsonResponse({'success': True,
                          'cart_len': len(cart),
                          'total_price': cart.get_total_price(),
-                         'total_price_discount': cart.get_total_price_with_discounts(),
+                         'total_price_discounts': cart.get_total_price_with_discounts(),
                          'total_discount': cart.get_total_discount(),
                          'prev_url': prev_url})
