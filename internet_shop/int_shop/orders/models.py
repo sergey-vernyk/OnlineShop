@@ -9,7 +9,7 @@ from django.core.validators import MinValueValidator
 
 class Order(models.Model):
     """
-    Модель заказа
+    Order model
     """
     METHOD_PAY = (
         ('Online', 'Online'),
@@ -41,8 +41,8 @@ class Order(models.Model):
 
     def get_total_values(self) -> dict:
         """
-        Метод возвращает словарь с суммарными значениями
-        общей стоимости заказа без скидок, со скидками и сумму самой скидки
+        Method returns dictionary with amount values such as:
+        total cost without discounts, total cost with discounts, and total discount amount
         """
         totals = {
             'total_cost': sum(item.get_cost() for item in self.items.all()),
@@ -59,7 +59,7 @@ class Order(models.Model):
 
         totals['total_discounts'] = totals['total_cost'] - totals['total_cost_with_discounts']
 
-        return {k: v.quantize(Decimal('0.01')) for k, v in totals.items()}  # округление результатов до двух знаков
+        return {k: v.quantize(Decimal('0.01')) for k, v in totals.items()}  # rounds result to 2 signs
 
     class Meta:
         ordering = ('-created',)
@@ -67,7 +67,7 @@ class Order(models.Model):
 
 class Delivery(models.Model):
     """
-    Модель доставки товара
+    Delivery model
     """
 
     DELIVERY_METHOD = (
@@ -100,7 +100,7 @@ class Delivery(models.Model):
 
 class OrderItem(models.Model):
     """
-    Модель единиц в заказе
+    Order items model
     """
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, related_name='order_items', on_delete=models.CASCADE)
@@ -112,7 +112,6 @@ class OrderItem(models.Model):
 
     def get_cost(self):
         """
-        Подсчет суммарной стоимости единицы заказа,
-        с учетом его количества
+        Calculate amount cost of the order item taking in account it quantity
         """
         return self.price * self.quantity

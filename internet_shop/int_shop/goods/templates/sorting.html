@@ -3,7 +3,7 @@
           id="sorting-form" onchange="formSubmit()">
         <span class="material-symbols-outlined" style="margin-right: 4px; position: relative; top: 5px;">sort</span>
         <select class="sorting-select" name="sort" id="sorting_id" onchange="checkSelect()">
-            <!--Перебор всех полей для сортировки-->
+            <!--Iterate over all sorting fields-->
             {% for k, v in sorting_by_price.fields.sorting.choices %}
                 <option id="opt-{{ forloop.counter }}"
                         {% if selected_sort == k %}selected{% endif %}

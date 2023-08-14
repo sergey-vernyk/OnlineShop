@@ -1,6 +1,6 @@
 $(document).ready(function() {
     $('.show-all-orders, .hide-another-orders').click(function() {
-        var collapseOrders = $('.collapse-order'); //все блоки, которые должны быть скрыты
+        var collapseOrders = $('.collapse-order'); //all blocks, that should be hidden
 
         if(collapseOrders && $(collapseOrders).is(':hidden')) {
             $(collapseOrders).slideDown(500);

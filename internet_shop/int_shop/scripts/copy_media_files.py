@@ -7,39 +7,39 @@ from typing import Callable
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'int_shop.settings')
 env = environ.Env()
-environ.Env.read_env(env_file=os.path.join(settings.BASE_DIR, 'settings', '.env'))
+environ.Env.read_env(env_file=os.path.join(settings.BASE_DIR, 'settings', '.env'))  # env file location
 
 
 def update_sha(filepath, sha):
     """
-    Функция обновляет хеш после каждого прочитанного файла
+    Function updates hash after each read file
     """
     with open(filepath, 'rb') as f:
         while True:
-            block = f.read(2 ** 10)  # блок в 1 Мб
+            block = f.read(2 ** 10)  # block size equal 1 Mb
             if not block:
                 break
             sha.update(block)
 
 
 def make_hash() -> Callable:
-    sha = hashlib.sha1()  # гарантирует, что всегда будет обновляться только один экземпляр
+    sha = hashlib.sha1()  # guarantee, that only one instance will be updating
     files_amount = 0
 
     def wrap(dir_path, *args, **kwargs) -> tuple:
         """
-        Функция считает хеш всех файлов и их кол-во, находящихся в каталогах,
-        начиная с пути dir_path.
-        Возвращает результат в виде кортежа (хеш, кол-во)
+        Function calculates hash of all available files and their quantity,
+        which are located in directories, started from dir_path.
+        Returns result as tuple (hash, quantity)
         """
         nonlocal sha, files_amount
         for path, dirs, files in os.walk(dir_path):
-            for file in sorted(files):  # гарантия, что файлы будут всегда в одном порядке
+            for file in sorted(files):  # guarantee, that files will always be in the same order
                 update_sha(os.path.join(path, file), sha)
                 files_amount += 1
-            for directory in sorted(dirs):  # гарантия, что папки будут всегда в одном порядке
+            for directory in sorted(dirs):  # guarantee, that directories will always be in the same order
                 wrap(os.path.join(path, directory))
-            break  # нужна только одна итерация - получить все файлы в текущей директории
+            break  # necessary only one iteration for getting all files in the current directory
         return sha.hexdigest(), files_amount
 
     return wrap
@@ -47,10 +47,10 @@ def make_hash() -> Callable:
 
 def run(file):
     """
-    Функция копирует файлы и папки в новое расположение, если хеш не совпадает
-    (т.е. были обновлены файлы или папки в старом расположении)
+    If hash doesn't match (i.e. there were updated files or directories in old location),
+    function copies files and directories into new location
     """
-    # только если запуск происходит в продакшене
+    # action starts only in production server
     if env('DEV_OR_PROD') == 'prod':
         old_folder_path = os.path.join(settings.BASE_DIR, 'media/')
         new_folder_path = os.path.join(settings.BASE_DIR, settings.MEDIA_ROOT)

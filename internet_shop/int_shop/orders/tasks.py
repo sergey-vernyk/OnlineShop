@@ -8,9 +8,8 @@ from orders.models import Order
 @shared_task
 def order_created(data: dict, order_id: int, profile_username: str) -> str:
     """
-    Задача отправляет сообщение на электронную почту
-    пользователю, который сделал заказ
-    и заказ был успешно создан и подтвержден
+    Task will send email to the user's email, which made an order,
+    and the order has been created and confirmed successfully
     """
     order = Order.objects.get(pk=order_id)
     order_totals = order.get_total_values()

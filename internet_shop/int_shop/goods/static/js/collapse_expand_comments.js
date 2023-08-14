@@ -1,6 +1,6 @@
 $(document).ready(function() {
     $('.show-comments, .hide-comments').click(function() {
-        var collapsedComments = $('.collapse-comm'); //все блоки, которые должны быть скрыты
+        var collapsedComments = $('.collapse-comm'); //all blocks, that have to be hidden
 
         if(collapsedComments && $(collapsedComments).is(':hidden')) {
             $(collapsedComments).slideDown(500);

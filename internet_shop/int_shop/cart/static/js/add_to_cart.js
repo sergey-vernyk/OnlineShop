@@ -1,8 +1,8 @@
 $(document).ready(function() {
     var currentCartLen;
-    //селектор выбирает кнопку с id, который начинается на add-to-cart
+    //selector select button with id, which starts on "add-to-cart"
     $('[id^=add-to-cart]').click(function(event) {
-        var product_id = this.id.slice(12); //достаем id товара из нажатой кнопки
+        var product_id = this.id.slice(12); //get product id from button that was pressed
         event.preventDefault();
         event.stopPropagation();
         var data = $(`#add-form-${product_id}, #update-form-${product_id}`).serializeArray();
@@ -21,10 +21,10 @@ $(document).ready(function() {
                 quantity: quantity,
             },
             success: function(response) {
-                //установка значений кол-ва товаров в корзине и их общей стоимости
+                //set quantity products in cart and their total cost
                 $('.amount-cart').text(response['cart_len']);
                 $('.total-price').text('$' + response['total_price']);
-                $('.cart-button').css('pointer-events', 'all'); //включить возможность перейти в корзину
+                $('.cart-button').css('pointer-events', 'all'); //enable the ability to go to the cart
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 console.log(textStatus, errorThrown);
@@ -34,10 +34,10 @@ $(document).ready(function() {
         })
 
     })
-    // возвращает значение из словаря по указанному ключу value
+    // returns value from dict by the specified key
     function getValue(data, value) {
         values = {};
-        // достает из data значения и делает новый словарь
+        // getting value from data and create new dict
         data.forEach(function(element) {
             values[element.name] = element.value;
         });

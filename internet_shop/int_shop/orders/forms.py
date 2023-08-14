@@ -1,10 +1,11 @@
-from django import forms
-from django.utils import timezone
-from .models import Delivery, Order
 import phonenumbers
-from phonenumbers import carrier
+from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.utils import timezone
+from phonenumbers import carrier
+
+from .models import Delivery, Order
 
 
 class OrderCreateForm(forms.ModelForm):
@@ -14,14 +15,14 @@ class OrderCreateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # переопределение '------' на другое отображение при не выбранной категории
+        # overriding '------' if no category had chosen
         self.fields['pay_method'].widget.choices[0] = ('', "Not choose")
 
     prefix = 'order_form'
 
     def clean_phone(self):
         """
-        Валидация номера телефона в заказе
+        Phone number validation in the order
         """
         phone_number_in = self.cleaned_data.get('phone')
         phone_number_output = ''.join(num.strip('()') for num in phone_number_in.split())
@@ -62,7 +63,7 @@ class OrderCreateForm(forms.ModelForm):
             },
         }
 
-        # множественное добавление текста ошибки для полей
+        # adding errors messages for multiple fields
         error_messages.update(
             {k: {'required': 'This field must not be empty'} for k in
              ('first_name', 'last_name', 'address', 'phone', 'pay_method')}
@@ -71,7 +72,7 @@ class OrderCreateForm(forms.ModelForm):
 
 class DeliveryCreateForm(forms.ModelForm):
     """
-    Форма для создания информации о доставке
+    Forms using for creation info about delivery
     """
 
     delivery_date = forms.DateField(input_formats=settings.DATE_INPUT_FORMATS,
@@ -79,10 +80,10 @@ class DeliveryCreateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # переопределение '------' на другое отображение при не выбранной категории
+        # overriding '------' if no category had chosen
         self.fields['method'].widget.choices[0] = ('', "Not choose")
         self.fields['service'].widget.choices[0] = ('', "Not choose")
-        # переопределение стандартного сообщения об ошибке поля
+        # overriding default error field message
         self.fields['delivery_date'].error_messages['required'] = 'This field must not be empty'
 
     prefix = 'delivery_form'
@@ -106,8 +107,7 @@ class DeliveryCreateForm(forms.ModelForm):
 
     def clean_delivery_date(self):
         """
-        Проверка даты доставки на то, что
-        она не меньше сегодняшней даты
+        Checking delivery date, whether date not less than today
         """
         date_now = timezone.now().date()
         date = self.cleaned_data.get('delivery_date')

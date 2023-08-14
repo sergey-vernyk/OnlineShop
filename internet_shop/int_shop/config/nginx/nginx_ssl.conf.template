@@ -3,11 +3,11 @@ upstream django_app {
    }
 
     server {
-        # незащищенный протокол с переадресаций на протокол с ssl
+        # not secure protocol with redirection to ssl protocol
         listen           80 default_server;
         server_name      ${DOMAIN} www.${DOMAIN};
 
-        # директория для поиска challenge файла для завершения аутенификации
+        # directory for searching challenge file for complete authentication
         location /.well-known/acme-challenge/ {
             root        /vol/www/;
         }
@@ -18,44 +18,42 @@ upstream django_app {
     }
 
     server {
-        # защищенный протокол ssl с адресами к ключу и сертификату
+        # secure protocol ssl with pathes to key and certificate
         listen 443 ssl;
-        server_name             ${DOMAIN} www.${DOMAIN}; # certbot будет сохранять ключ и файл сертификата по этому адресу
+        server_name             ${DOMAIN} www.${DOMAIN}; # certbot wiil be saved key and cerificate file to this path
 
         ssl_certificate         /home/nginx/letsencrypt/live/${DOMAIN}/fullchain.pem;
         ssl_certificate_key     /home/nginx/letsencrypt/live/${DOMAIN}/privkey.pem;
-
-        # базовая конфигурация сервера с ssl для использования с certbot
+        # base server configuration with ssl for using with certbot
         include                 /etc/nginx/options-ssl-nginx.conf;
-
-        # параметры, которые определяют обмен ключами Diffie-Hellman с клиентом
+        # parameters, that defines exchange Diffie-Hellman keys with a client
         ssl_dhparam             /vol/proxy/ssl-dhparams.pem;
 
-        # заголовок запроса для запоминания браузером, что этот веб домен использует только HTTPS
+        # request header to remember by the browser that this web domain only uses HTTPS
         add_header              Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 
-        # запрещает отображать версию nginx’а в поле Server в Header Response
+        # forbidden to show nginx version in the Header Response Server field
         server_tokens           off;
 
         location / {
-            proxy_set_header        X-Forwarded-Proto https;  # заголовок для django для идентификации https
+            proxy_set_header        X-Forwarded-Proto https;  # header for django in order to identify HTTPS
             include                 /etc/nginx/uwsgi_params;
             uwsgi_pass              django_app;
             client_max_body_size    10M;
         }
 
-        # соответствует пути, указанном в STATIC_URL
+        # corresponds the path, specified in STATIC_URL
         location /static/ {
             alias /vol/web/static/;
         }
-        # соответствует пути, указанном в MEDIA_URL
+        # corresponds the path, specified in MEDIA_URL
         location /media/ {
             alias /vol/web/media/;
         }
 
-        # тайм-аут для keep-alive соединений. Сервер закроет соединения после истечения этого времени
+        # timeout for keep-alive connections.Server will close the connection after this time expiration
         keepalive_timeout 65;
 
-        # разрешение сервера закрывать соединия после того, как клиент перестает отвечать
+        # server permission to close connection after client stoping response
         reset_timedout_connection on;
     }

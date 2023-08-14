@@ -14,14 +14,14 @@
         <div class="mainlist-row">
             <div class="filter-prod-column">
                 {% if category %}
-                    {% include 'filters_menu.html' %}  <!--Добавление боковой панели слева с фильтрами-->
+                    {% include 'filters_menu.html' %}  <!--Adding left side panel with filters-->
                 {% endif %}
             </div>
             <div class="prod-list-column">
                 {% include 'products_navs.html' with category=category %}
                 <div class="d-flex justify-content-between pb-1 my-2">
                     <div class="breadcrumbs"></div>
-                    {% include 'sorting.html' with place=place %} <!--шаблон с выпадающим меню для сортировки товаров-->
+                    {% include 'sorting.html' with place=place %} <!--template with dropdown menu for sorting products-->
                 </div>
                 <div class="d-inline-flex flex-wrap mx-4 mb-4 p-2" style="gap: 55px;">
                     {% for product in products %}
@@ -32,7 +32,7 @@
                         </div>
                     {% endfor %}
                 </div>
-                <!--Пагинация-->
+                <!--Pagination-->
                 {% if is_paginated %}
                     <div class="row">
                         <div class="d-flex justify-content-center py-2 px-0 w-100">

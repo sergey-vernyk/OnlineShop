@@ -1,7 +1,7 @@
 $(document).ready(function() {
     var currentCartAmount = Number($('.amount-cart').text().trim());
 
-    //отключения перехода в корзину, когда в ней нет добавленных товаров
+    //disable transition to the cart, when there are no added products in it
     if(currentCartAmount) {
         $('.cart-button').css('pointer-events', 'all');
     } else {

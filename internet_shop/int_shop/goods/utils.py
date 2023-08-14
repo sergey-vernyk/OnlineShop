@@ -1,16 +1,18 @@
-from typing import Union, Generator, Tuple
-from django.db.models import QuerySet
 from decimal import Decimal
+from typing import Union, Generator, Tuple
+
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage, Page
+from django.db.models import QuerySet
+
 from common.moduls_init import redis
 from goods.models import Manufacturer, Product
 
 
 def distribute_properties_from_request(properties: list) -> dict:
     """
-    Функция собирает все принятые свойства с запроса на фильтр и
-    сохраняет в словарь, сохраняя каждый атрибут экземпляра свойства в список,
-    ключем которого есть имя каждого атрибута экземпляра свойства
+    Function gathers all received properties from request on filter,
+    save to the dictionary in which key is the name of the property instance attribute,
+    and value is the list with this instance property attribute values
     """
     properties_list = [p.split(',') for p in properties]
     dict_props = {'ids': [], 'names': [], 'text_values': [], 'numeric_values': []}
@@ -27,9 +29,10 @@ def distribute_properties_from_request(properties: list) -> dict:
 
 def get_page_obj(per_pages: int, page: int, queryset: Union[QuerySet, list]) -> Page:
     """
-    Функция принимает кол-во товаров на одной странице,
-    текущую страницу и товары, которые необходимо отобразить.
-    Возвращает объект страницы
+    Function returns page object
+    per_pages -> number of products per page;
+    page -> current page;
+    queryset -> list of the products, which have to display on all pages
     """
     p = Paginator(queryset, per_pages)
 
@@ -37,7 +40,7 @@ def get_page_obj(per_pages: int, page: int, queryset: Union[QuerySet, list]) -> 
         page_obj = p.page(page)
     except PageNotAnInteger:
         page_obj = p.page(1)
-    except EmptyPage:  # если получен номер страницы, выходящий за общее кол-во страниц
+    except EmptyPage:  # if received page number grater than amount pages
         page_obj = p.page(p.num_pages)
 
     return page_obj
@@ -45,9 +48,8 @@ def get_page_obj(per_pages: int, page: int, queryset: Union[QuerySet, list]) -> 
 
 def get_collections_with_manufacturers_info(qs: QuerySet) -> Generator[Union[QuerySet, dict], None, None]:
     """
-    Функция возвращает объекты генераторов,
-    которые содержат queryset с производителями для полученного qs из товаров
-    и словарь с кол-вом товаров для каждого производителя
+    Function returns generator objects, which contains queryset with the manufacturers
+    for received queryset with products and the dictionary with quantity of products for each manufacturer
     """
     manufacturers = Manufacturer.objects.filter(
         id__in=(item['manufacturer_id'] for item in qs.values('manufacturer_id'))
@@ -63,13 +65,12 @@ def get_collections_with_manufacturers_info(qs: QuerySet) -> Generator[Union[Que
 
 def get_products_sorted_by_views(list_ids: list) -> Tuple[list, dict]:
     """
-    Функция возвращает кортеж со списком с id товаров,
-    которые отсортированы по кол-ву их просмотров
-    и словарем с этими товарами
+    Function returns tuple with list, that contains products ids,
+    which are sorted by amount views and contains dictionary with these products
     """
-    # получение всех товаров и связанных с ними категорий и сортировка их по id
+    # getting all products, which linked with categories and then sort their by id
     products = Product.objects.select_related('category').filter(id__in=list_ids).order_by('pk')
-    # словарь с ключами id товара и значениями кол-ва его просмотров и категории товара
+    # dictionary with keys as product id and value as a dictionary with views quantity and product category
     # {pk: {views: int, category: str}}
     products_views = {}
     for product in products:
@@ -78,14 +79,14 @@ def get_products_sorted_by_views(list_ids: list) -> Tuple[list, dict]:
             'category': product.category.slug
         }
 
-    # сортировка словаря по уменьшению кол-ва просмотров
+    # dict sort by descending of views numbers
     products_views_sorted = {
         pk: {'views': data['views'], 'category': data['category']}
         for pk, data in sorted(products_views.items(), key=lambda x: x[1]['views'], reverse=True)
     }
 
-    products_ids_sorted = [pk for pk in products_views_sorted.keys()]  # ключи отсортированных товаров
-    # словарь с отсортированными товарами по кол-ву просмотров
+    products_ids_sorted = [pk for pk in products_views_sorted.keys()]  # the keys of sorted products
+    # dict with the sorted products by number of views
     products = Product.objects.select_related('category').in_bulk(products_ids_sorted)
 
     return products_ids_sorted, products

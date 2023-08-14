@@ -39,11 +39,11 @@ def cart_add(request):
 
 def cart_detail(request):
     """
-    Dispaying cart with goods (if they are in cart)
+    Displaying cart with goods (if they are in cart)
     """
     coupon_code = None
     present_card_code = None
-    # if coupon was apppied - show its code in form
+    # if coupon was applied - show its code in form
     if request.session.get('coupon_id'):
         coupon_code = Coupon.objects.get(id=request.session.get('coupon_id'))
 
@@ -68,7 +68,7 @@ def cart_remove(request):
     product_id = request.POST.get('product_id')
     cart = Cart(request)
     cart.remove(product_id)
-    if not cart:  # if there are no products in cart - delete applied coupon or present card
+    if not cart:  # if there are no products in the cart - delete applied coupon or present card
         cart.clear()
         prev_url = request.session.get('urls')['previous_url']
     return JsonResponse({'success': True,

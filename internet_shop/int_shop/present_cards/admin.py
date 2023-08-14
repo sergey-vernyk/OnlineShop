@@ -5,12 +5,15 @@ from present_cards.models import PresentCard, Category
 
 class ValidCardListFilter(ValidDiscountsListFilter):
     """
-    Фильтр по валидности карты
+    Filter by validity present card
     """
 
 
 @admin.register(PresentCard)
 class PresentCardAdmin(admin.ModelAdmin):
+    """
+    Info about present card in admin panel
+    """
     fieldsets = (
         ('General info', {
             'fields': ('code', 'valid_from', 'valid_to')
@@ -33,5 +36,8 @@ class PresentCardAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class PresentCardCategoryAdmin(admin.ModelAdmin):
+    """
+    Info about present card category in admin panel
+    """
     list_display = ['name', 'slug']
     prepopulated_fields = {'slug': ('name',)}

@@ -1,9 +1,20 @@
+from decimal import Decimal
+
+from django.contrib.postgres.search import TrigramSimilarity
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q, QuerySet
+from django.http.response import JsonResponse
 from django.shortcuts import render
+from django.urls import reverse
+from django.utils import timezone
+from django.views.decorators.http import require_POST
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import FormMixin
+
 from account.models import Profile
-from django.views.decorators.http import require_POST
-from django.http.response import JsonResponse
+from cart.forms import CartQuantityForm
+from common.decorators import ajax_required, auth_profile_required
+from common.moduls_init import redis
 from goods.forms import (
     RatingSetForm,
     CommentProductForm,
@@ -12,13 +23,7 @@ from goods.forms import (
     FilterByManufacturerForm,
     FilterByPriceForm,
 )
-from cart.forms import CartQuantityForm
 from goods.models import Product, Category, Favorite, Comment
-from django.urls import reverse
-from decimal import Decimal
-from django.core.exceptions import ObjectDoesNotExist
-from django.utils import timezone
-
 from .filters import get_max_min_price
 from .property_filters import get_property_for_category
 from .utils import (
@@ -27,15 +32,11 @@ from .utils import (
     get_collections_with_manufacturers_info,
     get_products_sorted_by_views
 )
-from common.decorators import ajax_required, auth_profile_required
-from django.contrib.postgres.search import TrigramSimilarity
-from django.db.models import Q, QuerySet
-from common.moduls_init import redis
 
 
 class ProductListView(ListView):
     """
-    Список всех товаров
+    List of all products
     """
     model = Product
     template_name = 'goods/product/list.html'
@@ -44,9 +45,8 @@ class ProductListView(ListView):
 
     def __init__(self):
         """
-        Переопределение метода для добавления
-        экземпляра Profile, необходимого для обозначения на карточках товара
-        информации о нахождении или отсутствии товара в избранном для данного Profile
+        Overriding the method to add Profile instance, which is necessary
+        for displaying info on the product card about whether product into favorite for this instance or not
         """
         super().__init__()
         self.profile = None
@@ -54,7 +54,7 @@ class ProductListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['place'] = 'mainlist'
-        if 'category_slug' in self.kwargs:  # если передана категория
+        if 'category_slug' in self.kwargs:  # if category has been got
             context['category'] = Category.objects.get(slug=self.kwargs.get('category_slug'))
             context['filter_manufacturers'] = FilterByManufacturerForm()
 
@@ -73,19 +73,20 @@ class ProductListView(ListView):
 
             category_products = self.get_queryset()
             manufacturers_info = get_collections_with_manufacturers_info(qs=category_products)
-            # обновление queryset производителя
+            # updating manufacturer's queryset
             context['filter_manufacturers'].fields['manufacturer'].queryset = next(manufacturers_info)
-            context['manufacturers_prod_qnty'] = next(manufacturers_info)  # кол-во товаров каждого производителя
+            context['manufacturers_prod_qnty'] = next(manufacturers_info)  # products quantity for each manufacturer
 
         if self.request.user.is_authenticated:
             context['favorites'] = self.profile.profile_favorite.product.prefetch_related()
 
         context['sorting_by_price'] = SortByPriceForm()
+        # show search request after receiving search results
         context['search_form'] = SearchForm(initial={'query': self.request.GET.get('query')})
         return context
 
     def get_queryset(self):
-        if ('category_slug' and 'search_result') in self.kwargs:  # если передана категория и был поиск
+        if ('category_slug' and 'search_result') in self.kwargs:  # if category has been got and was search
             return self.kwargs.get('search_result')
         if 'category_slug' in self.kwargs:
             return super().get_queryset().filter(category__slug=self.kwargs['category_slug'])
@@ -94,7 +95,7 @@ class ProductListView(ListView):
 
     def dispatch(self, request, *args, **kwargs):
         """
-        Установка в атрибут profile гостевого или аутентифицированного пользователя
+        Set to "profile" attribute guest or authenticated user
         """
         if request.user.is_authenticated:
             self.profile = Profile.objects.get(user=request.user)
@@ -104,13 +105,12 @@ class ProductListView(ListView):
 
     def get(self, request, *args, **kwargs):
         """
-        Метод используется для поиска по сайту
-        и для обычной загрузки главной страницы сайта
+        Method is using for the searching and simple loading main page
         """
         query = request.GET.get('query')
         category_slug = self.kwargs.get('category_slug')
 
-        # если был запрос на поиск
+        # if was search request
         if 'query' in request.GET:
             result = self._get_query_results(query, category_slug)
             self.kwargs['search_result'] = [product for product in result.values()]
@@ -120,8 +120,7 @@ class ProductListView(ListView):
     @staticmethod
     def _get_query_results(query: str, category_slug: str = None) -> dict:
         """
-        Метод для получения результатов поиска.
-        query - текст запроса
+        Method is using for getting search request results
         """
         if category_slug:
             q = Q(category__slug=category_slug, similarity__gte=0.3)
@@ -132,7 +131,7 @@ class ProductListView(ListView):
             similarity=TrigramSimilarity('name', query), ).filter(q).order_by('-similarity')
 
         product_ids = [product.pk for product in products]
-        # кол-во просмотров найденных товаров и сортировка их id по уменьшению просмотров
+        # number of views of products found and sort their id by descending views
         product_views = [int(redis.hget(f'product_id:{pk}', 'views')) for pk in product_ids]
         sorted_ids_by_views = [pk for pk, views in sorted(zip(product_ids, product_views), key=lambda x: -x[1])]
         return products.in_bulk(sorted_ids_by_views)
@@ -140,14 +139,14 @@ class ProductListView(ListView):
 
 class ProductDetailView(DetailView, FormMixin):
     """
-    Подробное описание товара
+    Detail information about product
     """
     model = Product
     template_name = 'goods/product/detail.html'
     slug_url_kwarg = 'product_slug'
     pk_url_kwarg = 'product_pk'
     context_object_name = 'product'
-    form_class = RatingSetForm  # форма добавляется из FormMixin
+    form_class = RatingSetForm  # form_class added from FormMixin
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -156,14 +155,14 @@ class ProductDetailView(DetailView, FormMixin):
 
     def get_success_url(self):
         """
-        Возвращает URL для перехода после обработки валидной формы
+        Returns URL for transition after handling valid form
         """
         return reverse('goods:product_detail', kwargs={'product_pk': self.kwargs['product_pk'],
                                                        'product_slug': self.kwargs['product_slug']})
 
     def dispatch(self, request, *args, **kwargs):
         """
-        Установка в атрибут profile гостевого или аутентифицированного пользователя
+        Set to "profile" attribute guest or authenticated user
         """
         if request.user.is_authenticated:
             self.profile = Profile.objects.get(user=request.user)
@@ -174,48 +173,45 @@ class ProductDetailView(DetailView, FormMixin):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['rating_form'] = self.form_class  # добавляем форму рейтинга в контекст
-        context['comment_form'] = CommentProductForm()  # добавляем форму комментария в контекст
-        context['quantity_form'] = CartQuantityForm()  # добавляем форму кол-ва товара в контекст
-        # получение всех объектов Profile, которые комментировали текущий товар и оценивали комментарий к товару
+        context['rating_form'] = self.form_class
+        context['comment_form'] = CommentProductForm()
+        context['quantity_form'] = CartQuantityForm()
+        # getting all Profile objects, that commented on the current product and rated product comment
         context['comments'] = self.object.comments.prefetch_related('profile',
                                                                     'profiles_likes',
                                                                     'profiles_unlikes').order_by('-created')
-        # получение всех объектов Property, которые принадлежат текущему товару
+        # getting all Property objects, that belongs to the current product
         context['properties'] = self.object.properties.select_related('category_property')
-        # если пользователь аутентифицирован, то заполнить имя, почту в форме отправки комментария
+        # fill the name and email in the send comment form, if user is authenticated
         if self.request.user.is_authenticated:
             context['comment_form'].fields['user_name'].initial = self.request.user.first_name
             context['comment_form'].fields['user_email'].initial = self.request.user.email
-            context['is_in_favorite'] = self.is_in_favorite()
+            context['is_in_favorite'] = self.is_in_favorite()  # whether current product is into Profile favorite
             context['profile_rated_comments'] = self.get_profile_rated_comments()
         return context
 
     def is_in_favorite(self) -> bool:
         """
-        Возвращает true/false находится ли этот товар
-        у текущего пользователя в избранном
+        Returns whether current product is in the current profile's favorite
         """
         try:
-            # получение объекта избранных товаров привязанного к профилю
+            # getting Favorite instance that linked to current Profile
             fav_obj = Favorite.objects.get(profile=self.profile)
         except ObjectDoesNotExist:
             return False
-        return self.object in fav_obj.product.prefetch_related()  # возвращаем результат, есть ли товар в избранном
+        return self.object in fav_obj.product.prefetch_related()
 
     def get_profile_rated_comments(self) -> dict:
         """
-        Возвращает id комментариев, под которыми текущий
-        пользователь (profile) установил like или dislike
+        Returns ids of comments, under which current profile has set like or dislike
         """
         liked_comments = self.profile.comments_liked.all()
         unliked_comments = self.profile.comments_unliked.all()
-        return {'liked_comments': [c.pk for c in liked_comments],
-                'unliked_comments': [c.pk for c in unliked_comments]}
+        return {'liked_comments': [c.pk for c in liked_comments], 'unliked_comments': [c.pk for c in unliked_comments]}
 
     @auth_profile_required
     def post(self, request, *args, **kwargs):
-        # если AJAX запрос
+        # if it's AJAX request
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             comment_id = request.POST.get('comment_id')
             action = request.POST.get('action')  # like/unlike
@@ -224,7 +220,7 @@ class ProductDetailView(DetailView, FormMixin):
             liked_comments = self.profile.comments_liked.all()
             unliked_comments = self.profile.comments_unliked.all()
 
-            # установка like/dislike для комментария
+            # set like/dislike for the comment
             if action == 'like':
                 if comment in liked_comments:
                     comment.profiles_likes.remove(self.profile)
@@ -249,17 +245,16 @@ class ProductDetailView(DetailView, FormMixin):
             form = self.get_form(form_class=CommentProductForm)
             if form.is_valid():
                 new_comment = form.save(commit=False)
-                new_comment.product = self.object  # привязка комментария к текущему товару
+                new_comment.product = self.object  # link the comment to the current product
                 new_comment.profile = self.profile
-                new_comment.save()  # сохранение в базе
+                new_comment.save()  # save the comment to DB
                 return self.form_valid(form)
             else:
                 return self.form_invalid(form)
 
     def form_invalid(self, form):
         """
-        Переопределение метода для добавления в контекст
-        формы с ошибками
+        Overriding the method for adding CommentProductForm instance with errors to the context
         """
         context = self.get_context_data()
         context.update(comment_form=form)
@@ -267,14 +262,13 @@ class ProductDetailView(DetailView, FormMixin):
 
     def get(self, request, *args, **kwargs):
         """
-        Метод используется для увеличения кол-ва
-        просмотров текущего товара при переходе на
-        детальную информацию о нем
+        Method is using for increase number of views of the current product
+        while transition to product detail page
         """
-        object_pk = self.kwargs.get(self.pk_url_kwarg)  # получение id товара из аргументов URL
-        # увеличение кол-ва просмотров товара на 1 при его просмотре
-        # задание времени жизни ключа из Redis - удаление товаров из просмотренных пользователем через 7 дней
-        # добавление товара в множество просмотренных товаров пользователем
+        object_pk = self.kwargs.get(self.pk_url_kwarg)  # getting product's id from URL kwargs
+        # increase number of views by 1 while it's watched
+        # set expire time for redis key i.e. deleting products ids from redis in 7 days, that user has watched
+        # add products to the set that profile has watched
         redis.hincrby(f'product_id:{object_pk}', 'views', 1)
         redis.expire(f'profile_id:{self.profile.pk}', time=604800, nx=True)
         redis.sadd(f'profile_id:{self.profile.pk}', object_pk)
@@ -286,7 +280,7 @@ class ProductDetailView(DetailView, FormMixin):
 @ajax_required
 def add_or_remove_product_favorite(request) -> JsonResponse:
     """
-    Добавление товара в избранное или удаление его
+    Adding or removing product to/from favorite
     """
     product_id = request.POST.get('product_id')
     action = request.POST.get('action')
@@ -299,7 +293,7 @@ def add_or_remove_product_favorite(request) -> JsonResponse:
     elif action == 'remove':
         profile.profile_favorite.product.remove(product)
 
-    # кол-во товаров в избранном для текущего profile
+    # products quantity in the favorite for current profile
     amount_prods = profile.profile_favorite.product.all().count()
 
     return JsonResponse({'success': True,
@@ -308,7 +302,7 @@ def add_or_remove_product_favorite(request) -> JsonResponse:
 
 class FilterResultsView(ListView):
     """
-    Отображение результатов после применения фильтра
+    Displaying sample results after filter has been applied
     """
     model = Product
     template_name = 'goods/product/list.html'
@@ -317,7 +311,7 @@ class FilterResultsView(ListView):
 
     def __init__(self):
         super().__init__()
-        self.filter_qs = None  # queryset с товарами полученными после фильтра
+        self.filter_qs = None  # queryset with the products, received after filter
 
     @property
     def queryset_filter(self):
@@ -331,7 +325,7 @@ class FilterResultsView(ListView):
             raise TypeError(f'Argument qs not QuerySet instance, ({type(qs).__name__}) was provided')
 
     def get(self, request, *args, **kwargs):
-        if request.GET:  # если была подтверждена форма с критериями фильтров
+        if request.GET:  # if form with filter terms was submitted
             if 'price_max' and 'price_min' in request.GET:
                 price_min = request.GET.get('price_min')
                 price_max = request.GET.get('price_max')
@@ -350,16 +344,16 @@ class FilterResultsView(ListView):
     def get_queryset(self):
         lookups = Q(category__slug=self.kwargs['category_slug'])
 
-        # отбор товаров по цене
+        # selection of products by price
         if 'filter_price' in self.kwargs:
             min_price = self.kwargs.get('filter_price')[0]
             max_price = self.kwargs.get('filter_price')[1]
             lookups &= Q(price__gte=min_price, price__lte=max_price)
-        # отбор товаров по производителю
+        # selection of products by manufacturer
         if 'filter_manufacturers' in self.kwargs:
             manufacturers = self.kwargs.get('filter_manufacturers')
             lookups &= Q(manufacturer_id__in=manufacturers)
-        # отбор товаров по свойствам
+        # selection of products by properties
         if 'props' in self.kwargs:
             properties = self.kwargs.get('props')
             props_dict = distribute_properties_from_request(properties)
@@ -368,10 +362,10 @@ class FilterResultsView(ListView):
                          properties__text_value__in=props_dict['text_values'],
                          properties__numeric_value__in=props_dict['numeric_values'])
 
-        # получение в queryset только уникальных результатов
+        # getting in the queryset only the unique results
         result_queryset = Product.objects.distinct().filter(lookups)
 
-        self.queryset_filter = result_queryset  # сохранение queryset в property
+        self.queryset_filter = result_queryset  # save queryset to the class property
         return result_queryset
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -380,8 +374,7 @@ class FilterResultsView(ListView):
         if 'category_slug' in self.kwargs:
             context['category'] = Category.objects.get(slug=self.kwargs.get('category_slug'))
 
-            context['category_properties'] = get_property_for_category(context['category'].name,
-                                                                       self.queryset_filter)
+            context['category_properties'] = get_property_for_category(context['category'].name, self.queryset_filter)
 
             if 'filter_price' in self.kwargs:
                 min_price = Decimal(self.kwargs['filter_price'][0])
@@ -394,16 +387,16 @@ class FilterResultsView(ListView):
                 'price_max': max_price,
             })
 
-            category_products = self.queryset_filter  # все товары для категории, которые были отфильтрованы
+            category_products = self.queryset_filter  # all products for the category, that were filtered
             manufacturers_info = get_collections_with_manufacturers_info(qs=category_products)
 
-            # обновление queryset и отметка выбранных производителя
+            # updating queryset and marking selected manufacturers
             context['filter_manufacturers'] = FilterByManufacturerForm(initial={
                 'manufacturer': self.kwargs.get('filter_manufacturers')
 
             })
             context['filter_manufacturers'].fields['manufacturer'].queryset = next(manufacturers_info)
-            context['manufacturers_prod_qnty'] = next(manufacturers_info)  # кол-во товаров каждого производителя
+            context['manufacturers_prod_qnty'] = next(manufacturers_info)  # products quantity of each manufacturer
         context['sorting_by_price'] = SortByPriceForm()
 
         return context
@@ -411,15 +404,15 @@ class FilterResultsView(ListView):
 
 def promotion_list(request, category_slug: str = None):
     """
-    Список товаров, которые отмечены как акционные
+    Promotions products list
     """
     category = Category.objects.get(slug=category_slug) if category_slug else ''
     lookup = Q(category__slug=category_slug, promotional=True) if category_slug else Q(promotional=True)
     products = Product.objects.filter(lookup)
-    page = request.GET.get('page')  # получаем текущую страницу из запроса
-    # пагинация списка
+    page = request.GET.get('page')  # getting current page from the request
+    # list pagination
     page_obj = get_page_obj(per_pages=1, page=page, queryset=products)
-    products = page_obj.object_list  # список товаров на выбранной странице
+    products = page_obj.object_list  # list of the products in the selected page
     sorting_by_price = SortByPriceForm()
 
     return render(request, 'goods/product/navs_categories_list.html', {'products': products,
@@ -433,20 +426,20 @@ def promotion_list(request, category_slug: str = None):
 
 def new_list(request, category_slug: str = None):
     """
-    Список товаров, которые добавлены на сайт
-    2 недели назад и считаются новыми
+    Products list, that were added to the site 2 weeks ago and considered as new
     """
     category = Category.objects.get(slug=category_slug) if category_slug else ''
     now = timezone.now()
-    diff = now - timezone.timedelta(weeks=2)
+    diff = now - timezone.timedelta(weeks=2)  # calculate the difference
     lookup = Q(created__gt=diff, category__slug=category_slug) if category_slug else Q(created__gt=diff)
 
     products = Product.objects.filter(lookup)
-    redis.hset('new_prods', 'ids', ','.join(str(prod.pk) for prod in products))  # сохранение id новых товаров в redis
-    page = request.GET.get('page')  # получаем текущую страницу из запроса
-    page_obj = get_page_obj(per_pages=1, page=page, queryset=products)
+    # saving ids of the new products to redis
+    redis.hset('new_prods', 'ids', ','.join(str(prod.pk) for prod in products))
+    page = request.GET.get('page')  # getting current page from the request
+    page_obj = get_page_obj(per_pages=1, page=page, queryset=products)  # list pagination
 
-    products = page_obj.object_list  # список товаров на выбранной странице
+    products = page_obj.object_list  # list of the products in the selected page
     sorting_by_price = SortByPriceForm()
 
     return render(request, 'goods/product/navs_categories_list.html', {'products': products,
@@ -460,17 +453,16 @@ def new_list(request, category_slug: str = None):
 
 def popular_list(request, category_slug: str = None):
     """
-    Список популярных товаров из определенной категории
-    или со всех категорий
+    List of the popular products from certain category or from all categories
     """
-    view_amount = 5  # кол-во отображаемых популярных товаров
+    view_amount = 5  # displaying number of popular products
     category = None
-    page = request.GET.get('page')  # текущая страница из запроса
+    page = request.GET.get('page')  # getting current page from the request
 
     products_ids = [int(pk) for pk in redis.smembers('products_ids')]  # id всех товаров на сайте
     products_ids_sorted, products = get_products_sorted_by_views(products_ids)
 
-    if category_slug:  # фильтр товаров по категории
+    if category_slug:  # products filter by category
         product_list = [
             products[pk] for pk in products_ids_sorted
             if category_slug == products[pk].category.slug
@@ -478,13 +470,13 @@ def popular_list(request, category_slug: str = None):
         category = Category.objects.get(slug=category_slug)
     else:
         product_list = [products[pk] for pk in products_ids_sorted]
-    # пагинация списка товаров
+    # list pagintion
     page_obj = get_page_obj(per_pages=2, page=page, queryset=product_list[:view_amount])
     products = page_obj.object_list
 
     sorting_by_price = SortByPriceForm()
 
-    # сохранение id популярных товаров в redis
+    # saving popular products ids to redis
     redis.hset('popular_prods', 'ids', ','.join(str(prod.pk) for prod in product_list))
 
     return render(request, 'goods/product/navs_categories_list.html', {'products': products,
@@ -498,9 +490,9 @@ def popular_list(request, category_slug: str = None):
 
 def product_ordering(request, place: str, category_slug: str = 'all', page: int = 1):
     """
-    Сортировка товаров по цене, asc и desc
+    Sorting products by price
     """
-
+    # names of templates, that will be rendering for each category (popular, new, promotion, main products list)
     templates = {
         'mainlist': 'list.html',
         'popular': 'navs_categories_list.html',
@@ -523,14 +515,14 @@ def product_ordering(request, place: str, category_slug: str = 'all', page: int 
         lookup = Q(category__slug=category_slug, promotional=True) if category_slug != 'all' else Q(promotional=True)
         product_ids_promotion = [p.pk for p in Product.objects.filter(lookup)]
 
-    sorting_by_price = SortByPriceForm()  # добавляем пустую форму на страницу после её подтверждения
+    sorting_by_price = SortByPriceForm()  # add the form to the page after form has been submitted
 
     if request.method == 'GET':
         sort = request.GET.get('sort')
-
+        # if sort is needed
         if sort == 'p_asc' or sort == 'p_desc':
             asc_sort, desc_sort = ('promotional_price', 'price'), ('-promotional_price', '-price')
-            if category_slug != 'all':  # если передана категория
+            if category_slug != 'all':  # if category has been received
                 category = Category.objects.get(slug=category_slug)
                 lookups = Q(category=category,
                             id__in=product_ids_popular or product_ids_new or product_ids_promotion,
@@ -545,7 +537,7 @@ def product_ordering(request, place: str, category_slug: str = 'all', page: int 
                 'products_ids'))
             products = Product.objects.filter(lookups)
 
-    # пагинация
+    # list pagination
     page_obj = get_page_obj(per_pages=1, page=page, queryset=products)
     products = page_obj.object_list
 
@@ -563,8 +555,7 @@ def product_ordering(request, place: str, category_slug: str = 'all', page: int 
 @ajax_required
 def set_product_rating(request) -> JsonResponse:
     """
-    Функция выставляет рейтинг товара
-    при помощи запроса ajax
+    Function set product rating using AJAX request
     """
     star = Decimal(request.POST.get('star'))
     product_id = request.POST.get('product_id')
@@ -572,10 +563,10 @@ def set_product_rating(request) -> JsonResponse:
     current_rating = product.rating
     if not current_rating:
         product.rating = star
-    else:  # расчет среднего рейтинга товара
+    else:  # evaluating average product rating
         current_rating = round(((star + current_rating) / 2), 1)
         product.rating = current_rating
-    product.save(update_fields=['rating'])  # сохранение в базе
+    product.save(update_fields=['rating'])  # save to DB
 
     return JsonResponse({'success': True,
                          'current_rating': product.rating})

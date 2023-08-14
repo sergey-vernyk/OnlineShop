@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import environ
 
-# инициализация переменных окружения
+# init environment variables
 env = environ.Env()
 environ.Env.read_env()
 
@@ -28,7 +28,7 @@ SECRET_KEY = env('DJANGO_SECRET_KEY')
 # Application definition
 
 INSTALLED_APPS = [
-    'account.apps.AccountConfig',  # должно быть на первом месте для собственного вывода шаблона logged_out.html
+    'account.apps.AccountConfig',  # must be on the first place for own displaying template logged_out.html
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -63,7 +63,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.sites.middleware.CurrentSiteMiddleware',
-    'common.middleware.previous_and_current_urls_middleware',  # сохраняет текущий и предыдущий URL адреса в сессию
+    'common.middleware.previous_and_current_urls_middleware',  # save current and previous URLs in session
 ]
 
 ROOT_URLCONF = 'int_shop.urls'
@@ -80,9 +80,9 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
 
-                'goods.context_processors.product_categories',  # категории товаров на любом шаблоне
-                'cart.context_processors.cart',  # корзина в любом шаблоне
-                'goods.context_processors.search_form',  # строка поиска в любом шаблоне
+                'goods.context_processors.product_categories',  # goods categories in all templates
+                'cart.context_processors.cart',  # cart in all templates
+                'goods.context_processors.search_form',  # search field in all templates
                 'social_django.context_processors.backends',
                 'social_django.context_processors.login_redirect',
             ],
@@ -121,9 +121,9 @@ USE_I18N = True
 
 USE_TZ = True
 
-USE_L10N = False  # отображение числа и даты, используя формат другой (не текущей локали) локали
+USE_L10N = False  # displaying date, using another format (not current) locale
 
-DATETIME_FORMAT = 'd/m/y l H:i:s'  # формат времени 24 часа (день/месяц/год День недели часы:минуты:секунды)
+DATETIME_FORMAT = 'd/m/y l H:i:s'  # 24-hours time format (day/month/year weekday hours:minutes:seconds)
 
 DATE_INPUT_FORMATS = ('%d-%m-%Y',)
 
@@ -143,20 +143,21 @@ STRIPE_WEBHOOK_SECRET = env('STRIPE_WEBHOOK_SECRET')
 
 FROM_EMAIL = env('FROM_EMAIL')
 
-# длительность валидности ссылки для сброса пароля
+# duration for validity link for reset password
 PASSWORD_RESET_TIMEOUT = 14400
 
-# конфигурация Redis в качестве БД
+# config Redis as simple DB
 REDIS_PORT = env('REDIS_PORT')
 REDIS_HOST = env('REDIS_HOST')
 REDIS_DB_NUM = env('REDIS_DB_NUM')
 REDIS_USER = env('REDIS_USER')
 REDIS_PASSWORD = env('REDIS_PASSWORD')
 
+# celery config
 CELERY_BROKER_URL = env('CELERY_BROKER_URL')
 CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND')
 
-# конфигурация кеша на основе Redis
+# Redis Cache configuration
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
@@ -164,11 +165,11 @@ CACHES = {
     }
 }
 
-# Модели аутентификации пользователей
+# Users Authentication models
 AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',  # встроенная модель
-    'social_core.backends.facebook.FacebookOAuth2',  # авторизация на сайте при помощи Facebook
-    'social_core.backends.google.GoogleOAuth2',  # авторизация на сайте при помощи Google
+    'django.contrib.auth.backends.ModelBackend',  # built-in model
+    'social_core.backends.facebook.FacebookOAuth2',  # authorization through Facebook
+    'social_core.backends.google.GoogleOAuth2',  # authorization through Google
 )
 
 SOCIAL_AUTH_PIPELINE = (
@@ -177,8 +178,8 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.auth_allowed',
     'social_core.pipeline.social_auth.social_user',
     'social_core.pipeline.user.get_username',
-    'account.utils.create_user',  # переопределение метода для замены "." в username
-    'account.views.save_social_user_to_profile',  # сохранение пользователя в Profile при входе через соц.сеть
+    'account.utils.create_user',  # overriding the method for replacing "." in username
+    'account.views.save_social_user_to_profile',  # save user to Profile while login through social
     'social_core.pipeline.social_auth.associate_user',
     'social_core.pipeline.social_auth.load_extra_data',
     'social_core.pipeline.user.user_details',
@@ -188,9 +189,9 @@ SOCIAL_AUTH_PIPELINE = (
 ACCESS_FACEBOOK_USER_TOKEN = env('ACCESS_FACEBOOK_USER_TOKEN')
 SOCIAL_AUTH_FACEBOOK_KEY = env('SOCIAL_AUTH_FACEBOOK_KEY')
 SOCIAL_AUTH_FACEBOOK_SECRET = env('SOCIAL_AUTH_FACEBOOK_SECRET')
-SOCIAL_AUTH_FACEBOOK_SCOPE = ['email', 'user_gender', 'user_birthday']  # дополнительные разрешения для авторизации
+SOCIAL_AUTH_FACEBOOK_SCOPE = ['email', 'user_gender', 'user_birthday']  # additional permissions for authorization
 
-# передача дополнительных параметров с facebook аккаунта
+# passing additional parameters from facebook account
 SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
     'fields': 'id, name, first_name, last_name, birthday, email, gender, picture.width(80).height(80)',
 }
@@ -203,7 +204,7 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['https://www.googleapis.com/auth/user.gender.
 API_KEY_GOOGLE = env('API_KEY_GOOGLE')
 BEARER_AUTHORIZATION_TOKEN_GOOGLE = env('BEARER_AUTHORIZATION_TOKEN_GOOGLE')
 
-# настройки summernote для редактирования поля Description в модели Product
+# summernote setting for editing Description field in Product model
 SUMMERNOTE_CONFIG = {
     'summernote': {
         'width': '80%',

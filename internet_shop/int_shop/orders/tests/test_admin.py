@@ -13,7 +13,7 @@ from django.utils import timezone
 
 class TestOrdersAdmin(TestCase):
     """
-    Проверка методов админ панели для заказов
+    Checking admin panel methods for orders
     """
 
     def setUp(self) -> None:
@@ -38,7 +38,7 @@ class TestOrdersAdmin(TestCase):
 
     def test_get_discount_for_coupon(self):
         """
-        Проверка правильности ссылки для перехода информации о купоне в заказе
+        Checking whether transition link to coupon info is correct in the order
         """
         order = Order.objects.create(first_name='Name',
                                      last_name='Surname',
@@ -53,7 +53,7 @@ class TestOrdersAdmin(TestCase):
 
     def test_get_discount_for_present_card(self):
         """
-        Проверка правильности ссылки для перехода информации о подарочной в заказе
+        Checking whether transition link to present card info is correct in the order
         """
         order = Order.objects.create(first_name='Name',
                                      last_name='Surname',
@@ -68,7 +68,7 @@ class TestOrdersAdmin(TestCase):
 
     def test_get_full_name_order_customer(self):
         """
-        Проверка правильности отображения полного имени пользователя для заказа
+        Checking whether displaying full user's name for the order is correct
         """
         order = Order.objects.create(first_name='Name',
                                      last_name='Surname',
@@ -82,7 +82,7 @@ class TestOrdersAdmin(TestCase):
 
     def test_get_full_name_order_delivery(self):
         """
-        Проверка правильности отображения полного имени пользователя для доставки
+         Checking whether displaying full user's name for the delivery is correct
         """
         order = Delivery.objects.create(first_name='Name',
                                         last_name='Surname',

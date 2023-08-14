@@ -1,21 +1,22 @@
-from goods.models import Product
+from decimal import Decimal
+
+from django.core.cache import cache
 from django.db.models import Max, Min
 from django.db.models.query import QuerySet
-from decimal import Decimal
-from django.core.cache import cache
+
+from goods.models import Product
 
 
 def get_max_min_price(category_slug: str) -> tuple:
     """
-    Возврат максимальной и минимальной цены товаров
-    для категории с category_slug
+    Returns maximum and minimum products price for category_slug category
     """
 
-    # достаем из кеша, если цены там есть
+    # get from cache prices if they are existing
     max_price = cache.get(f'max_price_{category_slug}')
     min_price = cache.get(f'min_price_{category_slug}')
 
-    # кешируем цены по категориям, если их нет в кеше
+    # caching prices by categories, if they no in cache yet
     if max_price and min_price:
         return max_price['max_price'], min_price['min_price']
     else:
@@ -27,8 +28,7 @@ def get_max_min_price(category_slug: str) -> tuple:
 
 def get_products_between_max_min_price(price_min: str, price_max: str) -> QuerySet:
     """
-    Возврат товаров с ценой между
-    максимальной и минимальной, указанной в фильтре
+    Returns products with price between maximum and minimum prices, that define in the filter
     """
     price_min = Decimal(price_min)
     price_max = Decimal(price_max)

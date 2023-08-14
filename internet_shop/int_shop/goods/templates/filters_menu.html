@@ -1,13 +1,13 @@
 {% load get_value_from_dict %}
-<!--Меню для выбора фильтра слева на странице списка товаров определенной категории-->
+<!--Menu to select a filter on the left side of the product list page of a specific category-->
 
-<!--Фильтры-->
+<!--Filters-->
 <div class="filter-header">
     <span class="material-symbols-outlined">filter_alt</span>
     Filters
 </div>
 <form id="filters-form" method="get" action="{% url 'goods:filter_results_list' category.slug page_obj.number %}">
-    <!--По цене-->
+    <!--By price-->
     <div class="title-filters">
         <div>Price</div>
         <span class="material-symbols-outlined">expand_less</span>
@@ -26,7 +26,7 @@
             </div>
         </div>
     </div>
-    <!--По производителю-->
+    <!--By manufacturer-->
     <div class="title-filters">
         <div>Brand</div>
         <span class="material-symbols-outlined">expand_less</span>
@@ -40,12 +40,12 @@
             </div>
         {% endfor %}
     </div>
-    <!--По свойствам-->
+    <!--By properties-->
     <div class="title-filters">
         <div>Properties</div>
         <span class="material-symbols-outlined">expand_less</span>
     </div>
-    <!--Меню со свойствами для выбранной категории товаров-->
+    <!--Menu with properties for selected product category-->
     {% include 'filter_properties.html' with properties=category_properties %}
 </form>
 <div class="filter-buttons">

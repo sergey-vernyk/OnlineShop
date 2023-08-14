@@ -38,7 +38,7 @@ class OrderCreateTest(TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         super().setUpClass()
-        # doing celery task locally, not sent they to message broker
+        # doing celery task locally, not sent it to the message broker
         settings.CELERY_TASK_ALWAYS_EAGER = True
         random_number = randint(1, 50)
 

@@ -11,6 +11,9 @@ from orders.forms import OrderCreateForm, DeliveryCreateForm
 
 
 class TestOrderCreateForm(TestCase):
+    """
+    Testing forms in orders application
+    """
 
     def setUp(self):
         settings.CELERY_TASK_ALWAYS_EAGER = True
@@ -41,7 +44,7 @@ class TestOrderCreateForm(TestCase):
 
     def test_invalid_phone_number(self):
         """
-        Проверка отображение ошибки формы при неправильно введенном номере телефона
+        Checking displaying form error if entered phone number is incorrect
         """
 
         self.data_order_form.update({'order_form-phone': '+38 (099) 123 45 678'})  # в номере телефона больше цифр
@@ -59,7 +62,7 @@ class TestOrderCreateForm(TestCase):
 
     def test_invalid_delivery_date(self):
         """
-        Проверка отображение ошибки поля даты доставки, когда была передана дата в прошлом времени
+        Checking displaying form error of the delivery date, when passed delivery date as the past date
         """
         self.data_order_form.update({'delivery_form-delivery_date': datetime.strftime(
             datetime.now().date() + timezone.timedelta(days=-3), '%d-%m-%Y')})  # дата доставки в прошлом

@@ -17,7 +17,7 @@ body {
     min-height: 100vh;
 }
 
-/*Пагинация*/
+/*Pagination*/
 .pagination li { margin: 0 5px !important; }
 
 .pagination .page-link {
@@ -153,7 +153,7 @@ body {
     align-items: center;
 }
 
-/*панель пользователя на navbar*/
+/*user panel on the navbar*/
 .user-panel {
     display: block;
     position: relative;
@@ -181,7 +181,7 @@ body {
     font-size: 1.2rem;
 }
 
-/* Корзина */
+/* The Cart */
 .cart-panel {
     display: flex;
     margin: 0 10px;
@@ -258,7 +258,7 @@ body {
 
 #register-button:hover { color: #F7CB39; }
 
-/*Выпадающий список с категориями товаров главного навбара*/
+/*Dropdown with categories, positioned on the main navbar*/
 .dropdwn {
     position: absolute;
     left: 200px;
@@ -314,7 +314,7 @@ body {
 #main-nav-item:hover { color: rgb(184, 138, 150) }
 
 
-/*Дополнительные пункты меню главного навбара*/
+/*Extra items on the main navbar*/
 .header-block-links-1 {
     display: flex;
     flex: 1 0 22%;
@@ -354,7 +354,7 @@ body {
 
 .additional-menu-items a:hover { color: rgb(184, 138, 150) !important;}
 
-/*Строка поиска*/
+/*Search bar*/
 #search-form {
     display: flex;
     align-items: center;
@@ -424,7 +424,7 @@ body {
     font-size: 1.2rem;
 }
 
-/*Цвет звезды текущего рейтинга*/
+/*Star color of the current product rating*/
 .rating-star .checked {
     color: orange;
     display: inline;
@@ -533,7 +533,7 @@ body {
 .footer-categories a .material-symbols-outlined { margin-right: 5px; }
 
 
-/*страницы с ошибками*/
+/*page with the errors*/
 .page404-content {
     font-family: 'Exo 2', sans-serif;
     display: flex;
@@ -567,7 +567,7 @@ body {
     justify-content: center;
 }
 
-/*Страница информации о службах доставки*/
+/*Page with delivery services information*/
 .container {
     display: flex;
     flex-direction: column;
@@ -646,7 +646,7 @@ body {
     border-bottom: 1px solid #ced4da;
 }
 
-/*страница контактов*/
+/*Page with contacts*/
 .contact-info-emails {
     margin-bottom: 3rem;
     margin-top: 1rem;

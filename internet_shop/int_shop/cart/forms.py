@@ -3,7 +3,7 @@ from django import forms
 
 class CartQuantityForm(forms.Form):
     """
-    Форма для указания добавляемого кол-ва товара в корзину
+    Form for entering product quantity to will add to the cart
     """
 
     quantity = forms.IntegerField(initial=1,

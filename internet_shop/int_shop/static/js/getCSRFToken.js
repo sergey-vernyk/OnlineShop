@@ -1,4 +1,4 @@
-//функция возвращает файл cookie для получения из него csrf токена
+//function returns cookies file in order to get csrf token from it
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {

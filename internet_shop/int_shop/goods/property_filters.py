@@ -1,8 +1,9 @@
-from .models import Property, PropertyCategory
+from django.core.cache import cache
 from django.db.models import F, Q
 from django.db.models.aggregates import Count
-from django.core.cache import cache
 from django.utils.text import slugify
+
+from .models import Property, PropertyCategory
 
 mobile_phones_necessary_props = (
     {'Display': ('Diagonal', 'Resolution', 'Type'),
@@ -47,8 +48,7 @@ smart_gadgets_necessary_props = (
 
 def get_property_for_category(products_category: str, prods_queryset=None) -> dict:
     """
-    Функция получает необходимые для поиска свойства
-    с категории product_category
+    Function gets necessary properties for products search from product_category
     """
     necessary_props = None
     rest_props = None
@@ -66,17 +66,17 @@ def get_property_for_category(products_category: str, prods_queryset=None) -> di
     if prods_queryset:
         lookup = Q(product__in=prods_queryset)
 
-    all_props = cache.get(f'category_{slugify(products_category)}_props')  # получение queryset с кеша
+    all_props = cache.get(f'category_{slugify(products_category)}_props')  # getting queryset from cache
     if not all_props:
         properties_categories = PropertyCategory.objects.prefetch_related('product_categories')
         lookup &= Q(category_property__in=properties_categories, product__category__name__iexact=products_category)
         all_props = Property.objects.select_related('category_property').filter(lookup)
-        cache.set(f'category_{slugify(products_category)}_props', all_props)  # сохранение queryset в кеш
+        cache.set(f'category_{slugify(products_category)}_props', all_props)  # saving queryset to cache
 
     if prods_queryset:
-        rest_props = all_props.filter(lookup)  # оставшиеся свойства, для отфильтрованных товаров
+        rest_props = all_props.filter(lookup)  # remaining filtered products properties
 
-    # отбор нужных категорий и свойств для отображения поиска
+    # select necessary categories and properties for searching
     result = {}
     for prop in (rest_props or all_props).select_related('category_property').values('name',
                                                                                      'text_value',

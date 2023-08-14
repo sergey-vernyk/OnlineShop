@@ -1,9 +1,9 @@
 $(document).ready(function() {
-    var methodInput = $(':input[id=id_delivery_form-method]'); //поле для выбора метода доставки заказа
+    var methodInput = $(':input[id=id_delivery_form-method]'); //field for select delivery method for an order
 
-    var addressInput = $('#id_order_form-address'); //поле ввода адреса доставки
-    var officeNumberInput = $('#id_delivery_form-office_number'); //поле для выбора номера отделения доставки
-    //изменение видимости номера отделения в зависимости от метода
+    var addressInput = $('#id_order_form-address'); //field for enter delivery address
+    var officeNumberInput = $('#id_delivery_form-office_number'); //field for select office number of delivery
+    //changing visibility delivery office number depending on delivery method
     changeVisibility($(methodInput).find(':selected').val());
 
     $(methodInput).change(function() {
@@ -11,7 +11,7 @@ $(document).ready(function() {
         changeVisibility(sel);
     });
 
-    //функция изменят видимость поля ввода в зависимости от значения inputVal
+    //function changes field visibility depending on inputVal value
     function changeVisibility(inputVal) {
         if(inputVal === 'Post office') {
             $(officeNumberInput).parent('.order-form-fields').show();
@@ -21,7 +21,7 @@ $(document).ready(function() {
 
         if(inputVal === 'Apartment') {
             $(addressInput).parent('.order-form-fields').show();
-            $(addressInput).focus(); //установить курсор на поле адреса
+            $(addressInput).focus(); //set cursor om the field
         } else if(inputVal === 'Post office' || inputVal === '' || inputVal === 'Self-delivery')
             $(addressInput).parent('.order-form-fields').hide();
     }

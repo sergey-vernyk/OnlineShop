@@ -9,8 +9,7 @@ from orders.models import Order
 @shared_task
 def order_paid(data: dict, order_id: int, amount_total: Decimal) -> str:
     """
-    Задача отправляет сообщение на электронную почту
-    пользователю, который успешно оплатил заказ
+    Task will send email to user's email, which has been paid order successfully
     """
 
     to_email = Order.objects.get(pk=order_id).email

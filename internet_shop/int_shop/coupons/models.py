@@ -5,7 +5,7 @@ from django.utils import timezone
 
 class Coupon(models.Model):
     """
-    Модель купона для покупки
+    Coupon model for purchases
     """
 
     code = models.CharField(max_length=50, unique=True)
@@ -20,7 +20,7 @@ class Coupon(models.Model):
     @property
     def is_valid(self) -> bool:
         """
-        Возврат состояния купона
+        Returns coupon state
         """
         now = timezone.now()
         return self.valid_from <= now <= self.valid_to
@@ -28,7 +28,7 @@ class Coupon(models.Model):
 
 class Category(models.Model):
     """
-    Модель категории купона
+    Coupon category model
     """
     name = models.CharField(max_length=50)
     slug = models.SlugField(max_length=50)

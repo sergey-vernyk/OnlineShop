@@ -12,25 +12,24 @@ import shutil
 
 
 @receiver(signal=[post_save, post_delete], sender=Product)
-def invalidate_prices_cache(sender, instance: Product, *args, **kwargs):
+def invalidate_prices_cache(sender, product: Product, *args, **kwargs):
     """
-    Инвалидация кеша максимальной или минимальной
-    цены из всех цен товаров для категории, которой принадлежит instance
-    при добавлении нового товара или при удалении
+    Invalidate the cache of maximum or minimum price for product category,
+    when adding new the product or deleting the existing product
     """
-    max_price = cache.get(f'max_price_{instance.category.slug}')
-    min_price = cache.get(f'min_price_{instance.category.slug}')
+    max_price = cache.get(f'max_price_{product.category.slug}')
+    min_price = cache.get(f'min_price_{product.category.slug}')
 
-    if max_price and (instance.price > max_price['max_price'] or instance.price == max_price['max_price']):
-        cache.delete(f'max_price_{instance.category.slug}')
-    if min_price and (instance.price < min_price['min_price'] or instance.price == min_price['min_price']):
-        cache.delete(f'min_price_{instance.category.slug}')
+    if max_price and (product.price > max_price['max_price'] or product.price == max_price['max_price']):
+        cache.delete(f'max_price_{product.category.slug}')
+    if min_price and (product.price < min_price['min_price'] or product.price == min_price['min_price']):
+        cache.delete(f'min_price_{product.category.slug}')
 
 
 def invalidate_properties_cache(sender, instance, **kwargs):
     """
-    Инвалидация кеша для хранения queryset со свойствами товаров,
-    когда добавляется в БД новое свойство или категория свойств
+    Invalidate the cache for storage queryset with products properties,
+    when adding the new property or property category
     """
 
     if isinstance(instance, Property):
@@ -43,17 +42,18 @@ def invalidate_properties_cache(sender, instance, **kwargs):
 
 
 @receiver(signal=post_delete, sender=Product)
-def delete_product_images_folder(sender, instance: Product, *args, **kwargs):
+def delete_product_images_folder(sender, product: Product, *args, **kwargs):
     """
-    Удаление фото товара из aws, папки с фото товара из media
-    и id товара из redis
+    Deleting product image from AWS Bucket,
+    deleting directory with product photos from media root,
+    and deleting product id frm Redis
     """
-    # если используется облачное хранилище aws
-    if isinstance(instance.image.storage, MediaStorage):
-        aws_image_key = f'media/{instance.image.name}'
+    # if using AWS Cloud storage
+    if isinstance(product.image.storage, MediaStorage):
+        aws_image_key = f'media/{product.image.name}'
         aws_s3_bucket = MediaStorage().bucket_name
         client = boto3.client('s3')
         client.delete_object(Bucket=aws_s3_bucket, Key=aws_image_key)
-    # удаление папки товара из файловой системы
-    shutil.rmtree(os.path.join(settings.MEDIA_ROOT, f'products/product_{instance.name}'))
-    redis.srem('products_ids', instance.pk)
+    # deleting product's photo directory from the file system
+    shutil.rmtree(os.path.join(settings.MEDIA_ROOT, f'products/product_{product.name}'))
+    redis.srem('products_ids', product.pk)

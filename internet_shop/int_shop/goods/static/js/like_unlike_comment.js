@@ -1,7 +1,7 @@
 import getCookie from '/static/js/getCSRFToken.js';
 
 $(document).ready(function() {
-    //стили 'закрашенного и не закрашенного' пальца для like/unlike
+    //styles for "filled" and no "unfilled" thumbs for like/dislike стили
     const cssFillThumb = {'font-variation-settings': `"FILL" 1, "GRAD" 0, "opsz" 48, "wght" 400`};
     const cssUnfillThumb = {'font-variation-settings': `"FILL" 0, "GRAD" 0, "opsz" 48, "wght" 400`};
     const url = $('.comment-like-unlike-block').data('url');
@@ -27,7 +27,7 @@ $(document).ready(function() {
                     case 'like':
                         if(previousStatus == 'unset') {
                             $(currentButton).css(cssFillThumb);
-                            $(`#unlike-${commentId}`).css(cssUnfillThumb); //сброс противоположного действия
+                            $(`#unlike-${commentId}`).css(cssUnfillThumb); //reset opposite action
                         } else if(previousStatus == 'set') {
                             $(currentButton).css(cssUnfillThumb);
                         }
@@ -38,19 +38,19 @@ $(document).ready(function() {
                             $(currentButton).css(cssUnfillThumb);
                         } else if(previousStatus == 'unset') {
                             $(currentButton).css(cssFillThumb);
-                            $(`#like-${commentId}`).css(cssUnfillThumb); //сброс противоположного действия
+                            $(`#like-${commentId}`).css(cssUnfillThumb); //reset opposite action
                         }
         
                         break;
                     default:
                         break;
                 }
-                //установка новых значений кол-ва лайков/дизлайков
+                //setting new values of quantity likes/dislikes
                 $(`#likes-count-${commentId}`).text(`(${response['new_count_likes']})`);
                 $(`#unlikes-count-${commentId}`).text(`(${response['new_count_unlikes']})`);
             },
             error: function(jqXHR, textStatus, errorThrown) {
-                //если посльзователь не авторизован - вывести окно с информацией
+                //if user is not authenticated - show up window with an information
                 if(errorThrown === 'Unauthorized') {
                     var login_url = jqXHR.responseJSON['login_page_url']
                     const content = `<div id="dialog">Please <a href="${login_url}">login</a> to be able to rate comments!</div>`

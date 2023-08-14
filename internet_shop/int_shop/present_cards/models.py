@@ -1,11 +1,12 @@
 from django.db import models
 from django.utils import timezone
+
 from account.models import Profile
 
 
 class PresentCard(models.Model):
     """
-    Модель подарочной карты для покупки
+    Present card for purchases model
     """
     code = models.CharField(max_length=50, unique=True)
     valid_from = models.DateTimeField(null=False)
@@ -25,7 +26,7 @@ class PresentCard(models.Model):
     @property
     def is_valid(self) -> bool:
         """
-        Возврат состояния купона
+        Returns state of present card
         """
         now = timezone.now()
         return self.valid_from <= now <= self.valid_to
@@ -33,7 +34,7 @@ class PresentCard(models.Model):
 
 class Category(models.Model):
     """
-    Модель категории подарочной карты
+    Present card category model
     """
     name = models.CharField(max_length=50)
     slug = models.SlugField(max_length=50)

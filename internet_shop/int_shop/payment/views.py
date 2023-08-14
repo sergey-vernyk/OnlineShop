@@ -1,12 +1,13 @@
+from decimal import Decimal
 from typing import Union
 
-from django.shortcuts import redirect, get_object_or_404, reverse, render
 import stripe
 from django.conf import settings
-from django.views.decorators.csrf import csrf_exempt
-from decimal import Decimal
 from django.http import HttpResponse
+from django.shortcuts import redirect, get_object_or_404, reverse, render
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+
 from orders.models import Order
 from .tasks import order_paid
 
@@ -16,9 +17,9 @@ endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
 
 def create_discounts(discount_type: str = None, discount_value: int = None) -> Union[stripe.Coupon, str, None]:
     """
-    Создание скидок для оплаты: купон или подарочная карта.
-    Купон содержит скидку в процентах от полной суммы за товары.
-    Подарочная карта содержит фиксированную сумму от полной суммы за товары.
+    Creating discounts for the order: coupon or present card.
+    Coupon contains with discount in percentage from total goods cost.
+    Present card contains with fixed amount from total goods cost.
     """
     if not (discount_type and discount_value):
         return None
@@ -32,7 +33,7 @@ def create_discounts(discount_type: str = None, discount_value: int = None) -> U
                 duration='forever'
             )
         elif discount_type == 'present_card':
-            # умножение на 100 для перевода значения в центы
+            # multiply by 100, cause convert value to cents
             discount = stripe.Coupon.create(
                 amount_off=discount_value * 100,
                 duration='forever',
@@ -49,8 +50,7 @@ def create_discounts(discount_type: str = None, discount_value: int = None) -> U
 @csrf_exempt
 def create_checkout_session(request) -> Union[redirect, str]:
     """
-    Сеанс оформления заказа представляет собой сеанс клиента,
-    когда он оплачивает разовые покупки
+    Checkout session is customer session, when customer paying one-time purchases
     """
     order_id = request.session.get('order_id')
     order = get_object_or_404(Order, pk=order_id)
@@ -63,17 +63,17 @@ def create_checkout_session(request) -> Union[redirect, str]:
                           customer_email=request.user.email,
                           client_reference_id=order.pk)
 
-    discount_type_value = tuple(None for _ in range(2))  # начальная инициализация кортежа для параметров скидки
+    discount_type_value = tuple(None for _ in range(2))  # init tuple for discount parameters
 
     if order.coupon:
         discount_type_value = ('coupon', order.coupon.discount)
     elif order.present_card:
         discount_type_value = ('present_card', order.present_card.amount)
 
-    discount_instance = create_discounts(*discount_type_value)  # создание экземпляра купона
+    discount_instance = create_discounts(*discount_type_value)  # creating coupon instance
 
     if discount_instance:
-        session_params.update(discounts=[{'coupon': discount_instance}])  # добавление экземпляра скидки
+        session_params.update(discounts=[{'coupon': discount_instance}])  # adding discount instance
 
     try:
         checkout_session = stripe.checkout.Session.create(**session_params)
@@ -86,7 +86,7 @@ def create_checkout_session(request) -> Union[redirect, str]:
 
 def create_session_line_items(order: Order) -> list:
     """
-    Функция создает список с позициями, купленными покупателем
+    Function creates list, consists from items bought by customer
     """
     result = []
 
@@ -108,15 +108,15 @@ def create_session_line_items(order: Order) -> list:
 
 def payment_success(request):
     """
-    Представление успешного завершения оплаты
+    Successfully payment view
     """
-    # достаем сессию по её id и смотрим статус оплаты заказа с order_id
+    # getting checkout session by it id and getting it payment status by order_id
     session_id = request.session['stripe_checkout_session_id']
     session = stripe.checkout.Session.retrieve(session_id)
     order_id = request.session.get('order_id')
     order = Order.objects.get(pk=order_id)
 
-    # если заказ был оплачен - обозначаем это и сохраняем
+    # if order has been paid, therefore make mark it and save to DB
     if session.payment_status == 'paid':
         order.is_paid = True
         order.save(update_fields=['is_paid'])
@@ -129,7 +129,7 @@ def payment_success(request):
 
 def payment_cancel(request):
     """
-    Представление отклонения оплаты
+    View for displaying decline payment status
     """
     return render(request, 'payment/cancel.html')
 
@@ -138,13 +138,13 @@ def payment_cancel(request):
 @csrf_exempt
 def webhook(request) -> HttpResponse:
     """
-    Обработка вебхука
+    Webhook handling
     """
     event = None
     payload = request.body
     sig_header = request.META['HTTP_STRIPE_SIGNATURE']
 
-    # проверка, что запрос пришел от Stripe
+    # check, that request came from Stripe
     try:
         event = stripe.Webhook.construct_event(
             payload,
@@ -152,28 +152,28 @@ def webhook(request) -> HttpResponse:
             endpoint_secret
         )
     except ValueError:
-        # невалидный содержание запроса
+        # invalid request content
         return HttpResponse(status=400)
 
     except stripe.error.SignatureVerificationError:
-        # невалидная сигнатура
+        # invalid signature
         return HttpResponse(status=400)
 
-    # обработка события завершения сессии
+    # handling session complete event
     if event.type == 'checkout.session.completed':
         session = event.data.object
-        # если режим сессии оплата и статус оплачено - отправка email пользователю, что заказ был оплачен
+        # if the session mode is payment and the payment status is paid, send email to user, that order has been paid
         if session.mode == 'payment' and session.payment_status == 'paid':
             total_amount = (Decimal(session.amount_total or
                                     session.amount_subtotal) / Decimal('100')).quantize(Decimal('0.01'))
-            order_id = session.client_reference_id  # client_reference_id соответствует id заказа
+            order_id = session.client_reference_id  # client_reference_id corresponds order id
             order = Order.objects.get(pk=order_id)
-            order.stripe_id = session.payment_intent  # присвоение заказу id paymentIntent
+            order.stripe_id = session.payment_intent  # assigning to the order paymentIntent id
             order.save(update_fields=['stripe_id'])
 
             domain = request.site.domain
             is_secure = request.is_secure()
-            # отправка email об оплате заказа
+            # sending email about order payment for the order
             order_paid.delay(data={'domain': domain, 'is_secure': is_secure},
                              order_id=order.pk,
                              amount_total=total_amount)

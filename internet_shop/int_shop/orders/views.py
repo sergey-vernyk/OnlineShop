@@ -1,18 +1,20 @@
 from typing import NoReturn
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http.response import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic import FormView, TemplateView
-from django.contrib.auth.mixins import LoginRequiredMixin
+
 from account.models import Profile
 from cart.cart import Cart
-from .forms import OrderCreateForm, DeliveryCreateForm
 from orders.models import Order, OrderItem
 from orders.tasks import order_created
-from django.http.response import HttpResponseRedirect
+from .forms import OrderCreateForm, DeliveryCreateForm
 
 
 class OrderCreateView(LoginRequiredMixin, FormView):
     """
-    Представление для создания заказа на сайте
+    View for creation order
     """
     form_class = OrderCreateForm
     template_name = 'orders/order_create.html'
@@ -27,9 +29,9 @@ class OrderCreateView(LoginRequiredMixin, FormView):
         return context
 
     def post(self, request, *args, **kwargs):
-        cart = Cart(request)  # создаем объект корзины
+        cart = Cart(request)  # creating cart instance
         profile = Profile.objects.get(user=self.request.user)
-        # получаем формы
+        # getting forms
         order_form = self.get_form()
         delivery_form = self.get_form(form_class=DeliveryCreateForm)
 
@@ -38,35 +40,34 @@ class OrderCreateView(LoginRequiredMixin, FormView):
 
         if all([order_valid, delivery_valid]):
             order = order_form.save(commit=False)
-            # если в корзине есть валидный купон или подарочная карта, присваиваем к заказу
+            # if there are valid coupon or valid present card in the cart, linking them to the order
             if cart.coupon:
                 order.coupon = cart.coupon
             elif cart.present_card:
                 order.present_card = cart.present_card
 
             delivery = delivery_form.save()
-            # привязка доставки и профиля к заказу
+            # linking delivery and profile to the order
             order.delivery = delivery
             order.profile = profile
             order.save()
-            self.create_order_items_from_cart(order)  # создание элементов заказа в базе
+            self.create_order_items_from_cart(order)  # creating the order items in DB
             self.request.session['order_id'] = order.pk
 
             domain = request.site.domain
             is_secure = request.is_secure()
-            # отправка сообщения о завершении заказа на почту
+            # send message about complete the order to user's email
             order_created.delay(data={'domain': domain, 'is_secure': is_secure},
                                 order_id=order.pk,
                                 profile_username=self.request.user.username)
             return HttpResponseRedirect(self.success_url)
-        else:  # возврат форм с ошибками
+        else:  # returns forms with errors
             return self.render_to_response(context={'form': order_form,
                                                     'delivery_form': delivery_form})
 
     def create_order_items_from_cart(self, order: Order) -> NoReturn:
         """
-        Создание элементов заказа в базе из элементов корзины,
-        привязанных к текущему заказу
+        Creating order items in DB from cart items, linked with current order
         """
         cart = Cart(self.request)
         for item in cart:
@@ -79,7 +80,7 @@ class OrderCreateView(LoginRequiredMixin, FormView):
 
 class OrderConfirmedView(TemplateView):
     """
-    Представление для отображения страницы созданного заказа
+    View for displaying page with info,that order has been created
     """
     template_name = 'orders/order_created.html'
 

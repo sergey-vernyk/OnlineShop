@@ -9,6 +9,6 @@ class GoodsConfig(AppConfig):
     def ready(self):
         from . import signals
         from goods.models import Property, PropertyCategory
-        # инвалидация кеша при создании нового свойства товара или новой категории свойства
+        # cache invalidate while created new product property or new property category
         post_save.connect(receiver=signals.invalidate_properties_cache, sender=Property)
         post_save.connect(receiver=signals.invalidate_properties_cache, sender=PropertyCategory)

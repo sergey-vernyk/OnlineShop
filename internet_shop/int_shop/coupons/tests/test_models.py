@@ -1,7 +1,9 @@
+from random import randint
+
 from django.test import TestCase
 from django.utils import timezone
+
 from coupons.models import Coupon, Category
-from random import randint
 
 
 class TestCouponModels(TestCase):
@@ -24,7 +26,7 @@ class TestCouponModels(TestCase):
         self.coupon.save()
         self.assertTrue(self.coupon.is_valid)
 
-    def test_coupons_is_valid_property_if_coupon_really_invalid(self):
+    def test_coupons_is_valid_property_if_coupon_invalid(self):
         """
         Checking whether coupon is invalid
         """

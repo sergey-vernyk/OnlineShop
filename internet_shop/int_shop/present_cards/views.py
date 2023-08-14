@@ -1,10 +1,11 @@
+from django.http.response import JsonResponse
+from django.views.decorators.http import require_POST
+
 from account.models import Profile
+from common.decorators import ajax_required
+from common.decorators import auth_profile_required
 from present_cards.forms import PresentCardApplyForm
 from present_cards.models import PresentCard
-from common.decorators import ajax_required
-from django.views.decorators.http import require_POST
-from django.http.response import JsonResponse
-from common.decorators import auth_profile_required
 
 
 @auth_profile_required
@@ -12,8 +13,7 @@ from common.decorators import auth_profile_required
 @require_POST
 def apply_present_card(request):
     """
-    Применение подарочной карты со страницы корзины
-    и добавление ее в профиль пользователя
+    Applying present card from cart page and adding it to profile
     """
     card_form = PresentCardApplyForm(request.POST)
     if card_form.is_valid():
@@ -30,12 +30,12 @@ def apply_present_card(request):
                              'form_errors': card_form.errors})
 
 
+@auth_profile_required
 @ajax_required
 @require_POST
 def cancel_present_card(request):
     """
-    Отмена применения подарочной карты к корзине,
-    удаление ее из сессии и из пользовательского профиля
+    Canceling applying present card to cart, deleting this card from session and from profile
     """
     present_card = PresentCard.objects.get(pk=request.session.get('present_card_id'))
     present_card.profile.profile_cards.update(profile_id=None)

@@ -1,7 +1,7 @@
 FROM python:3.9-alpine3.16
 LABEL maintainer="volt.awp@gmail.com"
 
-# переменные нужны для работы с python
+# variales needeed for interaction with python
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
@@ -9,17 +9,17 @@ EXPOSE 5000
 WORKDIR /code
 ARG user=shop_admin
 
-# пакеты для подключения postgresql
+# packages for connection to postgresql
 RUN apk update && \
     apk add --update --no-cache postgresql-client \
-        build-base postgresql-dev linux-headers nano
+        build-base postgresql-dev linux-headers
 
-# создание и назначения пользователя от которого будут запускаться команды в контейнере
+# creating and assigning user from which will starts commands in the docker
 RUN adduser -D $user && \
     addgroup $user www-data
 
-# папки для сокетов, файл лога, файл результат хеша файлов медиа
-# установка владельца для созданных папок и файлов
+# directories for sockets, logs files and result file with hash media files
+# set owner for created directries and files
 RUN mkdir -p /var/run/postgresql /var/run/wsgi /vol/web/static /vol/web/media /code/scripts /code/coverage && \
     touch /code/main_log.log /code/scripts/result_hash.txt && \
     chmod -R 755 /code/main_log.log /code/scripts/result_hash.txt /vol /code/coverage && \
@@ -29,12 +29,13 @@ RUN mkdir -p /var/run/postgresql /var/run/wsgi /vol/web/static /vol/web/media /c
 
 USER $user
 
-# установка зависимостей
+# install dependencies
 RUN pip install --upgrade pip
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
-# добавление пути в PATH местонахождения приложений, установленных через pip
+# adding path to PATH environment variable, where located applications installed through pip
 ENV PATH "$PATH:/home/$user/.local/bin"
 
+# copy source code to docker
 COPY . /code

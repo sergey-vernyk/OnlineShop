@@ -13,13 +13,13 @@ from .forms import CartQuantityForm
 
 class Cart:
     """
-    Корзина с товарами
+    Cart with products
     """
 
     @property
     def coupon(self) -> Union[Coupon, None]:
         """
-        Возвращает объект купона или None
+        Returns coupon object or None
         """
         if self.coupon_id:
             coupon = Coupon.objects.get(id=self.coupon_id)
@@ -30,7 +30,7 @@ class Cart:
     @property
     def present_card(self) -> Union[PresentCard, None]:
         """
-        Возвращает объект подарочной карты или None
+        Returns present card object or None
         """
         if self.present_card_id:
             present_card = PresentCard.objects.get(id=self.present_card_id)
@@ -49,7 +49,7 @@ class Cart:
 
     def add(self, product: Product, quantity: int = 1) -> NoReturn:
         """
-        Метод добавления товаров в корзину
+        Method adds product to the cart
         """
         product_id = str(product.pk)
         if product_id not in self.cart:
@@ -62,17 +62,17 @@ class Cart:
 
     def __len__(self) -> int:
         """
-        Возвращает общее кол-во товаров с учетом кол-ва каждого товара
+        Returns the total number of goods quantity, taking into account it quantity
         """
         return sum(item['quantity'] for item in self.cart.values())
 
     def __iter__(self) -> Generator[dict, None, None]:
         """
-        Перебор всех товаров из корзины
+        Getting of all products from the cart
         """
         products_ids = [pk for pk in self.cart]
         products_ids_ordered = Case(*[When(pk=pk, then=Value(position)) for position, pk in enumerate(products_ids)])
-        # получение товаров в порядке их id в products_ids
+        # getting goods in order their id in products_ids
         products = Product.objects.filter(id__in=products_ids).order_by(products_ids_ordered)
         cart = deepcopy(self.cart)
 
@@ -87,7 +87,7 @@ class Cart:
 
     def remove(self, product_id: int) -> NoReturn:
         """
-        Удаление информации о товаре с корзины по его id
+        Deleting info about product from the cart by product id
         """
         if str(product_id) in self.cart:
             del self.cart[str(product_id)]
@@ -96,7 +96,7 @@ class Cart:
 
     def clear(self) -> NoReturn:
         """
-        Очистка корзины с удалением купона и подарочной карты из сессии
+        Clearing the cart with deleting coupon and present card from session
         """
         del self.session[settings.CART_SESSION_ID]
         if 'coupon_id' in self.session:
@@ -107,20 +107,20 @@ class Cart:
 
     def get_total_price(self) -> int:
         """
-        Получение общей стоимости всех товаров с учетом их кол-ва
+        Getting total cost of all products taking into account it quantity
         """
         return sum(Decimal(item['price']) * item['quantity'] for item in self.cart.values())
 
     def get_amount_items_in(self) -> int:
         """
-        Получение количества разных товаров
+        Getting quantity different products in the cart
         """
         return len(self.cart)
 
     def get_total_price_with_discounts(self) -> Decimal:
         """
-        Расчет общей суммы заказа с учетом скидки от купона
-        или вычета фиксированной суммы от подарочной карты
+        Calculating total order sum taking into account coupon discount
+        or deduction of the fixed amount of present card
         """
         price_without_discount = self.get_total_price()
         coupon, present_card = self.coupon, self.present_card
@@ -136,6 +136,6 @@ class Cart:
 
     def get_total_discount(self) -> Decimal:
         """
-        Сумма скидки с учётом купона или подарочной карты
+        Returns discount amount taking into account coupon or present card
         """
         return self.get_total_price() - self.get_total_price_with_discounts()

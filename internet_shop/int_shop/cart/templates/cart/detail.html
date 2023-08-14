@@ -10,7 +10,7 @@
 {% endblock %}
 {% block content %}
 <div class="container p-3">
-    <!--верхняя строка корзины-->
+    <!--top string of the cart-->
     <div class="cart-top">
         <h2 class="mb-1 d-block">Shopping cart</h2>
         <div class="d-block align-self-center">
@@ -26,7 +26,7 @@
     </div>
     <div class="row align-items-start gap-3">
         <div class="block-cart-items">
-            <!--карточки добавленных товаров-->
+            <!--the cards of added products-->
             {% for item in cart %}
                 <div class="cart-item">
                     {% with product=item.product %}
@@ -54,7 +54,7 @@
                             </form>
                         </div>
                         <div class="item-price">
-                            <!--расчет стоимости товара по его количеству-->
+                            <!--calculate product cost by it quantity-->
                             ${{ item.total_price }}
                         </div>
                         <div class="item-remove">
@@ -92,7 +92,7 @@
                 </div>
                 <div class="block-summary">
                     <h5 class="fw-bold mb-3">Discounts</h5>
-                    <!--Форма для кода купона-->
+                    <!--Form for coupon code-->
                     <div class="coupon-discount-block">
                         <div class="coupon-check">
                             <label for="have-coupon">Have a coupon?</label>
@@ -116,10 +116,10 @@
                             <span class="material-symbols-outlined">check_circle</span>
                             {% endif %}
                         </form>
-                        <!--ошибки для формы купона-->
+                        <!--errors for coupon form-->
                         <ul class="errorlist" style="display: none;"></ul>
                     </div>
-                    <!--Форма для кода подарочной карты (заполняется в JavaScript)-->
+                    <!--Form for present card form (will fill in JavaScript)-->
                     <div class="card-discount-block">
                         <div class="card-check">
                             <label for="have-card">Have a present card?</label>
@@ -143,7 +143,7 @@
                                 <span class="material-symbols-outlined">check_circle</span>
                             {% endif %}
                         </form>
-                        <!--ошибки для формы подарочной карты (заполняется в JavaScript)-->
+                        <!--errors for present card form (will fill in JavaScript)-->
                         <ul class="errorlist" style="display: none;"></ul>
                     </div>
                 </div>

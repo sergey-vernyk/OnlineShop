@@ -28,7 +28,7 @@
             <a class="text-decoration-none" href="{% url 'goods:product_list' %}">
                 <div class="shop-name">Online Shop</div>
             </a>
-            <!--Список с выпадающими категориями товара-->
+            <!--Dropdown list with products categories-->
             <div class="header-block-links-1">
                 <ul class="dropdwn">
                     <li id="main-nav-item">
@@ -75,7 +75,7 @@
                     </li>
                 </ul>
             </div>
-            <!--Форма поиска-->
+            <!--Search form-->
             <form id="search-form" action="{% url 'goods:product_list' %}" method="get">
                 {{ search_form.query }}
                 <button role="button" id="search-btn" type="submit">
@@ -83,7 +83,7 @@
                     Search
                 </button>
             </form>
-            <!--Панель с именем пользователя и кнопками регистрации или авторизации-->
+            <!--Panel with username and registration or authorization buttons-->
             <div style="display: flex;flex: 1 1 auto;align-items: center;">
                 <div class="header-block-links-2">
                     {% if request.user.is_authenticated %}
@@ -101,7 +101,7 @@
                         </div>
                     </div>
                     {% endif %}
-                    <!--Корзина-->
+                    <!--Cart-->
                     <div class="cart-panel">
                         <div class="cart-button">
                             <a type="button" href="{% url 'cart:cart_detail' %}">
@@ -131,6 +131,7 @@
                         {% endwith %}
                     </div>
                 </div>
+                <!--Social contacts-->
                 <div class="we-in-social">
                     <p>We are in messengers</p>
                     <ul>
@@ -183,6 +184,7 @@
             <div class="shop-prods-categories">
                 <h5 class="footer-headers">Shop categories</h5>
                 <ul>
+                    <!--Categories-->
                     {% for c in categories %}
                         <li class="footer-categories">
                             {% if c.name == 'Mobile phones' %}

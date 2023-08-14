@@ -1,12 +1,12 @@
 $(document).ready(function() {
     var order;
     checkSelect = function() {
-        // поиск выбранного пункта
+        //searching selected item
         order = $('#order_id').find(':selected').val();
     };
 
     formSubmit = function() {
-        // подтверждение формы
+        //submitting form
         $('#sorting-form').submit();
     };
 });

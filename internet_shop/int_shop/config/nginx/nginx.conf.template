@@ -1,9 +1,9 @@
 server {
-        # незащищенный протокол с переадресаций на протокол с ssl
+        # not secure protocol with redirection to ssl protocol
         listen 80;
         server_name ${DOMAIN} www.${DOMAIN};
 
-        # директория для поиска challenge файла для завершения аутенификации
+        # directory for searching challenge file for complete authentication
         location /.well-known/acme-challenge/ {
             root /vol/www/;
         }

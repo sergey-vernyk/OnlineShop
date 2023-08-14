@@ -6,44 +6,44 @@ DEBUG = False
 
 ALLOWED_HOSTS = env('ALLOWED_HOSTS').split(',')
 
-# django доверяет заголовку X-Forwarded-Proto, который исходит от прокси
+# django trusts header X-Forwarded-Proto, which come from proxy который исходит от прокси
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 CSRF_TRUSTED_ORIGINS = env('CSRF_TRUSTED_ORIGINS').split(',')
 
-SESSION_COOKIE_SECURE = True  # избежание случайной передачи сеанса файла cookie по HTTP
-# SECURE_SSL_REDIRECT = True  # перенаправление всех запросов на протокол HTTPS
-CSRF_COOKIE_SECURE = True  # браузеры будут передавать куки только через HTTPS
+SESSION_COOKIE_SECURE = True  # avoiding accidental transferring cookies over HTTP
+# SECURE_SSL_REDIRECT = True  # redirection all requests to HTTPS protocol
+CSRF_COOKIE_SECURE = True  # browsers will transfer cookies only over HTTPS
 
-# отправка email на почту пользователям из списка, когда происходят ошибки сервера
+# sending email to users in list below, when server errors occurred
 ADMINS = (
     ('Sergey V', 'volt.awp@gmail.com'),
 )
 
-# отправка email на почту пользователям из списка, когда происходят ошибки ссылок на страницы 404
-# когда у запроса есть Referer
+# sending email to users in list below, when occurred 404 pages links errors
+# when request has Referer header
 # MANAGERS = (
 #     ('John Doe', 'sergey.vernyk@petalmail.com'),
 # )
 
 
-# middleware для списка MANAGERS
+# middleware for list MANAGERS
 MIDDLEWARE.insert(0, 'django.middleware.common.BrokenLinkEmailsMiddleware')
-# почта с которой будут отправляться письма для списка ADMINS
+# email, from which will be sending emails for ADMINS list
 SERVER_EMAIL = 'errors@onlineshop.com'
 EMAIL_SUBJECT_PREFIX = ['Django Onlineshopproj']
 
-# (python manage.py collectstatic - собирает все статические файлы проекта и сохраняет их по этому пути)
-STATIC_ROOT = os.path.join(BASE_DIR, '/vol/web/static')
-MEDIA_ROOT = os.path.join(BASE_DIR, '/vol/web/media')  # путь, по которому находятся эти файлы
+# (python manage.py collectstatic - gathers all static file in project and saving their to this path)
+STATIC_ROOT = os.path.join(BASE_DIR, '/vol/web/static')  # path, where these files are located
+MEDIA_ROOT = os.path.join(BASE_DIR, '/vol/web/media')
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 
-# настройки для хранения файлов в AWS облаке (пока не используются)
+# settings for saving files in AWS Cloud (not used for now)
 # STATIC_ROOT = os.path.join(BASE_DIR, 'assets/')
-# MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')  # путь, по которому находятся эти файлы
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')  # path, where these files are located
 
 
-# места сохранения файлов в AWS облаке (пока не используются)
-# автоматическое добавление статических файлов в S3 bucket, когда запускается команда collectstatic
+# places for saving files in AWS Cloud (not used for now)
+# auto adding static files to S3 Bucket, when collectstatic command starts
 # STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 # DEFAULT_FILE_STORAGE = 'common.storage_backends.MediaStorage'
 
@@ -57,7 +57,7 @@ AWS_LOCATION = 'static'
 PUBLIC_MEDIA_LOCATION = 'media'
 AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 
-# URL для AWS (пока не используются)
+# URL for AWS (not used for now)
 # STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
 # MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/'
 
@@ -73,8 +73,8 @@ EMAIL_USE_SSL = False
 EMAIL_USE_TLS = True
 
 LOGGING = {
-    'version': 1,  # версия dictConfig
-    'disable_existing_loggers': False,  # сохранение логера по умолчанию
+    'version': 1,  # dictConfig version
+    'disable_existing_loggers': False,  # keep save logger by default
     'handlers': {
         'handler_log': {
             'class': 'logging.FileHandler',

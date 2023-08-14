@@ -10,7 +10,7 @@ register = template.Library()
 @register.filter('multiply')
 def multiply(value1, value2) -> Union[Decimal, None]:
     """
-    Фильтр возвращает результат перемножения значений
+    Filter returns result of multiply two values or None if values not numbers
     """
     try:
         result = Decimal(value1) * Decimal(value2)
@@ -23,7 +23,6 @@ def multiply(value1, value2) -> Union[Decimal, None]:
 @register.filter('to_str')
 def to_str(arg: int) -> str:
     """
-    Фильтр возвращает строку,
-    конвертированную из числа
+    Filter returns string, converted from number
     """
     return str(arg)

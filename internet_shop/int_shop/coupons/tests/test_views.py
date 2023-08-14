@@ -88,6 +88,7 @@ class TestCouponViews(TestCase):
         session.update({'coupon_id': self.coupon.pk})
         session.save()
 
+        self.profile.coupons.add(self.coupon)  # add coupon to profile
         client.login(username=self.user.username, password='password')
 
         self.response = client.post(reverse('coupons:cancel_coupon'),

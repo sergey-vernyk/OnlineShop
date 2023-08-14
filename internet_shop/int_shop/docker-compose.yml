@@ -10,11 +10,11 @@ services:
       - "5000:5000"
     volumes:
       - code:/code
-      - postgres_socket:/var/run/postgresql  # volume для подключения БД через сокет
-      - wsgi_socket:/var/run/wsgi  # volume для подключения nginx через сокет
+      - postgres_socket:/var/run/postgresql  # volume for connecting db through socket
+      - wsgi_socket:/var/run/wsgi  # volume for connection to nginx through socket
       - static_data:/vol/web/static
       - media_data:/vol/web/media
-    env_file: # файл с переменными окружения
+    env_file: # file with environment variables
       - ./int_shop/settings/.env
     command:
       sh -c "python manage.py collectstatic --noinput && \
@@ -33,7 +33,7 @@ services:
       - ./int_shop/settings/.env
     volumes:
       - shop_db_data:/var/lib/postgresql/data
-      - postgres_socket:/var/run/postgresql  # использование подключения через сокет
+      - postgres_socket:/var/run/postgresql  # using connection through socket
     ports:
       - "5431:5431"  # host:docker
     restart: always
@@ -53,7 +53,7 @@ services:
     volumes:
       - redis_data:/data
       - ./config/redis/redis.conf:/usr/local/etc/redis/redis.conf
-    command: redis-server /usr/local/etc/redis/redis.conf  # использование кастомного конфига
+    command: redis-server /usr/local/etc/redis/redis.conf  # using custom config
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
 
@@ -75,7 +75,7 @@ services:
       - ./int_shop/settings/.env
     volumes:
       - code:/code
-      - postgres_socket:/var/run/postgresql  # использование подключения через к БД через сокет
+      - postgres_socket:/var/run/postgresql  # using connection to the DB through socket
     command: celery -A int_shop worker -l INFO
     depends_on:
       - db
@@ -117,7 +117,7 @@ services:
     depends_on:
       - web
 
-  # используется только для возобновления сертификата и ключа для HTTPS
+  # using only for renew both certificate and key needs for HTTPS
   certbot:
     build:
       context: ./config/certbot

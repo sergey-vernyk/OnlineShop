@@ -3,8 +3,8 @@ $(document).ready(function() {
     const collapse = 'expand_less';
 
     $('[id^=expander]').click(function(){
-        var order_id = this.id.slice(9); //достаем id заказа из нажатой кнопки
-        var currentSign = $(this).children();  //внутренний блок со значком
+        var order_id = this.id.slice(9); //getting order id from pressed button
+        var currentSign = $(this).children();  //inner block with icon
         var currentAction = $(currentSign).text() == expand ? 'expand' : 'collapse';
         $(`#order-detail-${order_id}`).slideToggle();
 

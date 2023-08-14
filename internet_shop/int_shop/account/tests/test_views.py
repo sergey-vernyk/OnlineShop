@@ -179,7 +179,7 @@ class TestAccountViews(TestCase):
         for data in user_activate_data.values():
             activate_response = activate_user_account(request, data['uidb64'], data['token'])
             activate_response.client = self.client
-            request.profile = self.guest_profile  # gest user profile for main page
+            request.profile = self.guest_profile  # set user profile for main page
             self.assertRedirects(activate_response, reverse('goods:product_list'))
 
             messages = get_messages(request)

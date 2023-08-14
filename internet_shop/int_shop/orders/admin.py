@@ -7,6 +7,9 @@ from django.shortcuts import reverse
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
+    """
+    Admin panel for orders
+    """
     fieldsets = (
         ('Buyer info', {
             'fields': ('first_name', 'last_name', 'email', 'address', 'phone')
@@ -48,6 +51,9 @@ class OrderAdmin(admin.ModelAdmin):
 
 @admin.register(Delivery)
 class DeliveryAdmin(admin.ModelAdmin):
+    """
+    Admin panel for delivery
+    """
     list_display = ['get_full_name', 'method', 'service', 'office_number', 'delivery_date']
     search_fields = ['last_name']
     date_hierarchy = 'delivery_date'
@@ -60,5 +66,8 @@ class DeliveryAdmin(admin.ModelAdmin):
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
+    """
+    Admin panel for order items
+    """
     list_display = ['pk', 'order', 'product', 'price', 'quantity']
     list_filter = ['order', 'product']

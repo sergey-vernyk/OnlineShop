@@ -10,8 +10,8 @@
                     <div class="prop-name">{{ p.name }}</div>
                 {% endifchanged %}
                 <div class="form-check-filter">
-                    <!--Используется кастомный простой тег, который принимает словарь GET из запроса и значения самого checkbox'a-->
-                    <!--И проверяет, какие checkbox'ы были выбраны, что бы после применения фильтра отметить эти checkbox'ы как выбранные-->
+                    <!--Using custom simple tag, which receive GET dictionary from the request and receive checkbox values-->
+                    <!--And checks, what checkboxes were selected, to mark these checkboxes as selected-->
                     {% check_request request.GET p.category_property_pk p.name p.text_value p.numeric_value|cut_fraction as checked_flag %}
                     <input class="check-field-filter" id="prop-input-{{ forloop.counter }}" {% if checked_flag %}checked{% endif %}
                      type="checkbox" name="props" value="{{ p.category_property_pk }},{{ p.name }},{{ p.text_value }},{{ p.numeric_value|cut_fraction }}">

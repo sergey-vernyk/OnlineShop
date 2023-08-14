@@ -1,9 +1,9 @@
 $(document).ready(function() {
 
-    //блок с основной информацией    
+    //block with base information
     var parentSidebarCustomer = $('.sidebar-customer').parent();
 
-    toggleMenuStyle(1000); //переключение на другое меню при загрузке страницы
+    toggleMenuStyle(1000); //toggle to another menu style while loading
 
     $(window).on('resize', function() {
         toggleMenuStyle(1000);
@@ -11,8 +11,8 @@ $(document).ready(function() {
     
     function toggleMenuStyle(minWidth) {
         
-        /* функция изменяет вид меню с вертикального на горизонтальный,
-        в зависимости от ширины экрана minWidth */
+        /* function changes menu style from vertical to horizontal
+        depending on screen width minWidth */
 
         if ($(window).width() <= minWidth) {
             $('.sidebar-customer').addClass('sidebar-customer-horizontal')

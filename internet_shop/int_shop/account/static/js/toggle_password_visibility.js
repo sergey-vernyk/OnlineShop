@@ -1,14 +1,14 @@
 $(document).ready(function() {
     const eyeSign = 'material-symbols-outlined';
 
-    //обработка события нажатия на значок глаза на поле формы
+    //handling "eye" icon pressing event on form field
     $(`.auth-form-fields .${eyeSign},
      .reg-form-fields .${eyeSign},
      .set-new-pass-fields .${eyeSign}`).click(function() {
-        var currentInput = $(this).prev();  //определение input, который принадлежит нажатому значку глаза
+        var currentInput = $(this).prev();  //recognize input, on which were pressed on "eye" icon
         var currentVisibilityState = $(currentInput).prop('type') === 'password' ? 'off' : 'on';
 
-        //скрьтие или отображение вводимого пароля и изменения значка
+        //hide or show typing password and changing icon
         if(currentVisibilityState === 'on') {
             $(currentInput).prop('type', 'password');
             $(this).text('visibility_off');

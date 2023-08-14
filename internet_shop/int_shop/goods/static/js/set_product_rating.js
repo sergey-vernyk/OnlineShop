@@ -2,7 +2,7 @@ $(document).ready(function() {
 
 	const allStars = $('.rating-star').children();
 
-	//функция возвращает текущие статусы звезд рейтинга товара в виде словаря
+	//function returns current statuses of rating stars of a product in a dictionary form
 	function getStarsStatus(objects) {
 		var statuses = {};
 		objects.map(function() {
@@ -11,10 +11,10 @@ $(document).ready(function() {
 		return statuses;
 	}
 
-	const currentStarsStatus = getStarsStatus(allStars); //текущее состояние звезд рейтинга
+	const currentStarsStatus = getStarsStatus(allStars); //current state of rating stars
 
 	$('[id^=star-]').on('click mouseenter mouseleave', function(event) {
-		const starId = $(this).attr('id').slice(5); //звезда, над которой произошло событие
+		const starId = $(this).attr('id').slice(5); //the star, on which the event occurred
 
 		switch (event.type) {
 			case 'click':
@@ -29,7 +29,7 @@ $(document).ready(function() {
 						csrfmiddlewaretoken: token
 					},
 					function(response) {
-						var rating = Number(response['current_rating']); //получение текущего установленного рейтинга с view
+						var rating = Number(response['current_rating']); //getting current set rating from view
                         $('.current-rating-digits').text(rating.toFixed(1));
                         
                         switch (Math.round(rating)) {
@@ -85,9 +85,9 @@ $(document).ready(function() {
 				)
 				break;
 
-			case 'mouseenter': //наведение курсора на звезду
+			case 'mouseenter': //hovering cursor above the star
 				for (var i = Number(starId); i > 0; i--) {
-                    //если звезда еще не была закрашена - закрасить ее и все звезды перед ней
+                    //if the star aren't colored - will color it and all stars before it
 					if (!$(`#star-${i}`).hasClass('checked'))
 						$(`#star-${i}`).addClass('checked');
 				}
@@ -95,8 +95,8 @@ $(document).ready(function() {
 
 			case 'mouseleave': //отведение курсора от звезды
 				for (var i = Number(starId); i > 0; i--) {
-                    /*если звезда была закрашена при наведении и не была закрашена
-                     до наведения курсора - убрать ее закрашивание и звезд до нее*/
+                    /*if star were colored while hovering and weren't colored before hovering -
+                    will remove it color and color of the all stars before it*/
 					if ($(`#star-${i}`).hasClass('checked') && !currentStarsStatus[$(`#star-${i}`).attr('id')])
 						$(`#star-${i}`).removeClass('checked');
 				}

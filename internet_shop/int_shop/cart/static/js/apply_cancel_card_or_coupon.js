@@ -1,8 +1,8 @@
 $(document).ready(function() {
-	var listInputs = $('[id^=id_code]'); //все input в блоке
+	var listInputs = $('[id^=id_code]'); //all inputs in a block
 	var initialCurrentAmountPrice = Number($('.amount-items > span:nth-child(2)').text().slice(1)).toFixed(2);
 
-	//делаем неактивные и с другим цветом кнопки для подтверждения формы
+	//make buttons for confirm form inactive and with another color
 	for (var i = 0; i < listInputs.length; i++) {
 		if (!$(listInputs[i]).val()) {
 			$(listInputs[i]).closest('form').find('button').css({
@@ -13,7 +13,7 @@ $(document).ready(function() {
 		};
 	}
 
-	//отслеживания ввода в поле для каждого input
+	//tracking typing into each input field
 	$('[id^=id_code]').on('input', function() {
 		$(this).closest('form').find('button').css({
 			'pointer-events': 'all',
@@ -29,22 +29,22 @@ $(document).ready(function() {
 		}
 	});
 
-	//отслеживание подтверждения формы для кода
+	//tracking submitting form for code
 	$('#coupon-form, #present-card-form').on('submit', function(event) {
 		event.preventDefault();
 		var currentForm = $(this);
 		var submitBtn = $(this).find(':submit');
-		var action = submitBtn.text().trim(); //действие берется с названия кнопки с формы
+		var action = submitBtn.text().trim(); //action is taken from the name of the button
 		var url;
-		var boundErrorList = $(this).parent().find('.errorlist'); //список ошибок, связанных с выбранной формой
+		var boundErrorList = $(this).parent().find('.errorlist'); //errors list, linked with selected form
 
-		//применение купона/карты или отмена применения
+		//applying coupon/present card or their canceling
 		if (action === 'Apply') {
 			url = $(this).data('url-apply');
 		} else if (action === 'Cancel') {
 			url = $(this).data('url-cancel');
 		}
-		var code = $(this).find(':text').val(); //код купона/подарочной карты
+		var code = $(this).find(':text').val(); //coupon/present card code
 		var token = $(this).find(':hidden').val();
 
 		$.ajax({
@@ -55,17 +55,17 @@ $(document).ready(function() {
 				csrfmiddlewaretoken: token,
 			},
 			success: function(response) {
-				//список всех цен товаров из корзины
+				//list of all prices of products in the cart
 				var allProductsPrices = $('.item-price').map(function() {
 					return Number($(this).text().trim().slice(1));
 				}).get();
 
-				//сумма всех этих цен
+				//sum of all these prices
 				var totalPriceWithoutDiscounts = allProductsPrices.reduce(function(x, y) {
 					return x + y;
 				});
 
-				//текущая стоимость товаров со всеми скидками
+				//current cost of all products with all discounts
 				var currentAmountPrice;
 				if($('.amount-items > span:nth-child(2)').text() === 'Free') {
 					currentAmountPrice = initialCurrentAmountPrice;
@@ -76,27 +76,27 @@ $(document).ready(function() {
 				var finallyPriceWithCoupon = 0;
 				var finallyPriceWithCard = 0;
 				var formErrors = response['form_errors'];
-				//если есть ошибки в форме
+				//if there are errors in the form
 				if (formErrors) {
 					var error = formErrors['code'][0];
-					//если еще не было отображено ошибок
+					//if no errors have been displayed yet
 					if(!boundErrorList.has('li').length) {
-					    //добавление ошибки в список ошибок в шаблоне
+					    //adding error into error list in template
 					    $(boundErrorList).prepend(`<li style="text-align: left;">${error}</li>`);
 					}
 				} else {
-					$(boundErrorList).find('li').remove(); //удаление элемента списка с ошибкой
-                    //применение скидок
+					$(boundErrorList).find('li').remove(); //deleting list item, that with error
+                    //applying discounts
 					if (action === 'Apply') {
 						submitBtn.text('Cancel');
-						//применен купон
+						//coupon has been applied
 						if ($(currentForm).attr('id') === 'coupon-form') {
 							var couponDiscount = response['coupon_discount'];
 							finallyPriceWithCoupon = totalPriceWithoutDiscounts - (totalPriceWithoutDiscounts * Number(couponDiscount)).toFixed(2);
 							initialCurrentAmountPrice = finallyPriceWithCoupon;
 							$('.amount-items > span:nth-child(2), .total-price').text('$' + finallyPriceWithCoupon.toFixed(2));
 						}
-						//применена карта
+						//present card has been applied
 						if ($(currentForm).attr('id') === 'present-card-form') {
 							var cardAmount = response['card_amount'];
 							finallyPriceWithCard = currentAmountPrice - Number(cardAmount);
@@ -104,7 +104,7 @@ $(document).ready(function() {
 							$('.amount-items > span:nth-child(2), .total-price').text(finallyPriceWithCard > 0 ? `$${finallyPriceWithCard.toFixed(2)}` : 'Free');
 						}
 
-						//контент появляется, когда применяется одна из скидок
+						//content appear, when one of discounts was applied
 						var contentSummary = `<div class="discounts-total">
                                                   <div class="discount-title">Amount discounts:</div>
                                                   <div class="discount-value">-$${(currentAmountPrice - (finallyPriceWithCoupon || finallyPriceWithCard)).toFixed(2)}</div>
@@ -114,65 +114,65 @@ $(document).ready(function() {
                                                   <div class="without-value">$${currentAmountPrice}</div>
                                               </div>`
 
-						//вставка значка об успешном применении купона или карты
+						//paste icon about successfully applying coupon or present card
 						$(currentForm).append('<span class="material-symbols-outlined">check_circle</span>');
 
-						//если была применена только одна из скидок
+						//if was applied one of discounts
 						if (!$('.block-totals').children('.discounts-total, .without-discounts').length) {
-							$('.block-summary').after(contentSummary); //добавление информации о размере скидки и стоимости без скидки вниз блока
+							$('.block-summary').after(contentSummary); //adding to the bottom of the block information about discount amount and cost without discount
 
-							//если второй скидкой была подарочная карта
+							//if the second discount was present card
 						} else if (finallyPriceWithCard) {
-							var curDiscVal = Number($('.discount-value').text().slice(2)); //текущее значение скидки
-							var finallyDiscVal = (curDiscVal + Number(cardAmount)).toFixed(2) //окончательное значение скидки
+							var curDiscVal = Number($('.discount-value').text().slice(2)); //current discount value
+							var finallyDiscVal = (curDiscVal + Number(cardAmount)).toFixed(2) //finally discount value
 							$('.discounts-total > .discount-value').replaceWith(
 								`<div class="discount-value">
                                     -$${finallyDiscVal}
                                 </div>`
 							);
 
-							//если второй скидкой был купон
+							//if second discount was coupon
 						} else if (finallyPriceWithCoupon) {
-							var curDiscVal = Number($('.discount-value').text().slice(2)); //текущее значение скидки
-							var finallyDiscVal = (curDiscVal + (totalPriceWithoutDiscounts * Number(couponDiscount))).toFixed(2); //окончательное значение скидки
+							var curDiscVal = Number($('.discount-value').text().slice(2)); //current discount value
+							var finallyDiscVal = (curDiscVal + (totalPriceWithoutDiscounts * Number(couponDiscount))).toFixed(2); //finally discount value
 							$('.discounts-total > .discount-value').replaceWith(
 								`<div class="discount-value">
                                     -$${finallyDiscVal}
                                 </div>`
 							);
-							//окончательная стоимость со скидками вверху блока
+							//finally cost with discounts in the top of the block
 							$('.amount-items > span:nth-child(2)').text('$' + (totalPriceWithoutDiscounts - finallyDiscVal))
 						}
 
 					} else if (action === 'Cancel') {
 						submitBtn.text('Apply');
-						var restDisc; //оставшаяся сумма скидки
-						//отменен купон
+						var restDisc; //remaining sum of discount
+						//coupon was canceled
 						if ($(currentForm).attr('id') === 'coupon-form') {
 							var discVal = Number(totalPriceWithoutDiscounts * response['coupon_discount']).toFixed(2);
 							restDisc = (Number($('.discounts-total > .discount-value').text().trim().slice(2)) - discVal).toFixed(2);
-							$('.discounts-total > .discount-value').text('-$' + restDisc); //обновления суммы скидки
-							$('.amount-items > span:nth-child(2), .total-price').text('$' + (Number(currentAmountPrice) + Number(discVal)).toFixed(2)); //обновление общей стоимости товаров
+							$('.discounts-total > .discount-value').text('-$' + restDisc); //updated sum of discount
+							$('.amount-items > span:nth-child(2), .total-price').text('$' + (Number(currentAmountPrice) + Number(discVal)).toFixed(2)); //updating total cost of goods
 						}
-						//отменена карта
+						//present cart was canceled
 						if ($(currentForm).attr('id') === 'present-card-form') {
 							var cardAmount = Number(response['card_amount']);
 							restDisc = (Number($('.discounts-total > .discount-value').text().trim().slice(2)) - cardAmount).toFixed(2);
-							$('.discounts-total > .discount-value').text('-$' + restDisc); //обновления суммы скидки
-							$('.amount-items > span:nth-child(2), .total-price').text('$' + (Number(currentAmountPrice) + cardAmount).toFixed(2)); //обновление общей стоимости товаров
+							$('.discounts-total > .discount-value').text('-$' + restDisc); //updating sum of discount
+							$('.amount-items > span:nth-child(2), .total-price').text('$' + (Number(currentAmountPrice) + cardAmount).toFixed(2)); //updating total cost of goods
 
 						}
 						if (restDisc === '0.00') {
-							$('.block-totals').find('.discounts-total, .without-discounts').remove(); //удаление блока с информацией о суммах скидок
+							$('.block-totals').find('.discounts-total, .without-discounts').remove(); //deleting block with information about discount sums
 						}
 
-						$(currentForm).find('.material-symbols-outlined').remove(); //удаление значка
+						$(currentForm).find('.material-symbols-outlined').remove(); //deleting icon
 					}
 				}
 
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				//переход на страницу для входа в систему, если статус ответа 401
+				//redirecting to the login page, when response status is 401
 				if(errorThrown === 'Unauthorized') {
 					var login_url = jqXHR.responseJSON['login_page_url'];
 					window.open(login_url, '_self');

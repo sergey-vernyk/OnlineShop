@@ -1,10 +1,10 @@
 import os
+from decimal import Decimal
 
 from django.conf import settings
-from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 from django.urls import reverse
-from decimal import Decimal
 
 from account.models import Profile
 from common.moduls_init import redis
@@ -12,14 +12,14 @@ from common.moduls_init import redis
 
 def product_image_path(instance, filename):
     """
-    Возвращает путь сохранения изображений для каждого товара
+    Returns the save image path for each product
     """
     return f'products/product_{instance.name}/{filename}'
 
 
 class Product(models.Model):
     """
-    Модель товара на сайте
+    Product model
     """
 
     class Rating(models.IntegerChoices):
@@ -51,15 +51,14 @@ class Product(models.Model):
 
     def get_all_product_photos(self) -> list:
         """
-        Метод возвращает имена всех фото товара в виде списка
+        Returns names of all product images in list format
         """
         return os.listdir(os.path.join(settings.MEDIA_ROOT, f'products/product_{self.name}', 'Detail_photos'))
 
     def save(self, *args, **kwargs):
         """
-        Переопределение метода, что бы добавить id созданного
-        товара в множество со всеми id товаров, которые хранятся в БД Redis
-        и создать каталоги для хранения фото товара
+        Overriding the method to add the id of created product the set in Redis DB,
+        and creating directories for storage product's picture
         """
         super().save(*args, **kwargs)
         try:
@@ -69,6 +68,9 @@ class Product(models.Model):
         redis.sadd('products_ids', self.pk)
 
     def get_absolute_url(self):
+        """
+        Returns canonical path to the product in detail view
+        """
         return reverse('goods:product_detail', args=(self.pk, self.slug))
 
     class Meta:
@@ -79,7 +81,7 @@ class Product(models.Model):
 
 class Favorite(models.Model):
     """
-    Модель товаров, добавленных в избранное определенным пользователем
+    Profile's favorite products model
     """
     product = models.ManyToManyField(Product, blank=True)
     profile = models.OneToOneField(Profile, on_delete=models.CASCADE, related_name='profile_favorite')
@@ -91,7 +93,7 @@ class Favorite(models.Model):
 
 class Category(models.Model):
     """
-    Модель категории товаров на сайте
+    Products category model
     """
     name = models.CharField(max_length=50, db_index=True)
     slug = models.SlugField(max_length=50, unique=True)
@@ -100,6 +102,9 @@ class Category(models.Model):
         return self.name
 
     def get_absolute_url(self):
+        """
+        Returns canonical path to the product in certain category in detail view
+        """
         return reverse('goods:product_list_by_category', args=(self.slug,))
 
     class Meta:
@@ -109,7 +114,7 @@ class Category(models.Model):
 
 class Manufacturer(models.Model):
     """
-    Класс производителя товара
+    Products manufacturer model
     """
     name = models.CharField(max_length=50)
     slug = models.CharField(max_length=50, unique=True)
@@ -126,7 +131,7 @@ class Manufacturer(models.Model):
 
 class Comment(models.Model):
     """
-    Модель комментария для товара на сайте
+    Product comment model
     """
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='comments')
     user_name = models.CharField(max_length=30, verbose_name='Name')
@@ -148,8 +153,8 @@ class Comment(models.Model):
 
 class PropertyCategory(models.Model):
     """
-    Модель категории свойств,
-    например, свойства для дисплея, памяти, аккумулятора и т.д.
+    Property category model.
+    For example for display, memory, battery ect.
     """
 
     name = models.CharField(max_length=100)
@@ -165,7 +170,7 @@ class PropertyCategory(models.Model):
 
 class Property(models.Model):
     """
-    Модель отдельного свойства для товара
+    Product property
     """
     property_names = (sorted([
         # Display

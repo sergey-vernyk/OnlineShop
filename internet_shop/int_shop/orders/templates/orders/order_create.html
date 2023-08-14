@@ -13,7 +13,7 @@
     <div class="row flex-nowrap align-items-start">
         <div class="block-order-info">
             <form method="post" style="padding: 10px;">
-                <!--Общие данные о заказе-->
+                <!--General order data-->
                 <h4 class="my-3 text-center">General information</h4>
                 <hr>
                 {% csrf_token %}
@@ -44,7 +44,7 @@
                     </div>
                 {% endfor %}
                 <hr>
-                <!--Информация о доставке заказа-->
+                <!--Info about order delivery-->
                 <h4 class="my-3 text-center">Delivery information</h4>
                 <hr>
                 {% for field in delivery_form %}
@@ -61,7 +61,7 @@
                         </ul>
                     </div>
                 {% endfor %}
-                <!--Кнопки "Назад" и "Разместить заказ"-->
+                <!--Buttons "Back" and "Place order-->
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="order-back-btn">
                         <a href="{% url 'cart:cart_detail' %}" role="button">
@@ -76,7 +76,7 @@
                 </div>
             </form>
         </div>
-        <!--Информация о содержимом заказа-->
+        <!--Info about order items-->
         <div class="block-purchases-info">
             <h4 class="text-center fs-4 my-3">Your purchases</h4>
             <hr>
@@ -104,12 +104,12 @@
                         <div class="order-prod-total-price">${{ item.total_price }}</div>
                     </div>
                 {% endfor %}
-                <!--Общая стоимость без учета скидок-->
+                <!--Amount cost without discounts-->
                 <div class="order-total-amount">
                     <span>Amount:</span>
                     <span>${{ cart.get_total_price }}</span>
                 </div>
-                <!--Если есть скидки-->
+                <!--If are discounts-->
                 {% if cart.coupon_id or cart.present_card_id %}
                     <div class="order-total-discount">
                         <span>Discount:</span>

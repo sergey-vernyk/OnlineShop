@@ -12,7 +12,7 @@ input[type="text"], input[type="email"], textarea {
     min-width: 720px;
 }
 
-/*вертикальный вид меню*/
+/*vertical menu*/
 .sidebar-customer {
     padding: 0px 10px !important;
     margin-right: 10px;
@@ -60,7 +60,7 @@ input[type="text"], input[type="email"], textarea {
     margin-left: 5px;
 }
 
-/*Верхнее меню*/
+/*Top menu*/
 .often-use-menu {
     display: flex;
     padding: 0.5em;
@@ -87,7 +87,7 @@ input[type="text"], input[type="email"], textarea {
     color: grey;
 }
 
-/*sidebar с меню слева*/
+/*menu sidebar in the left side*/
 .sidebar-item {
     display: flex;
     align-items: center;
@@ -151,8 +151,7 @@ input[type="text"], input[type="email"], textarea {
     font-weight: 800;
 }
 
-/*Пункт с заказами*/
-
+/*"Orders" item*/
 .show-all-orders, .hide-another-orders {
     display: inline-block;
     text-align: end;
@@ -332,7 +331,7 @@ input[type="text"], input[type="email"], textarea {
     left: 21%;
 }
 
-/*Избранные товары*/
+/*Favorite goods*/
 .favorite-card {
     display: flex;
     position: relative;
@@ -439,7 +438,7 @@ input[type="text"], input[type="email"], textarea {
     color: gray;
 }
 
-/*Информация о доставке товара*/
+/*Information about goods delivery*/
 .delivery-info {
     padding: 1.1rem 1.1rem;
     margin: 1rem 0;
@@ -487,7 +486,7 @@ input[type="text"], input[type="email"], textarea {
     font-weight: bold;
 }
 
-/*Купоны*/
+/*Coupons*/
 .coupon-category, .card-category { display: flex; }
 
 .discount-value {
@@ -550,7 +549,7 @@ input[type="text"], input[type="email"], textarea {
     margin-right: 7px;
 }
 
-/*Подарочные карты*/
+/*Present cards*/
 .card-code {
     display: block;
     text-align: center;
@@ -584,7 +583,7 @@ input[type="text"], input[type="email"], textarea {
     text-indent: 20px;
 }
 
-/*Комментарии*/
+/*Comments*/
 .comment-body-profile {
     padding: 1rem 2rem 1rem 4rem;
     text-align: justify;
@@ -639,7 +638,7 @@ input[type="text"], input[type="email"], textarea {
 
 .unfilled { --unfilled-thumb: 0; }
 
-/*стиль значка пальца вверх/вниз*/
+/*thumb up/thumb down style*/
 .material-symbols-outlined {
     font-variation-settings:
     'FILL' var(--filled-thumb),
@@ -648,7 +647,7 @@ input[type="text"], input[type="email"], textarea {
     'opsz' 48
   }
 
- /*значок палец вверх*/
+ /*thumb up icon*/
  .rate-comment-profile > span:nth-child(1) {
     margin-right: 10px;
     cursor: default;
@@ -658,7 +657,7 @@ input[type="text"], input[type="email"], textarea {
     margin-right: 10px;
 }
 
-/*значок палец вниз*/
+/*thumb down icon*/
 .rate-comment-profile > span:nth-child(3) {
     margin-right: 10px;
     cursor: default;
@@ -668,7 +667,7 @@ input[type="text"], input[type="email"], textarea {
     margin-right: 10px;
 }
 
-/*Просмотренные товары*/
+/*Watched products*/
 .product-card-watched {
     position: relative;
     margin: 10px;
@@ -745,7 +744,7 @@ input[type="text"], input[type="email"], textarea {
     color: red;
 }
 
-/*Шаблон отправки email для сброса пароля*/
+/*Reset password email template*/
 .email-field {
     width: 250px;
     height: 25px;
@@ -797,7 +796,7 @@ input[type="text"], input[type="email"], textarea {
 
 .send-mail .material-symbols-outlined { margin-right: 5px;}
 
-/*Шаблон для установки нового пароля после сброса*/
+/*Set new password after reset old password template*/
 .pass-field {
     border: 1px solid grey;
     border-radius: 5px;
@@ -857,10 +856,10 @@ input[type="text"], input[type="email"], textarea {
     'opsz' 20
 }
 
-/*список ошибок*/
+/*errors list*/
 .set-pass { width: 250px; }
 
-/*элемент списка ошибок*/
+/*error list item*/
 .err-pass {
     text-align: start !important;
     width: 250px;
@@ -906,7 +905,7 @@ input[type="text"], input[type="email"], textarea {
 .block-set-success-pass .material-symbols-outlined { margin-right: 5px; }
 
 
-/*Форма входа в систему*/
+/*login form*/
 .login-form {
     margin-top: 10%;
     width: 800px;
@@ -1029,7 +1028,7 @@ input[type="text"], input[type="email"], textarea {
     text-decoration: underline;
 }
 
-/*Вход в систему через соц. сети*/
+/*Login through social*/
 .social {
     display: flex;
     flex-direction: column;
@@ -1062,7 +1061,7 @@ input[type="text"], input[type="email"], textarea {
     margin-right: 0.8rem;
 }
 
-/*Форма регистрации*/
+/*Registration form*/
 .register-form {
     display: block;
     position: relative;
@@ -1160,7 +1159,7 @@ input[type="text"], input[type="email"], textarea {
     color: darkgray;
 }
 
-/*горизонтальный вид меню*/
+/*horizontal manu*/
 .sidebar-customer-horizontal {
     display: flex;
     flex-direction: row;
@@ -1189,7 +1188,7 @@ input[type="text"], input[type="email"], textarea {
 
 .sidebar-customer-horizontal .sidebar-item a:hover { color: #0a58ca; }
 
-/*классы для изменения ширины блока content-customer через JavaScript*/
+/*classes for changing width of content-costumer block through JavaScript*/
 .content-customer-width-h { width: 100% !important; }
 
 .content-customer-width-v { min-width: 64.2% !important; }

@@ -2,7 +2,7 @@
 
 set -e
 
-# проверка dhparams и создание их, если еще нет
+# Checking dhparams and it's creating, if there are not yet
 
 echo "Checking for dhparams.pem"
 if [ ! -f "vol/proxy/ssl-dhparams.pem" ]; then
@@ -12,7 +12,7 @@ else
   echo "dhparams.pem have found"
 fi
 
-# Избежание замены параметров с envsubst
+# Avoid replacing these with envsubst
 export host=\$host
 export request_uri=\$request_uri
 
@@ -20,11 +20,10 @@ echo "Checking for fullchain.pem"
 
 if [ ! -f "/home/nginx/letsencrypt/live/${DOMAIN}/fullchain.pem" ]; then
   echo "No SSL cert, enabling HTTP only.."
-  envsubst < /etc/nginx/nginx.conf.template > /etc/nginx/conf.d/default.conf
+  envsubst </etc/nginx/nginx.conf.template >/etc/nginx/conf.d/default.conf
 else
   echo "SSL cert exists, enabling HTTPS..."
-  envsubst < /etc/nginx/nginx_ssl.conf.template > /etc/nginx/conf.d/default.conf
+  envsubst </etc/nginx/nginx_ssl.conf.template >/etc/nginx/conf.d/default.conf
 fi
-
-
+# starting nginx
 nginx -g 'daemon off;'

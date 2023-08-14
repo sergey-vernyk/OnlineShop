@@ -14,7 +14,7 @@ STATICFILES_DIRS = [
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # вывод всех сообщений с почты в shell (без SMTP)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # print all email messages to shell (without SMTP)
 EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
 EMAIL_HOST_USER = '46817091728879'
 EMAIL_HOST_PASSWORD = '1110aaff92a1c8'

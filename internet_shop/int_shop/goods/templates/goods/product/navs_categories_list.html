@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-<!--Шаблон для отображения новых товаром на сайте-->
+<!--Template for displaying new, popular, promotional products-->
 {% block title %}{{ place|title }} products | OnlineShop{% endblock %}
 
 {% block styles %}
@@ -34,7 +34,7 @@
                         <h3>There are no products in the section</h3>
                     {% endfor %}
                 </div>
-                <!--Пагинация-->
+                <!--Pagination-->
                 {% if is_paginated %}
                 <div class="row">
                     <div class="d-flex justify-content-center py-2 px-0 w-100">

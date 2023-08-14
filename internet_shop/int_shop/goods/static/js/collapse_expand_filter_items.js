@@ -1,6 +1,6 @@
 $(document).ready(function() {
 
-    //текст в значках
+    //text in the icons
     const expandSign = 'expand_more';
     const collapseSign = 'expand_less';
 

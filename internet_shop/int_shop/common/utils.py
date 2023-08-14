@@ -3,7 +3,7 @@ from django.contrib import admin
 
 class ValidDiscountsListFilter(admin.SimpleListFilter):
     """
-    Фильтр по валидности скидок в админ сайте (list_filter)
+    Filter by validity discounts in admin site (list_filter)
     """
     title = 'Validation status'
     parameter_name = 'validation_status'

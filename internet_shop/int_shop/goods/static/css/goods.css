@@ -3,7 +3,7 @@ input[type="text"], input[type="email"], textarea {
     font-size: 1rem;
 }
 
-/*главный список товаров*/
+/*main list of goods*/
 .product-card-mainlist {
     position: relative;
     padding: 10px;
@@ -94,7 +94,7 @@ input[type="text"], input[type="email"], textarea {
 }
 
 
-/*Фильтры на главной странице*/
+/*Filters on the main page*/
 .filter-prod-column {
     padding: 10px;
     width: 28% !important;
@@ -262,7 +262,7 @@ input[type="text"], input[type="email"], textarea {
     margin: 1rem 0;
 }
 
-/*вкладки вверху списка товаров*/
+/*tabs on the top of the goods list*/
 .prod-navs a {
     color: #696969;
     font-size: 16px;
@@ -294,7 +294,7 @@ input[type="text"], input[type="email"], textarea {
     margin-right: 0.5rem;
 }
 
-/*Сортировка товаров*/
+/*Sorting products*/
 .sorting { padding: 5px 0px 5px 5px; }
 
 .sorting label {
@@ -308,7 +308,7 @@ input[type="text"], input[type="email"], textarea {
     padding: 2px 5px;
 }
 
-/*контейнер со свойствами товара*/
+/*container with product's properties*/
 #prod-props {
     display: flex;
     flex-direction: column;
@@ -363,7 +363,7 @@ input[type="text"], input[type="email"], textarea {
     
 }
 
-/*Список новых товаров*/
+/*New products list*/
 .navs-product-list {
     margin: 1rem;
     background-color: #eff4f9;
@@ -372,7 +372,7 @@ input[type="text"], input[type="email"], textarea {
     border-bottom-right-radius: 10px;
 }
 
-/*Комментарии*/
+/*Comments*/
 .block-comments-row {
     display: flex;
     width: 100%;
@@ -448,7 +448,7 @@ input[type="text"], input[type="email"], textarea {
     --unfilled-thumb: 0;
 }
 
-/*стиль значка пальца вверх/вниз*/
+/*thumb up/thumb down icons style*/
 .material-symbols-outlined {
     font-variation-settings:
     'FILL' var(--filled-thumb),
@@ -457,7 +457,7 @@ input[type="text"], input[type="email"], textarea {
     'opsz' 48
   }
 
-  /*значок палец вверх*/
+/*thumb up icon*/
 .comment-like-unlike-block > span:nth-child(1) {
     margin-right: 10px;
     cursor: pointer;
@@ -467,7 +467,7 @@ input[type="text"], input[type="email"], textarea {
     margin-right: 10px;
 }
 
-/*значок палец вниз*/
+/*thumb down icon*/
 .comment-like-unlike-block > span:nth-child(3) {
     margin-right: 10px;
     cursor: pointer;
@@ -555,12 +555,11 @@ input[type="text"], input[type="email"], textarea {
 
 .collapse-comm { display: none;}
 
-/*Форма для написания комментария*/
+/*Form for writing comment*/
 #form-comment {
     display: block;
     width: 400px;
     margin: 20px auto;
-    /*height: 175px;*/
     min-height: 175px;
 }
 
@@ -631,7 +630,7 @@ input[type="text"], input[type="email"], textarea {
 
 .send-comment-btn:hover { background-color: #3370da; }
 
-/*Вкладки вверху страницы детальной информации о товаре*/
+/*Tabs on the top of the detail info about a product*/
 .nav-tabs {
     height: 40px;
     max-width: calc(860px + 275px);

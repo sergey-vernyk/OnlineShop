@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Ожидание доступности прокси и затем получение сертификата
+# Waiting proxy availability  and then getting certificate
 
 set -e
 

@@ -4,7 +4,7 @@ $(document).ready(function() {
     $('.cart-remove').click(function(event) {
         event.preventDefault();
         var url = $(this).data('url');
-        var product_card = $(this).parentsUntil('.block-cart-items').last() //карточка товара в корзине
+        var product_card = $(this).parentsUntil('.block-cart-items').last() //product card in the cart
         var product_id = $(this).data('pk');
         const csrftoken = getCookie('csrftoken');
 
@@ -17,18 +17,18 @@ $(document).ready(function() {
                 csrfmiddlewaretoken: csrftoken,
             },
             success: function(response) {
-                //установка значений кол-ва товаров в корзине и их общей стоимости
+                //set quantity products value and their total cost in the cart
                 $('.amount-cart').text(response['cart_len']);
                 $('.amount-items > div:nth-child(1) > span:nth-child(1)').text(response['cart_len']);
                 var totalPrice = response['total_price'];
                 var totalPriceDiscount = response['total_price_discounts'];
                 var totalDiscount = response['total_discount'];
-                //если все товары были удалены из корзины
+                //if all goods were deleted from the cart
                 if(totalPrice === 0 ) {
                      $('.total-price').text('');
-                     $('.block-cart-items').remove();  //удаление блока без карточек товаров
+                     $('.block-cart-items').remove();  //deleting blocks, which are without products cards
                      $('.block-totals').remove();
-                     //переход на предыдущую страницу, с которой был переход в корзину
+                     //redirecting to previous page, from which was transition to the cart
                      window.open(response['prev_url'], '_self');
                 } else {
                     $('.total-price, .amount-items > span:nth-child(2)').text(totalPriceDiscount > 0 ? `$${totalPriceDiscount}` : 'Free');
@@ -36,7 +36,7 @@ $(document).ready(function() {
                     $('.without-discounts > .without-value').text('$' + totalPrice);
                 }
 
-                product_card.remove();  //удаление карточки товара
+                product_card.remove();  //deleting product card
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 console.log(textStatus, errorThrown);

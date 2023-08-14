@@ -9,7 +9,7 @@ from orders.models import Order
 
 class TestPaymentTasks(TestCase):
     """
-    Проверка celery задач
+    Testing celery tasks
     """
 
     def setUp(self) -> None:
@@ -26,7 +26,7 @@ class TestPaymentTasks(TestCase):
 
     def test_order_paid(self):
         """
-        Проверка отправки письма пользователю, который оплатил заказ
+        Checking sending email to user, that has paid the order
         """
         data = {
             'domain': 'testserver',

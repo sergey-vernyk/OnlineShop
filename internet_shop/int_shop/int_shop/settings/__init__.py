@@ -1,7 +1,7 @@
 import os
 from .base import *
 
-# выбор настроек для сервера
+# select settings for server
 if os.environ.get('DEV_OR_PROD') == 'prod':
     from .prod import *
 else:

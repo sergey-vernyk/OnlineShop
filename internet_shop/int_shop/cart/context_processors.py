@@ -3,6 +3,6 @@ from .cart import Cart
 
 def cart(request):
     """
-    Метод делает корзину доступной во всех шаблонах
+    Making cart available in all templates
     """
     return {'cart': Cart(request)}

@@ -1,11 +1,28 @@
+from datetime import datetime
+
+import requests
+from django.conf import settings
+from django.contrib.auth.models import User
 from django.contrib.auth.views import (
     LoginView,
     PasswordChangeView,
     PasswordResetView,
     PasswordResetConfirmView
 )
+from django.contrib.messages.views import messages
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import QuerySet
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
+from django.utils.safestring import mark_safe
 from django.views.generic import CreateView
+from django.views.generic import DetailView
+from django.views.generic.edit import FormMixin
 
+from account.models import Profile
+from common.moduls_init import redis
 from coupons.models import Coupon
 from goods.models import Product, Favorite
 from orders.models import Order
@@ -16,55 +33,38 @@ from .forms import (
     ForgotPasswordForm,
     SetNewPasswordForm
 )
-from django.urls import reverse_lazy
-from account.models import Profile
 from .tasks import activate_account
-from django.utils.encoding import force_str
-from django.utils.http import urlsafe_base64_decode
-from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
 from .tokens import activation_account_token
-from django.shortcuts import redirect
-from django.views.generic import DetailView
-from django.db.models import QuerySet
-from datetime import datetime
 from .utils import get_image_from_url, create_profile_from_social
-import requests
-from django.views.generic.edit import FormMixin
-from django.contrib.messages.views import messages
-from django.utils.safestring import mark_safe
-from common.moduls_init import redis
-from django.conf import settings
 
 
 class LoginUserView(LoginView):
     """
-    Представление входа пользователя
+    Class for login user to the system
     """
     form_class = LoginForm
 
     def form_valid(self, form):
-        # если активна галочка "запомнить меня" - не выходить с системы до закрытия браузера
-        # работает не всегда корректно в некоторых браузерах
+        # if check mark "remember me" is active - don't log out, until a browser is closed
+        # it working not always correct in several browsers
         if form.cleaned_data.get('remember'):
             self.request.session.set_expiry(0)
         else:
-            self.request.session.set_expiry(1200)  # иначе выйти с системы через 20 минут
+            self.request.session.set_expiry(1200)  # otherwise log out in 20 minutes
         self.request.session.modified = True
         return super().form_valid(form)
 
 
 class UserPasswordChangeView(PasswordChangeView):
     """
-    Представление для изменения пароля
-    пользовательского аккаунта
+    Changing user account password view
     """
     form_class = UserPasswordChangeForm
 
 
 class UserRegisterView(CreateView):
     """
-    Представление для регистрации пользователя в системе
+    Registration user in the system view
     """
     form_class = RegisterUserForm
     template_name = 'registration/user_register_form.html'
@@ -77,28 +77,28 @@ class UserRegisterView(CreateView):
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         if form.is_valid():
-            new_user = form.save(commit=False)  # создаем пользователя, но в базе не сохраняем
+            new_user = form.save(commit=False)  # creating user, but not save it
             date_of_birth = form.cleaned_data.get('date_of_birth')
             user_photo = form.cleaned_data.get('user_photo')
-            # заполняем поля пользователя с данных формы
+            # filling user's fields from form data
             new_user.username = form.cleaned_data.get('username')
             new_user.email = form.cleaned_data.get('email')
             new_user.first_name = form.cleaned_data.get('first_name')
             new_user.last_name = form.cleaned_data.get('last_name')
-            new_user.is_active = False  # пользователь не активен
-            new_user.save()  # сохраняем пользователя в базе
-            # получаем домен и тип соединения для тела email
-            # для отправки на почту пользователю для активации аккаунта
+            new_user.is_active = False  # user not active
+            new_user.save()  # save user to db
+            # get domain and connection type for email body
+            # for sending email to user's post for account activation
             domain = request.site.domain
             is_secure = request.is_secure()
-            # передача задачи по отправке письма в celery
+            # passing sending email task to celery
             activate_account.delay({'domain': domain, 'is_secure': is_secure}, new_user.pk, new_user.email)
-            # Создаем профиль пользователя с доп. полями
+            # creating profile with additional fields
             profile = Profile.objects.create(user=new_user,
                                              date_of_birth=date_of_birth,
                                              photo=user_photo,
                                              gender=form.cleaned_data.get('gender'))
-            Favorite.objects.create(profile=profile)  # создание объекта избранного для профиля
+            Favorite.objects.create(profile=profile)  # creating favorite instance for profile
             messages.success(request, 'Please, check your email! '
                                       'You have to receive email with instruction for activate account')
             return self.form_valid(form)
@@ -108,18 +108,17 @@ class UserRegisterView(CreateView):
 
 def activate_user_account(request, uidb64, token):
     """
-    Активация аккаунта зарегистрированного пользователя
-    после отправки этому пользователю email сообщения
-    со ссылкой для активации
+    Activation registered user account after sending to user
+    email with activation link
     """
     try:
-        # декодирование id пользователя с uid64
-        # и получения пользователя из БД с данным id
+        # decoding user id from uidb64
+        # and getting user from db
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
     except (TypeError, ValueError, ObjectDoesNotExist):
         user = None
-    # если есть пользователь и время жизни токена не закончилось (токен валидный)
+    # if user is exists and token term isn't end (token is valid)
     if user is not None and activation_account_token.check_token(user, token):
         user.is_active = True
         user.save(update_fields=['is_active'])
@@ -135,8 +134,8 @@ def activate_user_account(request, uidb64, token):
 
 class DetailUserView(DetailView):
     """
-    Представление для отображения детальной информации
-    о пользователе: его заказы, информация, список избранных товаров и т.д.
+    Detail information about user: his/her orders, personal info,
+    favorite list etc.
     """
     model = Profile
     context_object_name = 'customer'
@@ -152,10 +151,10 @@ class DetailUserView(DetailView):
                                                            'present_card',
                                                            'items',
                                                            'items__product').filter(profile=self.object)
-        # формирование id купонов, которые были использованы в заказах пользователя profile
+        # composing coupons ids, which were used in profile's orders
         orders_id_with_coupons = [order.coupon.pk for order in context['orders'] if order.coupon]
         coupons = Coupon.objects.select_related('category').filter(id__in=orders_id_with_coupons).order_by('pk')
-        # установка заказов для каждого купона self.object и возврат обновленного queryset coupons
+        # assignment orders for each profile coupon and return updated coupons queryset
         context['coupons'] = self._set_orders_for_coupon(context['orders'], coupons)
         context['comments'] = self.object.profile_comments.prefetch_related('product',
                                                                             'profiles_likes',
@@ -164,7 +163,7 @@ class DetailUserView(DetailView):
         if location == 'present_cards':
             context['present_cards'] = self.object.profile_cards.select_related('category', 'order')
         elif location == 'watched':
-            # товары, просмотренные пользователем self.object
+            # products viewed by profile
             products_ids = (int(pk) for pk in redis.smembers(f'profile_id:{self.object.pk}'))
             context['watched'] = Product.objects.filter(pk__in=products_ids)
 
@@ -172,26 +171,24 @@ class DetailUserView(DetailView):
 
     def get_object(self, queryset=None):
         """
-        Возвращает объект пользователя по переданному
-        имени в URLconf
+        Return profile object by passed name in URL
         """
         return Profile.objects.get(user__username=self.kwargs.get('customer'))
 
     def _set_orders_for_coupon(self, orders: QuerySet, coupons: QuerySet) -> QuerySet:
         """
-        Метод устанавливает в каждом купоне профиля список заказов,
-        в которых был применен этот купон и возвращает обновленный queryset coupons
+        Method sets order list for each profile's coupon, in which it was applied.
+        Returns updated coupons queryset
         """
-
-        orders_for_coupon = {}  # словарь типа {купон: [заказ_1, заказ_2]}
+        orders_for_coupon = {}  # dictionary type {coupon: [order_1, order_2]}
         for order in orders:
             orders_for_coupon.setdefault(order.coupon, []).append(order)
 
         for coupon in coupons:
             for c, o in orders_for_coupon.items():
-                # если существует купон для заказа и купоны одинаковы
+                # if order coupon is exists and coupons are equivalent
                 if c and c == coupon:
-                    coupon.choices = sorted(o, key=lambda y: y.pk)  # сортировка списка по возрастанию id заказов
+                    coupon.choices = sorted(o, key=lambda y: y.pk)  # sort list ascending by order id
                     break
 
         return coupons
@@ -199,15 +196,15 @@ class DetailUserView(DetailView):
 
 def save_social_user_to_profile(backend, user, response, *args, **kwargs):
     if backend.name == 'facebook':
-        # если профиль еще не был создан
+        # if profile wasn't be created
         if kwargs.get('is_new'):
             date_of_birth = datetime.strptime(response.get('birthday'), '%m/%d/%Y')
             gender = response.get('gender')[0].upper()
             photo_url = response.get('picture')['data']['url']
             photo_name = f'fb_{response.get("id")}_photo.jpeg'
 
-            bytes_inst = get_image_from_url(photo_url)  # получение фото в байт-формате
-            # создание профиля с полученных данных
+            bytes_inst = get_image_from_url(photo_url)  # get photo in bytes format
+            # creating profile from received data
             create_profile_from_social(date_of_birth=date_of_birth,
                                        gender=gender,
                                        user_id=user.pk,
@@ -220,15 +217,15 @@ def save_social_user_to_profile(backend, user, response, *args, **kwargs):
             token_type = response.get('token_type')
             access_token = response.get('access_token')
 
-            bytes_inst = get_image_from_url(photo_url)  # получение фото в байт-формате
+            bytes_inst = get_image_from_url(photo_url)  # get photo in bytes format
 
-            # headers для запроса api
+            # headers for API request
             headers = {
                 "Authorization": f"{token_type} {access_token}",
                 "Accept": "application/json"
             }
 
-            # получение информации пользователя с api (пол и дата рождения)
+            # getting user information from API (gender and birthdate)
             user_info = requests.get(
                 url=(f'https://people.googleapis.com/v1/people/'
                      f'me?personFields=genders%2Cbirthdays&key={settings.API_KEY_GOOGLE}'),
@@ -248,7 +245,7 @@ def save_social_user_to_profile(backend, user, response, *args, **kwargs):
             account_id = response['sub']
             photo_name = f'google_{account_id}_photo.jpeg'
 
-            # создание профиля с полученных данных
+            # creating profile from received data
             create_profile_from_social(date_of_birth=date_of_birth,
                                        gender=gender[0],
                                        user_id=user.pk,
@@ -258,8 +255,7 @@ def save_social_user_to_profile(backend, user, response, *args, **kwargs):
 
 class ForgotPasswordView(PasswordResetView, FormMixin):
     """
-    Представления для отправки Email для сброса забытого пароля
-    от учетной записи
+    View for sending email needed for reset forgotten password from account
     """
 
     form_class = ForgotPasswordForm
@@ -272,13 +268,13 @@ class ForgotPasswordView(PasswordResetView, FormMixin):
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         if form.is_valid():
-            messages.success(request, mark_safe(self.message))  # вывод сообщения
+            messages.success(request, mark_safe(self.message))  # displaying message to frontend
 
         return super().post(request, *args, **kwargs)
 
 
 class SetNewPasswordView(PasswordResetConfirmView):
     """
-    Представление для установки нового пароля после сброса
+    View for set new password after reset
     """
     form_class = SetNewPasswordForm

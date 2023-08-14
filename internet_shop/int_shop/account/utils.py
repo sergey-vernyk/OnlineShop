@@ -11,7 +11,7 @@ USER_FIELDS = ["username", "email"]
 
 def get_image_from_url(url: str) -> BinaryIO:
     """
-    Получение изображения в формате байтов по его URL
+    Getting image in bytes format by it URL
     """
     resp = requests.get(url)
     bytes_inst = BytesIO()
@@ -23,7 +23,7 @@ def get_image_from_url(url: str) -> BinaryIO:
 
 def create_profile_from_social(**kwargs):
     """
-    Создание экземпляра Profile, используя данные с API соц. сетей
+    Creating Profile instance, using API data from social
     """
     user_id = kwargs.get('user_id')
     gender = kwargs.get('gender')
@@ -35,16 +35,16 @@ def create_profile_from_social(**kwargs):
                                      gender=gender,
                                      date_of_birth=date_of_birth)
 
-    profile.photo.save(photo_name, files.File(photo))  # сохранение фото для профиля
+    profile.photo.save(photo_name, files.File(photo))  # save photo for profile
 
-    Favorite.objects.create(profile=profile)  # создание объекта избранного для нового профиля
+    Favorite.objects.create(profile=profile)  # create favorite instance for new profile
 
 
 def create_user(strategy, details, backend, user=None, *args, **kwargs):
     """
-    Переопределение метода из pipeline social_auth.
-    Добавляется проверка на наличие точки "." в username
-    и замена ее на "_", если она есть
+    Overriding method from social_auth pipelines.
+    Added verification for a presence of a "." in username
+    and replacing it with "_", if "." exists
     """
     if user:
         return {"is_new": False}
@@ -57,7 +57,7 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
     if fields:
         for k, v in fields.items():
             if k == 'username' and '.' in v:
-                new_v = v.replace('.', '_')  # создание нового имени пользователя
+                new_v = v.replace('.', '_')  # creating a new username
                 fields[k] = new_v
 
     else:

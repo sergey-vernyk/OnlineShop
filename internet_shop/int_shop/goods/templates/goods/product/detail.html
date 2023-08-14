@@ -25,7 +25,7 @@
         </ul>
         <div class="top-info-row">
             <div class="photos-column">
-                <!--Отображение двух фото в большем разрешении-->
+                <!--Displaying 2 photos in a big resolution-->
                 {% with photos=product.get_all_product_photos %}
                     {% if photos %}
                         {% for photo in photos %}
@@ -39,7 +39,7 @@
                 {% endwith %}
             </div>
             <div class="buttons-column">
-                <!--Добавление товара в избранное-->
+                <!--Adding product to favorite-->
                 <div class="prod-buttons">
                     <div class="d-block my-2 p-1">
                         <div class="add-to-favorite">
@@ -65,7 +65,7 @@
                             {% endwith %}
                         </div>
                     </div>
-                    <!--Форма для добавления товара в корзину-->
+                    <!--Form for adding product to cart-->
                     <form id="add-form-{{ product.id }}" class="prod-add-form-detail" method="post">
                         {% csrf_token %}
                         {{ quantity_form.quantity }}
@@ -83,7 +83,7 @@
                             </svg>
                         </button>
                     </form>
-                    <!--Рейтинг товара-->
+                    <!--Products rating-->
                     <div class="prod-rating-detail">
                         <form id="rating-form"
                               data-url="{% url 'goods:set_product_rating' %}"
@@ -91,7 +91,7 @@
                             {% csrf_token %}
                             {{ rating_form.star }}
                         </form>
-                        <!--Отображение рейтинга в форме звезд-->
+                        <!--Displaying rating in a stars form-->
                         <div class="current-rating-stars">
                             {% include 'rating_stars.html' %}
                         </div>
@@ -104,7 +104,7 @@
                             <h4>Promo</h4>
                         </div>
                     {% endif %}
-                    <!--Цена товара-->
+                    <!--Product price-->
                     <div class{% if product.promotional %}="prod-price-detail promo" {% else %}="prod-price-detail" {% endif %}>
                         {% if product.promotional %}
                             <div class="two-prices">
@@ -118,7 +118,7 @@
                 </div>
             </div>
         </div>
-        <!--Свойства-->
+        <!--Product properties-->
         <h4 id="specification" class="headers-detail">Specifications</h4>
         <div id="prod-props" class="container">
             {% for property in properties %}
@@ -145,7 +145,7 @@
                 </div>
             {% endfor %}
         </div>
-        <!--комментарии-->
+        <!--Comments-->
         <h4 id="comments" class="headers-detail">Comments</h4>
         <div class="container-fluid">
             <div class="block-comments-row">
@@ -162,7 +162,7 @@
                                         </div>
                                     </div>
                                     <div data-url="{% url 'goods:like_unlike_comment' %}" class="comment-like-unlike-block">
-                                        <!-- если комментарию был установлен like текущим пользователем profile -->
+                                        <!--if comment was set by current profile as like-->
                                         {% if comment.pk in profile_rated_comments.liked_comments %}
                                             <span class="material-symbols-outlined filled" id="like-{{ comment.pk }}">thumb_up</span>
                                         {% else %}
@@ -170,7 +170,7 @@
                                         {% endif %}
 
                                         <span id="likes-count-{{ comment.pk }}">({{ comment.profiles_likes.count }})</span>
-                                        <!-- если комментарию был установлен dislike текущим пользователем profile -->
+                                        <!--if comment was set by current profile as dislike-->
                                         {% if comment.pk in profile_rated_comments.unliked_comments %}
                                             <span class="material-symbols-outlined filled" id="unlike-{{ comment.pk }}">thumb_down</span>
                                         {% else %}
