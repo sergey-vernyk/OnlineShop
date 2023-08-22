@@ -25,7 +25,7 @@ def ajax_required(func):
 
 def auth_profile_required(func):
     """
-    Decorator checks user's authentication, where user performs some action
+    Decorator checks user's authentication, when user performs some action
     on the site's pages, where requires being user is authenticated before
     performs that action
     """

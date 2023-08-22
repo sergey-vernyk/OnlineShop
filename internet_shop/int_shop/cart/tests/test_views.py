@@ -12,7 +12,6 @@ from django.utils import timezone
 from rest_framework import status
 
 from coupons.models import Category as Coupon_Category, Coupon
-from cart.cart import Cart
 from goods.models import Product, Category, Manufacturer
 from present_cards.models import Category as PresentCard_Category, PresentCard
 

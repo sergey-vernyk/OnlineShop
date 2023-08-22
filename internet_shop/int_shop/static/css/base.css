@@ -187,7 +187,8 @@ body {
     margin: 0 10px;
     padding: 10px;
     align-items: center;
-    justify-content: space-around;
+    justify-content: center;
+    min-width: 150px;
 }
 
 .cart-button { display: flex;}
@@ -205,8 +206,8 @@ body {
 .amount-cart {
     margin-left: 8px;
     font-size: 0.9rem;
-    width: 25px;
-    height: 25px;
+    width: 30px;
+    height: 30px;
     padding: 4px;
     border-radius: 50% 50%;
     display: inline-flex;
@@ -399,7 +400,7 @@ body {
 
 .we-in-social {
     flex: 1 0 10%;
-    justify-content: center;
+    justify-content: end;
     display: flex;
     margin: 10px;
     align-items: center;

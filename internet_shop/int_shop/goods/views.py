@@ -1,8 +1,7 @@
 from decimal import Decimal
 
 from django.contrib.postgres.search import TrigramSimilarity
-from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q, QuerySet
+from django.db.models import Q, QuerySet, Case, When, Value
 from django.http.response import JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
@@ -86,7 +85,7 @@ class ProductListView(ListView):
         return context
 
     def get_queryset(self):
-        if ('category_slug' and 'search_result') in self.kwargs:  # if category has been got and was search
+        if ('category_slug' and 'search_result') in self.kwargs:  # if category has been received and was search
             return self.kwargs.get('search_result')
         if 'category_slug' in self.kwargs:
             return super().get_queryset().filter(category__slug=self.kwargs['category_slug'])
@@ -111,14 +110,14 @@ class ProductListView(ListView):
         category_slug = self.kwargs.get('category_slug')
 
         # if was search request
-        if 'query' in request.GET:
+        if query:
             result = self._get_query_results(query, category_slug)
-            self.kwargs['search_result'] = [product for product in result.values()]
+            self.kwargs['search_result'] = result
 
         return super().get(request, *args, **kwargs)
 
     @staticmethod
-    def _get_query_results(query: str, category_slug: str = None) -> dict:
+    def _get_query_results(query: str, category_slug: str = None) -> QuerySet:
         """
         Method is using for getting search request results
         """
@@ -131,10 +130,12 @@ class ProductListView(ListView):
             similarity=TrigramSimilarity('name', query), ).filter(q).order_by('-similarity')
 
         product_ids = [product.pk for product in products]
-        # number of views of products found and sort their id by descending views
-        product_views = [int(redis.hget(f'product_id:{pk}', 'views')) for pk in product_ids]
-        sorted_ids_by_views = [pk for pk, views in sorted(zip(product_ids, product_views), key=lambda x: -x[1])]
-        return products.in_bulk(sorted_ids_by_views)
+        # number of views of products found
+        # compose "order_by" condition for sorting products by descending of the views
+        product_views = [int(redis.hget(f'product_id:{pk}', 'views') or 0) for pk in product_ids]
+        order_condition = Case(*[When(pk=pk, then=Value(views)) for pk, views in zip(product_ids, product_views)])
+        result = Product.objects.filter(id__in=product_ids).order_by(-order_condition)
+        return result
 
 
 class ProductDetailView(DetailView, FormMixin):
@@ -173,7 +174,6 @@ class ProductDetailView(DetailView, FormMixin):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['rating_form'] = self.form_class
         context['comment_form'] = CommentProductForm()
         context['quantity_form'] = CartQuantityForm()
         # getting all Profile objects, that commented on the current product and rated product comment
@@ -186,7 +186,7 @@ class ProductDetailView(DetailView, FormMixin):
         if self.request.user.is_authenticated:
             context['comment_form'].fields['user_name'].initial = self.request.user.first_name
             context['comment_form'].fields['user_email'].initial = self.request.user.email
-            context['is_in_favorite'] = self.is_in_favorite()  # whether current product is into Profile favorite
+            context['is_in_favorite'] = self.is_in_favorite()  # whether current product is in profile's favorite
             context['profile_rated_comments'] = self.get_profile_rated_comments()
         return context
 
@@ -194,11 +194,8 @@ class ProductDetailView(DetailView, FormMixin):
         """
         Returns whether current product is in the current profile's favorite
         """
-        try:
-            # getting Favorite instance that linked to current Profile
-            fav_obj = Favorite.objects.get(profile=self.profile)
-        except ObjectDoesNotExist:
-            return False
+        # getting Favorite instance that linked to current Profile
+        fav_obj = Favorite.objects.get(profile=self.profile)
         return self.object in fav_obj.product.prefetch_related()
 
     def get_profile_rated_comments(self) -> dict:
@@ -266,12 +263,12 @@ class ProductDetailView(DetailView, FormMixin):
         while transition to product detail page
         """
         object_pk = self.kwargs.get(self.pk_url_kwarg)  # getting product's id from URL kwargs
-        # increase number of views by 1 while it's watched
-        # set expire time for redis key i.e. deleting products ids from redis in 7 days, that user has watched
+        # increment number of views by 1 while it's watched
         # add products to the set that profile has watched
+        # set expire time for redis key i.e. deleting products ids from redis in 7 days, that user has watched
         redis.hincrby(f'product_id:{object_pk}', 'views', 1)
-        redis.expire(f'profile_id:{self.profile.pk}', time=604800, nx=True)
         redis.sadd(f'profile_id:{self.profile.pk}', object_pk)
+        redis.expire(f'profile_id:{self.profile.pk}', time=604800, nx=True)
         return super().get(request, *args, **kwargs)
 
 
@@ -321,8 +318,6 @@ class FilterResultsView(ListView):
     def queryset_filter(self, qs):
         if isinstance(qs, QuerySet):
             self.filter_qs = qs
-        else:
-            raise TypeError(f'Argument qs not QuerySet instance, ({type(qs).__name__}) was provided')
 
     def get(self, request, *args, **kwargs):
         if request.GET:  # if form with filter terms was submitted
@@ -459,7 +454,7 @@ def popular_list(request, category_slug: str = None):
     category = None
     page = request.GET.get('page')  # getting current page from the request
 
-    products_ids = [int(pk) for pk in redis.smembers('products_ids')]  # id всех товаров на сайте
+    products_ids = [int(pk) for pk in redis.smembers('products_ids')]  # ids of all products
     products_ids_sorted, products = get_products_sorted_by_views(products_ids)
 
     if category_slug:  # products filter by category
@@ -521,24 +516,36 @@ def product_ordering(request, place: str, category_slug: str = 'all', page: int 
         sort = request.GET.get('sort')
         # if sort is needed
         if sort == 'p_asc' or sort == 'p_desc':
-            asc_sort, desc_sort = ('promotional_price', 'price'), ('-promotional_price', '-price')
             if category_slug != 'all':  # if category has been received
                 category = Category.objects.get(slug=category_slug)
                 lookups = Q(category=category,
-                            id__in=product_ids_popular or product_ids_new or product_ids_promotion,
-                            _connector='OR')
-                products = Product.objects.filter(lookups).order_by(*asc_sort if sort == 'p_asc' else desc_sort)
+                            id__in=product_ids_popular or product_ids_new or product_ids_promotion or redis.smembers(
+                                'products_ids'))
+                products = Product.objects.filter(lookups).annotate(sort_order=Case(
+                    When(promotional=True, then='promotional_price'),
+                    default='price')
+                ).order_by('sort_order' if sort == 'p_asc' else '-sort_order')
             else:
                 lookups = Q(id__in=product_ids_popular or product_ids_new or product_ids_promotion or redis.smembers(
                     'products_ids'))
-                products = Product.objects.filter(lookups).order_by(*asc_sort if sort == 'p_asc' else desc_sort)
+                products = Product.objects.filter(lookups).annotate(sort_order=Case(
+                    When(promotional=True, then='promotional_price'),
+                    default='price')
+                ).order_by('sort_order' if sort == 'p_asc' else '-sort_order')
         else:
-            lookups = Q(id__in=product_ids_popular or product_ids_new or product_ids_promotion or redis.smembers(
-                'products_ids'))
+            if category_slug != 'all':
+                category = Category.objects.get(slug=category_slug)
+                lookups = Q(category=category,
+                            id__in=product_ids_popular or product_ids_new or product_ids_promotion or redis.smembers(
+                                'products_ids'))
+            else:
+                lookups = Q(id__in=product_ids_popular or product_ids_new or product_ids_promotion or redis.smembers(
+                    'products_ids'))
+
             products = Product.objects.filter(lookups)
 
     # list pagination
-    page_obj = get_page_obj(per_pages=1, page=page, queryset=products)
+    page_obj = get_page_obj(per_pages=2, page=page, queryset=products)
     products = page_obj.object_list
 
     return render(request, f'goods/product/{templates[place]}', {'products': products,
@@ -557,12 +564,12 @@ def set_product_rating(request) -> JsonResponse:
     """
     Function set product rating using AJAX request
     """
-    star = Decimal(request.POST.get('star'))
+    star = Decimal(request.POST.get('star'))  # rating, that user has installed (1 - 5)
     product_id = request.POST.get('product_id')
     product = Product.objects.get(pk=product_id)
     current_rating = product.rating
     if not current_rating:
-        product.rating = star
+        product.rating = f'{star:.1f}'
     else:  # evaluating average product rating
         current_rating = round(((star + current_rating) / 2), 1)
         product.rating = current_rating

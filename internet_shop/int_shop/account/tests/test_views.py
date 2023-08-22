@@ -124,7 +124,7 @@ class TestAccountViews(TestCase):
 
     def test_activate_user_account(self):
         """
-        Checking registred user's account activation after user followed to link in his/her email
+        Checking registered user's account activation after user followed to link in his/her email
         """
         register_data = {
             'username': 'testuser',
@@ -139,7 +139,7 @@ class TestAccountViews(TestCase):
             'gender': 'M',
         }
 
-        # csucessfully activation test
+        # successfully activation test
         register_response = self.client.post(reverse('register_user'), data=register_data)
         request = register_response.wsgi_request
         self.assertRedirects(register_response, reverse('login'))  # redirecting to the login page
@@ -164,7 +164,7 @@ class TestAccountViews(TestCase):
                     s.message, 'Thank you for your email confirmation. Now you can login your account'
                 )
 
-        # tests with not sucessfully activation (wrong token or uidb64)
+        # tests with not successfully activation (wrong token or uidb64)
         user_activate_data = {
             'wrong_token': {
                 'uidb64': urlsafe_base64_encode(force_bytes(user.pk)),
@@ -262,7 +262,7 @@ class TestAccountViews(TestCase):
 
         # add a profile rated comment
         # add present card to profile
-        # add product to profile's favarite
+        # add product to profile's favorite
         self.profile.comments_liked.add(self.comment)
         self.card.profile = self.profile
         self.favorite.product.add(self.product1)

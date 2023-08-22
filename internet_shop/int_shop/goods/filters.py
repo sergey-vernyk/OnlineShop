@@ -12,7 +12,7 @@ def get_max_min_price(category_slug: str) -> tuple:
     Returns maximum and minimum products price for category_slug category
     """
 
-    # get from cache prices if they are existing
+    # get prices from cache if they are existing
     max_price = cache.get(f'max_price_{category_slug}')
     min_price = cache.get(f'min_price_{category_slug}')
 

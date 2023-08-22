@@ -51,7 +51,7 @@ class TestAdminAccount(TestCase):
 
     def test_get_amount_profile_likes_for_comment(self):
         """
-        Сhecking correct likes count under comments
+        Checking correct likes count under comments
         """
         self.profile.comments_liked.add(self.comment_1)  # make comment liked by profile
         instance = CommentInline(parent_model=Comment, admin_site=self.site)

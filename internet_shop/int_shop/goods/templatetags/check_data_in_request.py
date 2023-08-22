@@ -7,14 +7,13 @@ register = template.Library()
 @register.simple_tag(name='check_request')
 def check_request(request_get: QueryDict, *args) -> bool:
     """
-    Тег принимает словарь GET запроса и проверяет,
-    есть ли в словаре значения, которые передаются в args
+    Tag receives GET dict and checks, whether values are in the dict, that passed in args
     """
     props = request_get.getlist('props')
     if props:
         props_list = [p.split(',') for p in props]
-        # преобразования элементов args в строку,
-        # так как в args первый элемент типа int
+        # convert args elements in string,
+        # because first element is the int type
         if [str(arg) for arg in args] in props_list:
             return True
     return False
