@@ -9,7 +9,7 @@ from django.dispatch import receiver
 
 from common.moduls_init import redis
 from common.storage_backends import MediaStorage
-from goods.models import Product, Property, PropertyCategory
+from goods.models import Product, Property, Category
 
 
 @receiver(signal=[post_save, post_delete], sender=Product)
@@ -29,32 +29,31 @@ def invalidate_prices_cache(sender, instance: Product, *args, **kwargs):
 
 def invalidate_properties_cache(sender, instance, **kwargs):
     """
-    Invalidate the cache for storage queryset with products properties,
-    when adding the new property or property category
+    Invalidate the cache for the storage queryset with products properties,
+    when deleting the product category or either creating or deleting product property
     """
-
+    category = None
     if isinstance(instance, Property):
         category = instance.product.category.slug
-        cache.delete(f'category_{category}_props')
-    elif isinstance(instance, PropertyCategory):
-        categories = instance.product_categories.all()
-        for c in categories:
-            cache.delete(f'category_{c.slug}_props')
+    elif isinstance(instance, Category):
+        category = instance.slug
+
+    cache.delete(f'category_{category}_props')
 
 
 @receiver(signal=post_delete, sender=Product)
-def delete_product_images_folder(sender, product: Product, *args, **kwargs):
+def delete_product_images_folder(sender, instance: Product, *args, **kwargs):
     """
     Deleting product image from AWS Bucket,
     deleting directory with product photos from media root,
     and deleting product id from Redis
     """
     # if using AWS Cloud storage
-    if isinstance(product.image.storage, MediaStorage):
-        aws_image_key = f'media/{product.image.name}'
+    if isinstance(instance.image.storage, MediaStorage):
+        aws_image_key = f'media/{instance.image.name}'
         aws_s3_bucket = MediaStorage().bucket_name
         client = boto3.client('s3')
         client.delete_object(Bucket=aws_s3_bucket, Key=aws_image_key)
     # deleting product's photo directory from the file system
-    shutil.rmtree(os.path.join(settings.MEDIA_ROOT, f'products/product_{product.name}'))
-    redis.srem('products_ids', product.pk)
+    shutil.rmtree(os.path.join(settings.MEDIA_ROOT, f'products/product_{instance.name}'))
+    redis.srem('products_ids', instance.pk)

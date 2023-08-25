@@ -1,9 +1,10 @@
-import shutil
+import hashlib
 import os
+import shutil
+from typing import Callable
+
 import environ
 from django.conf import settings
-import hashlib
-from typing import Callable
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'int_shop.settings')
 env = environ.Env()

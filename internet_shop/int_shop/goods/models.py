@@ -10,7 +10,7 @@ from account.models import Profile
 from common.moduls_init import redis
 
 
-def product_image_path(instance, filename):
+def get_product_image_path(instance, filename):
     """
     Returns the save image path for each product
     """
@@ -36,7 +36,7 @@ class Product(models.Model):
     manufacturer = models.ForeignKey('Manufacturer', on_delete=models.SET_NULL, related_name='products', null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField()
-    image = models.ImageField(upload_to=product_image_path, blank=True)
+    image = models.ImageField(upload_to=get_product_image_path, blank=True)
     available = models.BooleanField(default=True)
     promotional = models.BooleanField(default=False)
     promotional_price = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))

@@ -1,5 +1,5 @@
 from django.apps import AppConfig
-from django.db.models.signals import post_save
+from django.db.models.signals import post_delete, post_save
 
 
 class GoodsConfig(AppConfig):
@@ -8,7 +8,8 @@ class GoodsConfig(AppConfig):
 
     def ready(self):
         from . import signals
-        from goods.models import Property, PropertyCategory
-        # cache invalidate while created new product property or new property category
+        from goods.models import Property, Category
+        # cache invalidate while creating or deleting new property category or deleting product category
         post_save.connect(receiver=signals.invalidate_properties_cache, sender=Property)
-        post_save.connect(receiver=signals.invalidate_properties_cache, sender=PropertyCategory)
+        post_delete.connect(receiver=signals.invalidate_properties_cache, sender=Category)
+        post_delete.connect(receiver=signals.invalidate_properties_cache, sender=Property)
