@@ -461,7 +461,7 @@ class TestProductDetailView(TestCase):
         self.assertTrue(expired_time <= 604800 and expired_time != -1)  # must not be -1 (key has no expire time)
         self.assertEqual(products_viewers, set(f'{self.profile.pk}'))  # only default user "watched" the product
 
-    def test_post_method_as_ajax(self):
+    def test_set_like_dislike_comment(self):
         """
         Checking setting like/dislike to comment, using AJAX request
         """
@@ -541,7 +541,7 @@ class TestProductDetailView(TestCase):
         self.assertEqual(content_response['new_count_unlikes'], 0)
         self.assertEqual(content_response['new_count_likes'], 1)
 
-    def test_post_method_as_not_ajax(self):
+    def test_send_comment_about_product(self):
         """
         Checking leaving a comment about product and saving comment to DB
         """
@@ -561,7 +561,8 @@ class TestProductDetailView(TestCase):
         self.response = self.client.post(reverse('goods:product_detail',
                                                  args=(self.product1.pk, self.product1.slug)),
                                          data={'user_name': self.user.username,
-                                               'user_email': self.user.email})
+                                               'user_email': self.user.email,
+                                               'body': ''})
         # must be "body" field error
         self.assertFormError(self.response.context['comment_form'], 'body', ['This field must not be empty'])
 
@@ -714,7 +715,8 @@ class TestFilterResultsView(TestCase):
             elif key == 'category_properties':
                 self.assertEqual(value, {'Internal Memory': [
                     {'name': 'Volume', 'text_value': '', 'numeric_value': Decimal('256.00'), 'units': 'Gb',
-                     'category_property': 'Internal Memory', 'category_property_pk': 3, 'item_count': 2}]})
+                     'category_property': 'Internal Memory', 'category_property_pk': self.property_category3.pk,
+                     'item_count': 2}]})
             elif key == 'filter_manufacturers':
                 self.assertIsInstance(value, FilterByManufacturerForm)
             elif key == 'manufacturers_prod_qnty':
@@ -762,10 +764,12 @@ class TestFilterResultsView(TestCase):
             elif key == 'category_properties':
                 self.assertEqual(value, {'Display': [
                     {'name': 'Diagonal', 'text_value': '', 'numeric_value': Decimal('15.60'), 'units': '"',
-                     'category_property': 'Display', 'category_property_pk': 1, 'item_count': 1}],
+                     'category_property': 'Display', 'category_property_pk': self.property_category1.pk,
+                     'item_count': 1}],
                     'Software': [
                         {'name': 'OS', 'text_value': 'Linux', 'numeric_value': Decimal('0.00'), 'units': '',
-                         'category_property': 'Software', 'category_property_pk': 2, 'item_count': 1}]})
+                         'category_property': 'Software', 'category_property_pk': self.property_category2.pk,
+                         'item_count': 1}]})
             elif key == 'filter_manufacturers':
                 self.assertIsInstance(value, FilterByManufacturerForm)
             elif key == 'manufacturers_prod_qnty':
@@ -800,10 +804,12 @@ class TestFilterResultsView(TestCase):
             elif key == 'category_properties':
                 self.assertEqual(value, {'Display': [
                     {'name': 'Diagonal', 'text_value': '', 'numeric_value': Decimal('15.60'), 'units': '"',
-                     'category_property': 'Display', 'category_property_pk': 1, 'item_count': 1}],
+                     'category_property': 'Display', 'category_property_pk': self.property_category1.pk,
+                     'item_count': 1}],
                     'Software': [
                         {'name': 'OS', 'text_value': 'Linux', 'numeric_value': Decimal('0.00'), 'units': '',
-                         'category_property': 'Software', 'category_property_pk': 2, 'item_count': 1}]})
+                         'category_property': 'Software', 'category_property_pk': self.property_category2.pk,
+                         'item_count': 1}]})
             elif key == 'filter_manufacturers':
                 self.assertIsInstance(value, FilterByManufacturerForm)
             elif key == 'manufacturers_prod_qnty':

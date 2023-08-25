@@ -49,7 +49,7 @@ def get_page_obj(per_pages: int, page: int, queryset: Union[QuerySet, list]) -> 
 def get_collections_with_manufacturers_info(qs: QuerySet) -> Generator[Union[QuerySet, dict], None, None]:
     """
     Function returns generator objects, which contains queryset with the manufacturers
-    for received queryset with products and the dictionary with quantity of products for each manufacturer
+    for received queryset with products, and the dictionary with quantity of products for each manufacturer
     """
     manufacturers = Manufacturer.objects.filter(
         id__in=(item['manufacturer_id'] for item in qs.values('manufacturer_id'))

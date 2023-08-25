@@ -311,14 +311,14 @@ class TestAccountViews(TestCase):
         self.user = User.objects.create_user(username='testuser')
         self.profile = Profile.objects.create(user=self.user)
         self.instance = DetailUserView()
-        # setuping view instance and adding record to it kwargs
+        # set up view instance and adding record to it kwargs
         self.instance.setup(self.request, **{'customer': f'{self.user.username}'})
         self.assertEqual(self.instance.get_object(), self.profile)
 
-    @tag('social_profiles')  # иsing flag --exclude-tag social_profiles -> this test won't be run
+    @tag('social_profiles')  # using flag --exclude-tag social_profiles -> this test won't be run
     def test_save_social_user_to_profile(self):
         """
-        Checking whether profile instance, which login over social, was save
+        Checking whether profile instance save, while login over social
         """
 
         # Facebook
@@ -379,9 +379,9 @@ class TestAccountViews(TestCase):
         login_data = {'username': profile.user.username, 'password': 'password', 'remember': True}
         response = self.client.post(reverse('login'), data=login_data)
         self.assertEqual(response.wsgi_request.session.get_expiry_age(), 1209600)  # session lifetime is 14 days
-        self.assertRedirects(response, reverse('goods:product_list'))  # redirection after sucessfully login
+        self.assertRedirects(response, reverse('goods:product_list'))  # redirection after successfully login
 
-        login_data.update(remember=False)  # "toggle" checkbox "Remeber me?"
+        login_data.update(remember=False)  # "toggle" checkbox "Remember me?"
         response = self.client.post(reverse('login'), data=login_data)
         self.assertEqual(response.wsgi_request.session.get_expiry_age(), 1200)  # session lifetime is 20 minutes
         self.assertRedirects(response, reverse('goods:product_list'))

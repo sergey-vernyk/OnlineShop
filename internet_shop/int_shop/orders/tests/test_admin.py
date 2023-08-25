@@ -1,14 +1,15 @@
-from django.test import TestCase
-from orders.models import Order, Delivery
-from account.models import Profile
-from django.contrib.auth.models import User
-from orders.admin import OrderAdmin, DeliveryAdmin
 from django.contrib.admin.sites import AdminSite
-from coupons.models import Coupon
-from present_cards.models import PresentCard
-from coupons.models import Category as Coupon_category
-from present_cards.models import Category as Card_category
+from django.contrib.auth.models import User
+from django.test import TestCase
 from django.utils import timezone
+
+from account.models import Profile
+from coupons.models import Category as Coupon_category
+from coupons.models import Coupon
+from orders.admin import OrderAdmin, DeliveryAdmin
+from orders.models import Order, Delivery
+from present_cards.models import Category as Card_category
+from present_cards.models import PresentCard
 
 
 class TestOrdersAdmin(TestCase):

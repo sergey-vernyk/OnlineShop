@@ -206,48 +206,61 @@ class ProductDetailView(DetailView, FormMixin):
         unliked_comments = self.profile.comments_unliked.all()
         return {'liked_comments': [c.pk for c in liked_comments], 'unliked_comments': [c.pk for c in unliked_comments]}
 
-    @auth_profile_required
     def post(self, request, *args, **kwargs):
         # if it's AJAX request
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            comment_id = request.POST.get('comment_id')
-            action = request.POST.get('action')  # like/unlike
-            comment = Comment.objects.get(pk=comment_id)
-
-            liked_comments = self.profile.comments_liked.all()
-            unliked_comments = self.profile.comments_unliked.all()
-
-            # set like/dislike for the comment
-            if action == 'like':
-                if comment in liked_comments:
-                    comment.profiles_likes.remove(self.profile)
-                else:
-                    comment.profiles_likes.add(self.profile)
-                    comment.profiles_unlikes.remove(self.profile)
-
-            elif action == 'unlike':
-                if comment in unliked_comments:
-                    comment.profiles_unlikes.remove(self.profile)
-                else:
-                    comment.profiles_unlikes.add(self.profile)
-                    comment.profiles_likes.remove(self.profile)
-
-            new_count_likes = comment.profiles_likes.count()
-            new_count_unlikes = comment.profiles_unlikes.count()
-            return JsonResponse({'success': True,
-                                 'new_count_likes': new_count_likes,
-                                 'new_count_unlikes': new_count_unlikes})
+            return self.set_like_dislike_comment(request)
         else:
-            self.object = self.get_object()
-            form = self.get_form(form_class=CommentProductForm)
-            if form.is_valid():
-                new_comment = form.save(commit=False)
-                new_comment.product = self.object  # link the comment to the current product
-                new_comment.profile = self.profile
-                new_comment.save()  # save the comment to DB
-                return self.form_valid(form)
+            return self.send_comment_about_product()
+
+    def send_comment_about_product(self):
+        """
+        Method returns invalid form with errors or redirect to the page
+        with detail product under what that comment has been added successfully
+        """
+        self.object = self.get_object()
+        form = self.get_form(form_class=CommentProductForm)
+        if form.is_valid():
+            new_comment = form.save(commit=False)
+            new_comment.product = self.object  # link the comment to the current product
+            new_comment.profile = self.profile
+            new_comment.save()  # save the comment to DB
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    @auth_profile_required
+    def set_like_dislike_comment(self, request):
+        """
+        Method set like or dislike under comment
+        """
+        comment_id = request.POST.get('comment_id')
+        action = request.POST.get('action')  # like/unlike
+        comment = Comment.objects.get(pk=comment_id)
+
+        liked_comments = self.profile.comments_liked.all()
+        unliked_comments = self.profile.comments_unliked.all()
+
+        # set like/dislike for the comment
+        if action == 'like':
+            if comment in liked_comments:
+                comment.profiles_likes.remove(self.profile)
             else:
-                return self.form_invalid(form)
+                comment.profiles_likes.add(self.profile)
+                comment.profiles_unlikes.remove(self.profile)
+
+        elif action == 'unlike':
+            if comment in unliked_comments:
+                comment.profiles_unlikes.remove(self.profile)
+            else:
+                comment.profiles_unlikes.add(self.profile)
+                comment.profiles_likes.remove(self.profile)
+
+        new_count_likes = comment.profiles_likes.count()
+        new_count_unlikes = comment.profiles_unlikes.count()
+        return JsonResponse({'success': True,
+                             'new_count_likes': new_count_likes,
+                             'new_count_unlikes': new_count_unlikes})
 
     def form_invalid(self, form):
         """

@@ -77,7 +77,7 @@ class TestAdminAccount(TestCase):
 
     def test_profile_photo_tag_for_profile_admin(self):
         """
-        Checking correct making profile's photo link in change profile infiormation menu
+        Checking correct making profile's photo link in change profile information menu
         """
         instance = ProfileAdmin(model=Profile, admin_site=self.site)
         link = f'<img src="{self.profile.photo.url}" width="100" height="100"/>'

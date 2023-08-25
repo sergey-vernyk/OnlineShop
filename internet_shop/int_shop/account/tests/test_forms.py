@@ -9,7 +9,7 @@ from goods.models import Favorite
 
 class TestAccountForms(TestCase):
     """
-    Тестирование форм приложения account
+    Testing forms for the account application
     """
 
     def setUp(self) -> None:
@@ -22,44 +22,43 @@ class TestAccountForms(TestCase):
 
     def test_successfully_login(self):
         """
-        Проверка успешного входа в систему при вводе корректных данных (пользователь существует в системе)
+        Checking successfully login while entering correct data (user exists in the system)
         """
 
         response = self.client.post(reverse('login'), {'username': self.user.username, 'password': 'password'})
-        self.assertRedirects(response, reverse('goods:product_list'))  # переадресация на главную страницу
-        self.assertTrue(self.user.is_authenticated)  # пользователь теперь аутентифицирован
+        self.assertRedirects(response, reverse('goods:product_list'))  # redirecting to the main page
+        self.assertTrue(self.user.is_authenticated)  # user is authenticated
 
-        # email в качестве username
+        # email like username
         response = self.client.post(reverse('login'), {'username': self.user.email, 'password': 'password'})
         self.assertRedirects(response, reverse('goods:product_list'))
         self.assertTrue(self.user.is_authenticated)
 
     def test_enter_incorrect_data_to_login_form(self):
         """
-        Проверка определения существования пользователя
-        в системе по его username или его email
+        Checking if the user exists by it username or email
         """
-        # не существующее имя пользователя
+        # user name doesn't exists
         request = self.factory.post(reverse('login'), {'username': 'no_exists_user', 'password': 'password'})
         instance = LoginForm(data=request.POST)
         self.assertTrue(instance.has_error('username', code='No_exists_user'))
 
-        # не существующий email
+        # email doesn't exists
         request = self.factory.post(reverse('login'), {'username': 'mail@mail.com', 'password': 'password'})
         instance = LoginForm(data=request.POST)
         self.assertTrue(instance.has_error('username', code='No_exists_user'))
 
-        # не валидный email
+        # invalid email
         request = self.factory.post(reverse('login'), {'username': 'mail@mail', 'password': 'password'})
         instance = LoginForm(data=request.POST)
         self.assertTrue(instance.has_error('username', code='invalid'))
 
-        # неправильный пароль
+        # wrong password
         request = self.factory.post(reverse('login'), {'username': self.user.username, 'password': 'wrong-password'})
         instance = LoginForm(data=request.POST)
         self.assertTrue(instance.has_error('password', code='wrong_password'))
 
-        # пользователь не активен
+        # user is inactive
         self.user.is_active = False
         self.user.save()
 
@@ -70,26 +69,26 @@ class TestAccountForms(TestCase):
 
     def test_enter_exists_username_during_registration(self):
         """
-        Проверка возникновения ошибки при подтверждении регистрации,
-        когда введен уже существующий в системе username
+        Checking the raise an error while submitting registration,
+        when entered username, that exists in the system
         """
         request = self.factory.post(reverse('register_user'), {'username': self.user.username})
         instance = RegisterUserForm(request.POST)
-        self.assertTrue(instance.has_error('username', code='exists_username'))  # такой username уже есть в системе
+        self.assertTrue(instance.has_error('username', code='exists_username'))  # that username exists
 
     def test_enter_exists_email_during_registration(self):
         """
-        Проверка возникновения ошибки при подтверждении регистрации,
-        когда введен уже существующий в системе email
+        Checking the raise an error while submitting registration,
+        when entered email, that exists in the system
         """
         request = self.factory.post(reverse('register_user'), {'email': self.user.email})
         instance = RegisterUserForm(request.POST)
-        self.assertTrue(instance.has_error('email', code='exists_email'))  # такой email уже есть в системе
+        self.assertTrue(instance.has_error('email', code='exists_email'))  # that email exists
 
     def test_enter_not_exists_email_relative_with_register_user(self):
         """
-        Проверка возникновения ошибки, когда передается несуществующий
-        в системе адрес электронной почты, при попытке восстановления забытого пароля от учетной записи
+        Checking the raise an error, when transmitting not exists email
+        while user attempt to recover forgotten account password
         """
         request = self.factory.post(reverse('password_reset'), {'email': 'no_exists@example.com'})
         instance = ForgotPasswordForm(request.POST)
