@@ -42,7 +42,7 @@ jobs:
     - name: Set redis config file
       run: |
         sudo docker run -v /internet_shop/int_shop/config/redis/redis.conf:/usr/local/etc/redis/redis.conf --name redis_db -d redis:7-alpine3.16 redis-server /usr/local/etc/redis/redis.conf
-        netstat -ltnp | grep -w '6379'
+        sudo netstat -ltnp | grep -w '6379'
     - name: Run Tests
       run: |
         cd internet_shop/int_shop
