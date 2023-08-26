@@ -11,9 +11,9 @@ jobs:
       postgres:
         image: postgres:14.6-alpine
         env:
-          POSTGRES_DB: ${{ secrets.DATABASE_NAME }}
-          POSTGRES_USER: ${{ secrets.DATABASE_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          POSTGRES_DB: test_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
         ports:
           - 5432:5432
         volumes:
@@ -32,7 +32,6 @@ jobs:
         python-version: 3.9
     - name: Alter Postgres User
       run: |
-        sudo docker exec ${{ job.services.postgres.id }} sh -c "psql -c 'CREATE USER postgres SUPERUSER;'"
         sudo docker exec ${{ job.services.postgres.id }} sh -c "psql -U postgres -p 5432 -c 'ALTER USER ${{ secrets.DATABASE_USER }} CREATEDB;'"
     - name: Set redis config file
       run: |
