@@ -51,6 +51,7 @@ jobs:
         mv .env internet_shop/int_shop/int_shop/settings/.env
     - name: Set redis config file
       run: |
+        mkdir -p /etc/redis
         cp internet_shop/int_shop/config/redis/redis.conf /etc/redis/redis.conf
         kill -9 `sudo lsof -t -i:6379`
         docker exec ${{ job.services.redis_db.id }} sh -c 'redis-server /etc/redis/redis.conf'
