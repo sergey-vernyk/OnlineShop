@@ -48,7 +48,7 @@ jobs:
         echo "${{ secrets.ENV_FILE }}" > .env
     - name: Run Redis Server
       run: |
-        cd internet_shop/int_shop/confi/redis
+        cd internet_shop/int_shop/config/redis
         redis-server redis.conf
     - name: Run Tests
       run: |
