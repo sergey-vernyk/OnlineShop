@@ -16,17 +16,23 @@ jobs:
           POSTGRES_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
         ports:
           - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+        options: >-
+                 --health-cmd pg_isready
+                 --health-interval 10s
+                 --health-timeout 5s
+                 --health-retries 5
         
       redis_db:
         image: redis:7-alpine3.16
         ports: 
           - 6379:6379
-        volumes:
-          - /internet_shop/int_shop/config/redis/redis.conf:/usr/local/etc/redis/redis.conf
-        options: --entrypoint redis-server /usr/local/etc/redis/redis.conf
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          --entrypoint "redis-server /internet_shop/int_shop/conf/redis/redis.conf"
         
-
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.9
