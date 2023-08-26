@@ -30,6 +30,9 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: 3.9
+    - name: Alter Postgres User
+      run: |
+        sudo docker exec ${{ job.services.postgres.id }} sh -c "psql -U postgres -p 5432 -c 'CREATE USER ${{ secrets.DATABASE_USER }} with PASSWORD `${{ secrets.DATABASE_PASSWORD }}` CREATEDB;'"
     - name: Set redis config file
       run: |
         sudo docker run -v /internet_shop/int_shop/config/redis/redis.conf:/usr/local/etc/redis/redis.conf --name redis_db -d redis:7-alpine3.16 redis-server /usr/local/etc/redis/redis.conf
