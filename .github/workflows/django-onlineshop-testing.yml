@@ -17,10 +17,17 @@ jobs:
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+        
+      redis_db:
+        image: redis:7-alpine3.16
+        ports: 
+          - 6379:6379
+        options: --entrypoint redis-server internet_shop/int_shop/config/redis/redis.conf
+        
 
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python 3.9
       uses: actions/setup-python@v3
       with:
         python-version: 3.9
@@ -29,9 +36,10 @@ jobs:
         cd internet_shop/int_shop
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+    - name: Create env file
+      run: |
+        echo "${{ secrets.ENV_FILE }}" > .env
     - name: Run Tests
-      env:  
-        DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
       run: |
         cd internet_shop/int_shop
         python manage.py test
