@@ -16,6 +16,8 @@ jobs:
           POSTGRES_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
         ports:
           - 5432:5432
+        volumes:
+          - /var/run/postgresql:/var/run/postgresql
         options: >-
                  --health-cmd pg_isready
                  --health-interval 10s
@@ -49,5 +51,6 @@ jobs:
         mv .env internet_shop/int_shop/int_shop/settings/.env
     - name: Run Tests
       run: |
+        mkdir /var/run/postgresql
         cd internet_shop/int_shop
         python manage.py test
