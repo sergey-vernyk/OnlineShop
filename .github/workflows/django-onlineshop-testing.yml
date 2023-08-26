@@ -52,7 +52,7 @@ jobs:
     - name: Set redis config file
       run: |
         sudo docker stop ${{ job.services.redis_db.id }}
-        sudo docker run -p 6379:6379 -v /internet_shop/int_shop/config/redis/redis.conf:/usr/local/etc/redis/redis.conf --name myredis -d redis:7-alpine3.16 redis-server /usr/local/etc/redis/redis.conf
+        sudo docker run --entrypoint "redis-server /usr/local/etc/redis/redis.conf" -p 6379:6379 -v /internet_shop/int_shop/config/redis/redis.conf:/usr/local/etc/redis/redis.conf --name myredis -d redis:7-alpine3.16
     - name: Run Tests
       run: |
         cd internet_shop/int_shop
