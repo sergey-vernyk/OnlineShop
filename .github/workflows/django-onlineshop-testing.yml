@@ -51,10 +51,8 @@ jobs:
         mv .env internet_shop/int_shop/int_shop/settings/.env
     - name: Set redis config file
       run: |
-        sudo docker cp internet_shop/int_shop/config/redis/redis.conf ${{ job.services.redis_db.id }}:/home
-        sudo kill -9 $(sudo lsof -t -i:6379)
-        sleep 10s
-        sudo docker exec ${{ job.services.redis_db.id }} sh -c 'redis-server /home/redis.conf'
+        sudo docker stop ${{ job.services.redis_db.id }}
+        sudo docker run -v /internet_shop/int_shop/config/redis/redis.conf:/usr/local/etc/redis.conf --name myredis redis redis-server /usr/local/etc/redis/redis.conf
     - name: Run Tests
       run: |
         cd internet_shop/int_shop
