@@ -52,7 +52,7 @@ jobs:
     - name: Set redis config file
       run: |
         sudo docker cp internet_shop/int_shop/config/redis/redis.conf ${{ job.services.redis_db.id }}:/home
-        fuser -n tcp -k 6379
+        fuser -k 6379/tcp
         sudo docker exec ${{ job.services.redis_db.id }} sh -c 'redis-server /home/redis.conf'
     - name: Run Tests
       run: |
