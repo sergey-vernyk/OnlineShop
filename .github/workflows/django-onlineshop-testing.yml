@@ -33,7 +33,6 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-          --entrypoint 
           
     steps:
     - uses: actions/checkout@v3
@@ -50,6 +49,11 @@ jobs:
       run: |
         echo "${{ secrets.ENV_FILE }}" > .env
         mv .env internet_shop/int_shop/int_shop/settings/.env
+    - name: Set redis config file
+      run: |
+        cp internet_shop/int_shop/config/redis/redis.conf /etc/redis/redis.conf
+        kill -9 `sudo lsof -t -i:6379`
+        docker exec ${{ job.services.redis_db.id }} sh -c 'redis-server /etc/redis/redis.conf'
     - name: Run Tests
       run: |
         cd internet_shop/int_shop
