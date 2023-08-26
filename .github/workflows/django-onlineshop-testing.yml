@@ -24,7 +24,7 @@ jobs:
           - 6379:6379
         volumes:
           - /internet_shop/int_shop/config/redis/redis.conf:/usr/local/etc/redis/redis.conf
-        options: --entrypoint "redis-server /usr/local/etc/redis/redis.conf"
+        options: --entrypoint redis-server /usr/local/etc/redis/redis.conf
         
 
     steps:
