@@ -46,7 +46,7 @@ jobs:
     - name: Create env file
       run: |
         echo "${{ secrets.ENV_FILE }}" > .env
-        mv .env internet_shop/int_shop/settings/.env
+        mv .env internet_shop/int_shop/int_shop/settings/.env
     - name: Run Tests
       run: |
         cd internet_shop/int_shop
