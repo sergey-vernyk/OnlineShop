@@ -19,10 +19,10 @@ jobs:
         volumes:
           - /var/run/postgresql:/var/run/postgresql
         options: >-
-                 --health-cmd pg_isready
-                 --health-interval 10s
-                 --health-timeout 5s
-                 --health-retries 5
+           --health-cmd pg_isready
+           --health-interval 10s
+           --health-timeout 5s
+           --health-retries 5
         
       redis_db:
         image: redis:7-alpine3.16
@@ -33,6 +33,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+          --entrypoint=""
           
     steps:
     - uses: actions/checkout@v3
