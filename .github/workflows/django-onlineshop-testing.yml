@@ -51,6 +51,5 @@ jobs:
         mv .env internet_shop/int_shop/int_shop/settings/.env
     - name: Run Tests
       run: |
-        mkdir /var/run/postgresql
         cd internet_shop/int_shop
         python manage.py test
