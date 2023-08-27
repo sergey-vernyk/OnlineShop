@@ -14,6 +14,8 @@ SESSION_COOKIE_SECURE = True  # avoiding accidental transferring cookies over HT
 # SECURE_SSL_REDIRECT = True  # redirection all requests to HTTPS protocol
 CSRF_COOKIE_SECURE = True  # browsers will transfer cookies only over HTTPS
 
+SOCIAL_AUTH_REDIRECT_IS_HTTPS = True  # force using HTTPS while login through "social auth"
+
 # sending email to users in list below, when server errors occurred
 ADMINS = (
     ('Sergey V', 'volt.awp@gmail.com'),
