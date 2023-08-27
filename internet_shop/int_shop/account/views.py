@@ -1,6 +1,10 @@
+import base64
 from datetime import datetime
+from random import choices, shuffle
+from string import ascii_letters, digits
 
 import requests
+from captcha.image import ImageCaptcha
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.views import (
@@ -17,8 +21,7 @@ from django.urls import reverse_lazy
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from django.utils.safestring import mark_safe
-from django.views.generic import CreateView
-from django.views.generic import DetailView
+from django.views.generic import CreateView, DetailView
 from django.views.generic.edit import FormMixin
 
 from account.models import Profile
@@ -73,6 +76,40 @@ class UserRegisterView(CreateView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.object = None
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['captcha_image'] = self._create_captcha_image(200, 60, 30)
+        return context
+
+    def _create_captcha_image(self, width: int, height: int, font_size: int) -> base64:
+        """
+        Method returns image for captcha in base64 format
+        """
+        image = ImageCaptcha(width=width,
+                             height=height,
+                             fonts=['../int_shop/static/JetBrainsMono-Thin.ttf'],
+                             font_sizes=(font_size,))
+        random_captcha_text = self._create_random_text_for_captcha(3, 3)
+        print(random_captcha_text)
+        data = image.generate(random_captcha_text)
+        data.seek(0)
+        captcha_image = data.read()
+        base64_captcha_image = base64.b64encode(captcha_image).decode('utf-8')
+
+        return base64_captcha_image
+
+    @staticmethod
+    def _create_random_text_for_captcha(digits_nums: int, letters_nums: int) -> str:
+        """
+        Methods returns random text for captcha, which was generated from ASCII letters and digits
+        """
+        digits_list = [digit for digit in digits]
+        letters_list = [letter for letter in ascii_letters]
+        shuffle(digits_list)
+        shuffle(letters_list)
+        random_captcha_text = ''.join(choices(digits_list, k=digits_nums) + (choices(letters_list, k=letters_nums)))
+        return random_captcha_text
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
