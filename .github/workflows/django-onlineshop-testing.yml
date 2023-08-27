@@ -45,7 +45,11 @@ jobs:
       run: |
         echo "${{ secrets.ENV_FILE }}" > .env
         mv .env internet_shop/int_shop/int_shop/settings/.env
-    - name: Run with Coverage
+    - name: Run tests with Coverage
       run: |
         cd internet_shop/int_shop
         coverage run --source '.' --omit '*/migrations/*,*/tests/*,*/settings/*' manage.py test --exclude-tag social_profiles
+    - name: Coverage report
+      run: |
+        cd internet_shop/int_shop
+        coverage report
