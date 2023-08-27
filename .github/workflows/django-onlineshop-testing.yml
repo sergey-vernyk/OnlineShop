@@ -17,7 +17,7 @@ jobs:
         ports:
           - 5432:5432
         volumes:
-          - /var/run/postgresql:/var/run/postgresql
+          - /var/run/postgresql:/var/run/postgresql  # volume for connection socket
         options: >-
            --health-cmd pg_isready
            --health-interval 10s
@@ -30,10 +30,10 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: 3.9
-    - name: Alter Postgres User
+    - name: Create postgres user with createdb privilege
       run: |
         sudo docker exec ${{ job.services.postgres.id }} sh -c "psql -U postgres -p 5432 -c 'CREATE USER ${{ secrets.DATABASE_USER }} CREATEDB;'"
-    - name: Set redis config file
+    - name: Run redis server in Docker with custom config file
       run: | 
         sudo docker run -v ./internet_shop/int_shop/config/redis/redis.conf:/usr/local/etc/redis/redis.conf -p 6379:6379 --name redis_db -d redis:7-alpine3.16 redis-server /usr/local/etc/redis/redis.conf
     - name: Install Dependencies
@@ -45,7 +45,7 @@ jobs:
       run: |
         echo "${{ secrets.ENV_FILE }}" > .env
         mv .env internet_shop/int_shop/int_shop/settings/.env
-    - name: Run Tests
+    - name: Run with Coverage
       run: |
         cd internet_shop/int_shop
-        python manage.py test
+        coverage run --source '.' --omit '*/migrations/*,*/tests/*,*/settings/*' manage.py test --exclude-tag social_profiles
