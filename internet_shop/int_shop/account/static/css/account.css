@@ -1073,10 +1073,7 @@ input[type="text"], input[type="email"], textarea {
     width: 600px;
 }
 
-#reg-form{
-    padding: 10px; 
-    height: 800px;
-}
+#reg-form{ padding: 10px; }
 
 .register-form .reg-form-fields {
     display: block;
@@ -1108,10 +1105,7 @@ input[type="text"], input[type="email"], textarea {
     'opsz' 20
   }
 
-#id_about {
-    min-height: 95px;
-    max-height: 95px;
-}
+#id_about { min-height: 95px; }
 
 .reg-photo {
     padding-left: 0px !important;
@@ -1125,44 +1119,19 @@ input[type="text"], input[type="email"], textarea {
     font-family: 'Merriweather', serif;
 }
 
-.reg-form-captcha {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 77px;
-}
-
-.reg-field-captcha {
-    width: 250px;
-    height: 50px;
-    padding-left: 10px;
-    border-radius: 5px;
-    margin-left: 10px;
-    border: 1px solid grey;
-}
-
-.captcha-image {
-    border: 1px solid grey;
-}
-
 .reg-button {
     display: flex;
     align-items: center;
-    width: 250px;
+    width: 150px;
     font-size: 1.2rem;
     background-color: #568EED;
     position: absolute;
-    bottom: 10px;
-    right: 25px;
+    bottom: 20px;
+    left: 15px;
     padding: 5px 10px;
     color: white;
-    border-radius: 8px;
+    border-radius: 5px;
     border: 1px solid;
-    justify-content: center;
-}
-
-.reg-button:hover {
-    background-color: #7fa2de;
 }
 
 .radio-gender {

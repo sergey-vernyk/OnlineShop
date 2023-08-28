@@ -47,7 +47,7 @@ def auth_profile_required(func):
             obj = Product.objects.get(pk=match.kwargs['product_pk'], slug=match.kwargs['product_slug'])
             url_next = obj.get_absolute_url()
         else:
-            url_next = reverse(match.view_name)
+            url_next = reverse(match.view_name, kwargs=match.kwargs)
 
         reverse_url = f'{reverse("login")}?next={url_next}'
         return JsonResponse({'success': False, 'login_page_url': reverse_url}, status=401)
