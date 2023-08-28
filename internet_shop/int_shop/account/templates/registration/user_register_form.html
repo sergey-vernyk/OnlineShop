@@ -16,47 +16,67 @@
             {% csrf_token %}
             {% for field in form %}
                 <div class="reg-form-fields">
-                    {% if field.label == 'Photo' %}
-                        <label class="reg-label"
-                               for="{{ field.id_for_label }}">{{ field.label }}
-                                {% if field.field.required %}<span class="required-field">*</span>{% endif %}
-                        </label>
-                        <div class="reg-photo">
-                            {{ field }}
-                        </div>
-                    {% elif field.label == 'Gender' %}
-                        <label class="reg-label"
-                               for="{{ field.id_for_label }}">{{ field.label }}
-                                {% if field.field.required %}<span class="required-field">*</span>{% endif %}
-                        </label>
-                            <!--iteration by radio button values-->
-                            <div class="gender-choice">
-                                {% for radio in field %}
-                                    <div class="radio-gender">
-                                        {{ radio.choice_label }} {{ radio.tag }}
-                                    </div>
-                                {% endfor %}
+                    {% if field.label != 'Captcha' %}
+                        {% if field.label == 'Photo' %}
+                            <label class="reg-label"
+                                   for="{{ field.id_for_label }}">{{ field.label }}
+                                    {% if field.field.required %}<span class="required-field">*</span>{% endif %}
+                            </label>
+                            <div class="reg-photo">
+                                {{ field }}
                             </div>
-                    {% else %}
-                        <label class="reg-label"
-                               for="{{ field.id_for_label }}">{{ field.label }}
-                                {% if field.field.required %}<span class="required-field">*</span>{% endif %}
-                        </label>
-                        {{ field }}
-                        {% if field.label == 'Password' or field.label == 'Confirm password'  %}
-                            <span class="material-symbols-outlined">visibility_off</span>
+                        {% elif field.label == 'Gender' %}
+                            <label class="reg-label"
+                                   for="{{ field.id_for_label }}">{{ field.label }}
+                                    {% if field.field.required %}<span class="required-field">*</span>{% endif %}
+                            </label>
+                                <!--iteration by radio button values-->
+                                <div class="gender-choice">
+                                    {% for radio in field %}
+                                        <div class="radio-gender">
+                                            {{ radio.choice_label }} {{ radio.tag }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                        {% else %}
+                            <label class="reg-label"
+                                   for="{{ field.id_for_label }}">{{ field.label }}
+                                    {% if field.field.required %}<span class="required-field">*</span>{% endif %}
+                            </label>
+                            {{ field }}
+                            {% if field.label == 'Password' or field.label == 'Confirm password'  %}
+                                <span class="material-symbols-outlined">visibility_off</span>
+                            {% endif %}
                         {% endif %}
+                        {% if field.help_text %}
+                            <p class="help">{{ field.help_text }}</p>
+                        {% endif %}
+                        <ul class="errorlist">
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
                     {% endif %}
-                    {% if field.help_text %}
-                        <p class="help">{{ field.help_text }}</p>
-                    {% endif %}
+                </div>
+            {% endfor %}
+            <div class="reg-form-captcha">
+                <div class="captcha-image">
+                    <img data-url="{% url 'update_captcha' %}"
+                         src="data:image/png;base64,{{ captcha_image }}" alt="captcha">
+                    <p class="help help-captcha">All letters in lower case. For update the captcha click on the image</p>
+                </div>
+                {% if form.captcha.field.required %}
+                    <span class="required-field captcha-required">*</span>
+                {% endif %}
+                <div>
+                    {{ form.captcha }}
                     <ul class="errorlist">
-                        {% for error in field.errors %}
+                        {% for error in form.captcha.errors %}
                             <li>{{ error }}</li>
                         {% endfor %}
                     </ul>
                 </div>
-            {% endfor %}
+            </div>
         </form>
         <button form="reg-form" type="submit" class="reg-button">
             <span class="material-symbols-outlined">how_to_reg</span>
@@ -65,4 +85,5 @@
     </div>
 </div>
 <script src="{% static 'js/toggle_password_visibility.js' %}"></script>
+<script src="{% static 'js/update_captcha.js' %}" type="module"></script>
 {% endblock %}

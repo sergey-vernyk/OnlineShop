@@ -17,12 +17,12 @@ from django.urls import reverse_lazy
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from django.utils.safestring import mark_safe
-from django.views.generic import CreateView
-from django.views.generic import DetailView
+from django.views.generic import CreateView, DetailView
 from django.views.generic.edit import FormMixin
 
 from account.models import Profile
 from common.moduls_init import redis
+from common.utils import create_captcha_image
 from coupons.models import Coupon
 from goods.models import Product, Favorite
 from orders.models import Order
@@ -74,6 +74,11 @@ class UserRegisterView(CreateView):
         super().__init__(**kwargs)
         self.object = None
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['captcha_image'] = create_captcha_image(self.request)
+        return context
+
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         if form.is_valid():
@@ -101,6 +106,8 @@ class UserRegisterView(CreateView):
             Favorite.objects.create(profile=profile)  # creating favorite instance for profile
             messages.success(request, 'Please, check your email! '
                                       'You have to receive email with instruction for activate account')
+            # delete captcha text, when user has complete registration
+            redis.hdel(f'user_register_captcha:{new_user.email}', 'captcha_text')
             return self.form_valid(form)
         else:
             return self.form_invalid(form)

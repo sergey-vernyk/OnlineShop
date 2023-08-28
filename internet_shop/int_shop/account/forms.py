@@ -13,6 +13,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 
+from common.moduls_init import redis
 from .models import Profile
 
 help_messages = (
@@ -124,9 +125,11 @@ class RegisterUserForm(UserCreationForm):
 
     user_photo = forms.ImageField(required=False, label='Photo', widget=forms.FileInput(attrs={'class': 'reg-photo'}))
 
+    captcha = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': 'reg-field-captcha'}))
+
     field_order = ('username', 'first_name', 'last_name', 'gender',
                    'email', 'phone_number', 'date_of_birth', 'password1',
-                   'password2', 'user_photo', 'about')
+                   'password2', 'user_photo', 'about', 'captcha')
 
     error_messages = {
         'date_of_birth': {
@@ -156,6 +159,24 @@ class RegisterUserForm(UserCreationForm):
             raise ValidationError('Email is already register', code='exists_email')
 
         return email
+
+    def clean_captcha(self):
+        """
+        Checking whether user entered correct text from captcha, otherwise raise an exception
+        """
+        captcha = self.cleaned_data.get('captcha').upper()  # convert all symbols to upper case as well
+        email = self.cleaned_data.get('email')
+
+        # captcha text may be empty if user forgot enter his/her email while registration
+        if email:
+            correct_captcha = redis.hget(f'user_register_captcha:{email}', 'captcha_text').decode('utf-8').upper()
+        else:
+            raise ValidationError('Captcha is not correct', code='wrong_captcha')
+
+        if captcha != correct_captcha:
+            raise ValidationError('Captcha is not correct', code='wrong_captcha')
+
+        return captcha
 
 
 class ForgotPasswordForm(PasswordResetForm):

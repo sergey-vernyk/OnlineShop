@@ -19,6 +19,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import TemplateView
+from common.utils import create_captcha_image
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -33,8 +34,9 @@ urlpatterns = [
     path('summernote/', include('django_summernote.urls')),
     path('delivery/', TemplateView.as_view(template_name='./delivery.html'), name='delivery_services'),
     path('contacts/', TemplateView.as_view(template_name='./contacts.html'), name='contacts'),
+    path('ajax/update_captcha/', create_captcha_image, name='update_captcha')
 ]
 
-if settings.DEBUG:  # сохранение файлов по этому адресу будет происходить только в режиме разработки
+if settings.DEBUG:  # save files will be happened to this path only in debug mode
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

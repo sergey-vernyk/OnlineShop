@@ -1073,7 +1073,10 @@ input[type="text"], input[type="email"], textarea {
     width: 600px;
 }
 
-#reg-form{ padding: 10px; }
+#reg-form{
+    padding: 10px;
+    min-height: 900px;
+}
 
 .register-form .reg-form-fields {
     display: block;
@@ -1105,7 +1108,10 @@ input[type="text"], input[type="email"], textarea {
     'opsz' 20
   }
 
-#id_about { min-height: 95px; }
+#id_about {
+    min-height: 95px;
+    max-height: 95px;
+}
 
 .reg-photo {
     padding-left: 0px !important;
@@ -1119,19 +1125,56 @@ input[type="text"], input[type="email"], textarea {
     font-family: 'Merriweather', serif;
 }
 
+.reg-form-captcha {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    margin-top: 90px;
+}
+
+.reg-field-captcha {
+    width: 250px;
+    height: 50px;
+    padding-left: 10px;
+    border-radius: 5px;
+    margin-left: 20px;
+    border: 1px solid grey;
+}
+
+.captcha-image img {
+    border: 1px solid grey;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+.help-captcha {
+    width: 200px !important;
+}
+
+.captcha-required {
+    font-family: 'Merriweather', serif;
+    margin-right: 60px;
+    font-size: 1.1rem;
+}
+
 .reg-button {
     display: flex;
     align-items: center;
-    width: 150px;
+    width: 250px;
     font-size: 1.2rem;
     background-color: #568EED;
     position: absolute;
-    bottom: 20px;
-    left: 15px;
+    bottom: 25px;
+    right: 25px;
     padding: 5px 10px;
     color: white;
-    border-radius: 5px;
+    border-radius: 8px;
     border: 1px solid;
+    justify-content: center;
+}
+
+.reg-button:hover {
+    background-color: #7fa2de;
 }
 
 .radio-gender {
@@ -1156,7 +1199,7 @@ input[type="text"], input[type="email"], textarea {
     width: 160px;
     position: relative;
     margin: 5px 0;
-    color: darkgray;
+    color:rgb(84, 82, 82);
 }
 
 /*horizontal manu*/
