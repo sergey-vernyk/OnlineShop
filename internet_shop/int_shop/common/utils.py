@@ -1,4 +1,8 @@
+from typing import Union
+
+import phonenumbers
 from django.contrib import admin
+from phonenumbers import carrier
 
 
 class ValidDiscountsListFilter(admin.SimpleListFilter):
@@ -30,3 +34,20 @@ class ValidDiscountsListFilter(admin.SimpleListFilter):
         if self.value() == 'invalid':
             invalid_ids = (x.id for x in queryset if not x.is_valid)
             return queryset.filter(id__in=invalid_ids)
+
+
+def check_phone_number(phone_number: str) -> Union[str, bool]:
+    """
+    Return phone number if it is correct, otherwise return False
+    """
+    phone_number_output = ''.join(num.strip('()') for num in phone_number.split())
+    phone_number_parse = phonenumbers.parse(phone_number_output, 'UA')
+    carrier_of_number = carrier.name_for_number(phone_number_parse, 'en')
+    if phonenumbers.is_possible_number(phone_number_parse) and carrier_of_number in (
+            'Kyivstar',
+            'Vodafone',
+            'lifecell'
+    ):
+        return phone_number_output
+    else:
+        return False

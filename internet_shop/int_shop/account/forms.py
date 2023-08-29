@@ -13,6 +13,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 
+from common.utils import check_phone_number
 from .models import Profile
 
 help_messages = (
@@ -104,7 +105,7 @@ class RegisterUserForm(UserCreationForm):
     email = forms.CharField(required=True, label='Email', widget=forms.EmailInput(attrs={'class': 'reg-field'}))
     phone_number = forms.CharField(required=False, label='Phone',
                                    widget=forms.TextInput(attrs={'class': 'reg-field',
-                                                                 'placeholder': '+x (xxx) xxx xx xx'}))
+                                                                 'placeholder': '+country code ...'}))
     password1 = forms.CharField(required=True, label='Password', widget=forms.PasswordInput(
         attrs={'class': 'reg-field', 'autocomplete': 'new-password'}),
                                 help_text=help_messages[0])
@@ -156,6 +157,17 @@ class RegisterUserForm(UserCreationForm):
             raise ValidationError('Email is already register', code='exists_email')
 
         return email
+
+    def clean_phone_number(self):
+        """
+        Checking whether phone number is valid in the register form
+        """
+        phone_number_in = self.cleaned_data.get('phone_number')
+        phone_number_output = check_phone_number(phone_number_in)
+        if phone_number_output:
+            return phone_number_output
+        else:
+            self.add_error('phone_number', 'Invalid phone number')
 
 
 class ForgotPasswordForm(PasswordResetForm):

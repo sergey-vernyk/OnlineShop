@@ -1,10 +1,8 @@
-import phonenumbers
 from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from phonenumbers import carrier
-
+from common.utils import check_phone_number
 from .models import Delivery, Order
 
 
@@ -22,17 +20,11 @@ class OrderCreateForm(forms.ModelForm):
 
     def clean_phone(self):
         """
-        Phone number validation in the order
+        Checking whether phone number is valid in the order
         """
         phone_number_in = self.cleaned_data.get('phone')
-        phone_number_output = ''.join(num.strip('()') for num in phone_number_in.split())
-        phone_number_parse = phonenumbers.parse(phone_number_output, 'UA')
-        carrier_of_number = carrier.name_for_number(phone_number_parse, 'en')
-        if phonenumbers.is_possible_number(phone_number_parse) and carrier_of_number in (
-                'Kyivstar',
-                'Vodafone',
-                'lifecell'
-        ):
+        phone_number_output = check_phone_number(phone_number_in)
+        if phone_number_output:
             return phone_number_output
         else:
             self.add_error('phone', 'Invalid phone number')
