@@ -80,6 +80,9 @@ class UserRegisterView(CreateView):
             new_user = form.save(commit=False)  # creating user, but not save it
             date_of_birth = form.cleaned_data.get('date_of_birth')
             user_photo = form.cleaned_data.get('user_photo')
+            phone_number = form.cleaned_data.get('phone_number')
+            about_info = form.cleaned_data.get('about')
+
             # filling user's fields from form data
             new_user.username = form.cleaned_data.get('username')
             new_user.email = form.cleaned_data.get('email')
@@ -97,6 +100,8 @@ class UserRegisterView(CreateView):
             profile = Profile.objects.create(user=new_user,
                                              date_of_birth=date_of_birth,
                                              photo=user_photo,
+                                             phone_number=phone_number,
+                                             about=about_info,
                                              gender=form.cleaned_data.get('gender'))
             Favorite.objects.create(profile=profile)  # creating favorite instance for profile
             messages.success(request, 'Please, check your email! '
