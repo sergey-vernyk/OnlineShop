@@ -559,7 +559,7 @@ input[type="text"], input[type="email"], textarea {
 #form-comment {
     display: block;
     width: 400px;
-    margin: 20px auto;
+    margin: auto;
     min-height: 175px;
 }
 
@@ -613,6 +613,7 @@ input[type="text"], input[type="email"], textarea {
     border: 1px solid grey;
     cursor: pointer;
     margin-right: 5px;
+    border-radius: 8px;
 }
 
 .help-captcha { width: 135px !important; }

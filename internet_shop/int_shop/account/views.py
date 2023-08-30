@@ -260,7 +260,7 @@ def save_social_user_to_profile(backend, user, response, *args, **kwargs):
                                        photo=bytes_inst)
 
 
-class ForgotPasswordView(PasswordResetView, FormMixin):
+class ForgotPasswordView(PasswordResetView):
     """
     View for sending email needed for reset forgotten password from account
     """
@@ -272,12 +272,19 @@ class ForgotPasswordView(PasswordResetView, FormMixin):
     message = ("We've emailed you instructions for setting your password. "
                "If you don't receive an email, please make sure you've entered the address you registered with")
 
-    def post(self, request, *args, **kwargs):
-        form = self.get_form()
-        if form.is_valid():
-            messages.success(request, mark_safe(self.message))  # displaying message to frontend
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['captcha_image'] = create_captcha_image(self.request, width=135, font_size=30)
+        return context
 
-        return super().post(request, *args, **kwargs)
+    def form_valid(self, form):
+        if form.is_valid():
+            captcha_text = form.cleaned_data.get('captcha')
+            # delete captcha text, when user has complete send email to the server
+            redis.hdel(f'captcha:{captcha_text}', 'captcha_text')
+            messages.success(self.request, mark_safe(self.message))  # displaying message to frontend
+
+        return super().form_valid(form)
 
 
 class SetNewPasswordView(PasswordResetConfirmView):
