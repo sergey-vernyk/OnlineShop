@@ -8,6 +8,7 @@ from django.contrib import admin
 from django.http.response import JsonResponse
 
 from common.moduls_init import redis
+from django.core.exceptions import ValidationError
 
 NUMBER_OF_CAPTCHA_SYMBOLS = 6
 
@@ -90,3 +91,19 @@ def create_random_text_for_captcha(symbols_num: int) -> str:
     # convert to string from list, cause choice returns list
     random_captcha_text = ''.join(choices(symbols_set, k=symbols_num))
     return random_captcha_text
+
+
+def validate_captcha_text(cleaned_data: dict) -> str:
+    """
+    Validating captcha text, which user is entering on pages with captcha
+    """
+
+    captcha = cleaned_data.get('captcha').upper()  # convert all symbols to upper case as well
+
+    redis_captcha = redis.hget(f'captcha:{captcha}', 'captcha_text')
+    if redis_captcha:
+        decode_captcha = redis_captcha.decode('utf-8').upper()
+    else:
+        raise ValidationError('Captcha is not correct', code='wrong_captcha')
+
+    return decode_captcha

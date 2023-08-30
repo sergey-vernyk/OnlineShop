@@ -1,5 +1,6 @@
 from django import forms
 
+from common.utils import validate_captcha_text
 from goods.models import Product, Comment, Manufacturer
 from django.core.validators import ValidationError
 from common.moduls_init import redis
@@ -43,15 +44,7 @@ class CommentProductForm(forms.ModelForm, forms.Form):
         """
         Checking whether user entered correct text from captcha, otherwise raise an exception
         """
-        captcha = self.cleaned_data.get('captcha').upper()  # convert all symbols to upper case as well
-
-        redis_captcha = redis.hget(f'captcha:{captcha}', 'captcha_text')
-        if redis_captcha:
-            decode_captcha = redis_captcha.decode('utf-8').upper()
-        else:
-            raise ValidationError('Captcha is not correct', code='wrong_captcha')
-
-        return decode_captcha
+        return validate_captcha_text(self.cleaned_data)
 
 
 class FilterByPriceForm(forms.Form):
