@@ -14,6 +14,7 @@ from account.models import Profile
 from cart.forms import CartQuantityForm
 from common.decorators import ajax_required, auth_profile_required
 from common.moduls_init import redis
+from common.utils import create_captcha_image
 from goods.forms import (
     RatingSetForm,
     CommentProductForm,
@@ -174,6 +175,7 @@ class ProductDetailView(DetailView, FormMixin):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['captcha_image'] = create_captcha_image(self.request, width=135, font_size=30)
         context['comment_form'] = CommentProductForm()
         context['quantity_form'] = CartQuantityForm()
         # getting all Profile objects, that commented on the current product and rated product comment
@@ -225,6 +227,9 @@ class ProductDetailView(DetailView, FormMixin):
             new_comment.product = self.object  # link the comment to the current product
             new_comment.profile = self.profile
             new_comment.save()  # save the comment to DB
+            captcha_text = form.cleaned_data.get('captcha')
+            # delete captcha text, when user has posted comment successfully
+            redis.hdel(f'captcha:{captcha_text}', 'captcha_text')
             return self.form_valid(form)
         else:
             return self.form_invalid(form)

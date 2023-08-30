@@ -3,12 +3,13 @@ import getCookie from '/static/js/getCSRFToken.js';
 $(document).ready(function() {
     // handling click on the captcha image
     $('.captcha-image > img').click(function() {
-        var url = $(this).data('url');
+        const url = $(this).data('url');
+        const width = $(this).data('width') || 200;
+        const height = $(this).data('height') || 60;
+        const fontSize = $(this).data('fontSize') || 30;
+
         // user email as identifier for storing captcha text
         var userEmail = $('.reg-form-fields').find('input[name=email]').val();
-        const witdh = 200;
-        const height = 60;
-        const fontSize = 30;
         const csrftoken = getCookie('csrftoken');
 
         $.ajax({
@@ -16,7 +17,7 @@ $(document).ready(function() {
             method: 'POST',
             dataType: 'json',
             data: {
-                width: witdh,
+                width: width,
                 height: height,
                 font_size: fontSize,
                 user_email: userEmail,

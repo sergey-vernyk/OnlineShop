@@ -107,7 +107,7 @@ class UserRegisterView(CreateView):
             messages.success(request, 'Please, check your email! '
                                       'You have to receive email with instruction for activate account')
             # delete captcha text, when user has complete registration
-            redis.hdel(f'user_register_captcha:{new_user.email}', 'captcha_text')
+            redis.hdel(f'captcha:{form.cleaned_data.get("captcha")}', 'captcha_text')
             return self.form_valid(form)
         else:
             return self.form_invalid(form)

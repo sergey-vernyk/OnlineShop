@@ -6,6 +6,7 @@ from typing import Union
 from captcha.image import ImageCaptcha
 from django.contrib import admin
 from django.http.response import JsonResponse
+
 from common.moduls_init import redis
 
 NUMBER_OF_CAPTCHA_SYMBOLS = 6
@@ -45,11 +46,10 @@ class ValidDiscountsListFilter(admin.SimpleListFilter):
 def create_captcha_image(request,
                          width: int = 200,
                          height: int = 60,
-                         font_size: tuple = 35) -> Union[base64, JsonResponse]:
+                         font_size: int = 35) -> Union[base64, JsonResponse]:
     """
     Method returns image for captcha in base64 format or Json response with this image
     """
-    user_email = ''
     is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
     # if image creating occurs when user updating captcha by click on captcha (used AJAX)
@@ -57,7 +57,6 @@ def create_captcha_image(request,
         width = int(request.POST.get('width'))
         height = int(request.POST.get('height'))
         font_size = int(request.POST.get('font_size'))
-        user_email = request.POST.get('user_email')
 
     image = ImageCaptcha(width=width,
                          height=height,
@@ -65,12 +64,13 @@ def create_captcha_image(request,
                          font_sizes=(font_size,))
     random_captcha_text = create_random_text_for_captcha(NUMBER_OF_CAPTCHA_SYMBOLS)
     data = image.generate(random_captcha_text)  # generate image of the given text
-    data.seek(0)  # make sure you're at the beginning of the BytesIO object
+    data.seek(0)  # make sure we're at the beginning of the BytesIO object
     captcha_image = data.read()
     base64_captcha_image = base64.b64encode(captcha_image).decode('utf-8')
 
-    if user_email:
-        redis.hset(f'user_register_captcha:{user_email}', 'captcha_text', random_captcha_text)
+    # save captcha text to redis and set expire their key on 10 minutes
+    redis.hset(f'captcha:{random_captcha_text}', 'captcha_text', random_captcha_text)
+    redis.expire(f'captcha:{random_captcha_text}', time=600, nx=True)
 
     result = JsonResponse({'success': True,
                            'captcha_image': base64_captcha_image}) \

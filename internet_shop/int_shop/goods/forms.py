@@ -1,6 +1,8 @@
 from django import forms
 
 from goods.models import Product, Comment, Manufacturer
+from django.core.validators import ValidationError
+from common.moduls_init import redis
 
 
 class RatingSetForm(forms.ModelForm):
@@ -16,14 +18,15 @@ class RatingSetForm(forms.ModelForm):
         }
 
 
-class CommentProductForm(forms.ModelForm):
+class CommentProductForm(forms.ModelForm, forms.Form):
     """
     Form for leaving comments for a product
     """
+    captcha = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': 'comment-field-captcha'}))
 
     class Meta:
         model = Comment
-        fields = ('user_name', 'user_email', 'body')
+        fields = ('user_name', 'user_email', 'body', 'captcha')
         widgets = {
             'user_name': forms.TextInput(attrs={'class': 'comment-field', 'placeholder': 'Your name'}),
             'user_email': forms.EmailInput(attrs={'class': 'comment-field', 'placeholder': 'example@example.com'}),
@@ -35,6 +38,20 @@ class CommentProductForm(forms.ModelForm):
 
         # set the same error message for each field
         error_messages = {field: {'required': 'This field must not be empty'} for field in fields}
+
+    def clean_captcha(self):
+        """
+        Checking whether user entered correct text from captcha, otherwise raise an exception
+        """
+        captcha = self.cleaned_data.get('captcha').upper()  # convert all symbols to upper case as well
+
+        redis_captcha = redis.hget(f'captcha:{captcha}', 'captcha_text')
+        if redis_captcha:
+            decode_captcha = redis_captcha.decode('utf-8').upper()
+        else:
+            raise ValidationError('Captcha is not correct', code='wrong_captcha')
+
+        return decode_captcha
 
 
 class FilterByPriceForm(forms.Form):

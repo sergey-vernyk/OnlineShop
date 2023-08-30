@@ -165,18 +165,14 @@ class RegisterUserForm(UserCreationForm):
         Checking whether user entered correct text from captcha, otherwise raise an exception
         """
         captcha = self.cleaned_data.get('captcha').upper()  # convert all symbols to upper case as well
-        email = self.cleaned_data.get('email')
 
-        # captcha text may be empty if user forgot enter his/her email while registration
-        if email:
-            correct_captcha = redis.hget(f'user_register_captcha:{email}', 'captcha_text').decode('utf-8').upper()
+        redis_captcha = redis.hget(f'captcha:{captcha}', 'captcha_text')
+        if redis_captcha:
+            decode_captcha = redis_captcha.decode('utf-8').upper()
         else:
             raise ValidationError('Captcha is not correct', code='wrong_captcha')
 
-        if captcha != correct_captcha:
-            raise ValidationError('Captcha is not correct', code='wrong_captcha')
-
-        return captcha
+        return decode_captcha
 
 
 class ForgotPasswordForm(PasswordResetForm):

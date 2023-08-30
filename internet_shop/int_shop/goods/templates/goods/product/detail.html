@@ -195,23 +195,46 @@
                         {% endfor %}
                     {% endwith %}
                 </div>
+                <!--Post new comment-->
                 <div class="post-comment">
                     <h4>New comment</h4>
                     <form id="form-comment" method="post">
                         {% csrf_token %}
                         {% for field in comment_form %}
-                            <div class="comment-form-fields">
-                                <label class="comment-label" for="{{ field.id_for_label}}">{{ field.label }}
-                                    {% if field.field.required %}<span class="required-field">*</span>{% endif %}
-                                </label>
-                                {{ field }}
-                            </div>
-                            <ul class="errorlist">
-                                {% for error in field.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
+                            {% if field.label != 'Captcha' %}
+                                <div class="comment-form-fields">
+                                    <label class="comment-label" for="{{ field.id_for_label}}">{{ field.label }}
+                                        {% if field.field.required %}<span class="required-field">*</span>{% endif %}
+                                    </label>
+                                    {{ field }}
+                                </div>
+                                <ul class="errorlist">
+                                    {% for error in field.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
                         {% endfor %}
+                        <div class="comment-form-captcha">
+                            <div class="captcha-image">
+                                <img data-url="{% url 'update_captcha' %}"
+                                     src="data:image/png;base64,{{ captcha_image }}"
+                                     data-width="135" data-height="60" data-font-size="30"
+                                     alt="captcha">
+                                <p class="help help-captcha">All letters in lower case. For update the captcha click on the image</p>
+                            </div>
+                            {% if comment_form.captcha.field.required %}
+                                <span class="required-field captcha-required">*</span>
+                            {% endif %}
+                            <div>
+                                {{ comment_form.captcha }}
+                                <ul class="errorlist">
+                                    {% for error in comment_form.captcha.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
                     </form>
                     <div>
                         <button type="submit" form="form-comment" class="send-comment-btn">
@@ -228,6 +251,7 @@
             <script src="{% static 'js/add_remove_favorite.js' %}" type="module"></script>
             <script src="{% static 'js/like_unlike_comment.js' %}" type="module"></script>
             <script src="{% static 'js/collapse_expand_comments.js' %}"></script>
+            <script src="{% static 'js/update_captcha.js' %}" type="module"></script>
         </div>
     </div>
 {% endblock %}
