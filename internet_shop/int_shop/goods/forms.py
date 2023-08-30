@@ -1,6 +1,9 @@
 from django import forms
 
+from common.utils import validate_captcha_text
 from goods.models import Product, Comment, Manufacturer
+from django.core.validators import ValidationError
+from common.moduls_init import redis
 
 
 class RatingSetForm(forms.ModelForm):
@@ -16,14 +19,15 @@ class RatingSetForm(forms.ModelForm):
         }
 
 
-class CommentProductForm(forms.ModelForm):
+class CommentProductForm(forms.ModelForm, forms.Form):
     """
     Form for leaving comments for a product
     """
+    captcha = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': 'comment-field-captcha'}))
 
     class Meta:
         model = Comment
-        fields = ('user_name', 'user_email', 'body')
+        fields = ('user_name', 'user_email', 'body', 'captcha')
         widgets = {
             'user_name': forms.TextInput(attrs={'class': 'comment-field', 'placeholder': 'Your name'}),
             'user_email': forms.EmailInput(attrs={'class': 'comment-field', 'placeholder': 'example@example.com'}),
@@ -35,6 +39,12 @@ class CommentProductForm(forms.ModelForm):
 
         # set the same error message for each field
         error_messages = {field: {'required': 'This field must not be empty'} for field in fields}
+
+    def clean_captcha(self):
+        """
+        Checking whether user entered correct text from captcha, otherwise raise an exception
+        """
+        return validate_captcha_text(self.cleaned_data)
 
 
 class FilterByPriceForm(forms.Form):

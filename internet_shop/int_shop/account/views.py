@@ -17,12 +17,12 @@ from django.urls import reverse_lazy
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from django.utils.safestring import mark_safe
-from django.views.generic import CreateView
-from django.views.generic import DetailView
+from django.views.generic import CreateView, DetailView
 from django.views.generic.edit import FormMixin
 
 from account.models import Profile
 from common.moduls_init import redis
+from common.utils import create_captcha_image
 from coupons.models import Coupon
 from goods.models import Product, Favorite
 from orders.models import Order
@@ -74,6 +74,11 @@ class UserRegisterView(CreateView):
         super().__init__(**kwargs)
         self.object = None
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['captcha_image'] = create_captcha_image(self.request)
+        return context
+
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         if form.is_valid():
@@ -106,6 +111,8 @@ class UserRegisterView(CreateView):
             Favorite.objects.create(profile=profile)  # creating favorite instance for profile
             messages.success(request, 'Please, check your email! '
                                       'You have to receive email with instruction for activate account')
+            # delete captcha text, when user has complete registration
+            redis.hdel(f'captcha:{form.cleaned_data.get("captcha")}', 'captcha_text')
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
@@ -258,7 +265,7 @@ def save_social_user_to_profile(backend, user, response, *args, **kwargs):
                                        photo=bytes_inst)
 
 
-class ForgotPasswordView(PasswordResetView, FormMixin):
+class ForgotPasswordView(PasswordResetView):
     """
     View for sending email needed for reset forgotten password from account
     """
@@ -270,12 +277,19 @@ class ForgotPasswordView(PasswordResetView, FormMixin):
     message = ("We've emailed you instructions for setting your password. "
                "If you don't receive an email, please make sure you've entered the address you registered with")
 
-    def post(self, request, *args, **kwargs):
-        form = self.get_form()
-        if form.is_valid():
-            messages.success(request, mark_safe(self.message))  # displaying message to frontend
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['captcha_image'] = create_captcha_image(self.request, width=135, font_size=30)
+        return context
 
-        return super().post(request, *args, **kwargs)
+    def form_valid(self, form):
+        if form.is_valid():
+            captcha_text = form.cleaned_data.get('captcha')
+            # delete captcha text, when user has complete send email to the server
+            redis.hdel(f'captcha:{captcha_text}', 'captcha_text')
+            messages.success(self.request, mark_safe(self.message))  # displaying message to frontend
+
+        return super().form_valid(form)
 
 
 class SetNewPasswordView(PasswordResetConfirmView):

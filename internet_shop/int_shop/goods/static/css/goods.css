@@ -559,7 +559,7 @@ input[type="text"], input[type="email"], textarea {
 #form-comment {
     display: block;
     width: 400px;
-    margin: 20px auto;
+    margin: auto;
     min-height: 175px;
 }
 
@@ -594,6 +594,47 @@ input[type="text"], input[type="email"], textarea {
 }
 
 .comment-form-fields { margin: 20px 0; }
+
+.comment-form-captcha {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    margin-top: 50px;
+}
+
+.captcha-required {
+    font-family: 'Merriweather', serif;
+    margin-right: 60px;
+    font-size: 1.1rem;
+
+}
+
+.captcha-image img {
+    border: 1px solid grey;
+    cursor: pointer;
+    margin-right: 5px;
+    border-radius: 8px;
+}
+
+.help-captcha { width: 135px !important; }
+
+.help {
+    font-style: italic;
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px;
+    width: 160px;
+    position: relative;
+    margin: 5px 0;
+    color:rgb(84, 82, 82);
+}
+
+.comment-field-captcha {
+    height: 50px;
+    padding-left: 10px;
+    border-radius: 5px;
+    width: 180px;
+    border: 1px solid grey;
+}
 
 .comment-field {
     border-radius: 5px;

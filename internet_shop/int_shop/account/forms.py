@@ -14,6 +14,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 
 from common.utils import check_phone_number
+from common.utils import validate_captcha_text
 from .models import Profile
 
 help_messages = (
@@ -125,9 +126,11 @@ class RegisterUserForm(UserCreationForm):
 
     user_photo = forms.ImageField(required=False, label='Photo', widget=forms.FileInput(attrs={'class': 'reg-photo'}))
 
+    captcha = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': 'reg-field-captcha'}))
+
     field_order = ('username', 'first_name', 'last_name', 'gender',
                    'email', 'phone_number', 'date_of_birth', 'password1',
-                   'password2', 'user_photo', 'about')
+                   'password2', 'user_photo', 'about', 'captcha')
 
     error_messages = {
         'date_of_birth': {
@@ -169,6 +172,12 @@ class RegisterUserForm(UserCreationForm):
         else:
             self.add_error('phone_number', 'Invalid phone number')
 
+    def clean_captcha(self):
+        """
+        Checking whether user entered correct text from captcha, otherwise raise an exception
+        """
+        return validate_captcha_text(self.cleaned_data)
+
 
 class ForgotPasswordForm(PasswordResetForm):
     """
@@ -179,6 +188,13 @@ class ForgotPasswordForm(PasswordResetForm):
                              max_length=254,
                              widget=forms.EmailInput(attrs={'class': 'email-field',
                                                             'autocomplete': 'email'}))
+    captcha = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': 'reset-pass-field-captcha'}))
+
+    def clean_captcha(self):
+        """
+        Checking whether user entered correct text from captcha, otherwise raise an exception
+        """
+        return validate_captcha_text(self.cleaned_data)
 
     def clean_email(self) -> str:
         """

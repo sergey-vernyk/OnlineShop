@@ -746,7 +746,7 @@ input[type="text"], input[type="email"], textarea {
 
 /*Reset password email template*/
 .email-field {
-    width: 250px;
+    width: 340px;
     height: 25px;
     padding-left: 10px;
     border: 1px solid #898383;
@@ -756,7 +756,7 @@ input[type="text"], input[type="email"], textarea {
 .block-reset {
     display: block;
     position: relative;
-    text-align: start;
+    text-align: center;
     width: 600px;
     padding: 1rem;
     border: 1px solid #ced4da;
@@ -779,17 +779,16 @@ input[type="text"], input[type="email"], textarea {
 
 .send-mail {
 	padding: 1px 8px;
-	position: absolute;
-	display: inline-flex;
-	border: 1px solid grey;
-	border-radius: 5px;
-	background-color: #0BAE21;
-	color: white;
-	font-family: 'Merriweather', serif;
-	font-size: 0.9rem;
-	font-weight: bold;
-	top: 99px;
-	right: 160px;
+    display: inline-flex;
+    border: 1px solid grey;
+    border-radius: 5px;
+    background-color: #0BAE21;
+    color: white;
+    font-family: 'Merriweather', serif;
+    font-size: 0.9rem;
+    font-weight: bold;
+    height: 2rem;
+    align-items: center;
 }
 
 .send-mail:hover { background-color: #3BCA4E; }
@@ -1073,7 +1072,10 @@ input[type="text"], input[type="email"], textarea {
     width: 600px;
 }
 
-#reg-form{ padding: 10px; }
+#reg-form{
+    padding: 10px;
+    min-height: 900px;
+}
 
 .register-form .reg-form-fields {
     display: block;
@@ -1105,7 +1107,10 @@ input[type="text"], input[type="email"], textarea {
     'opsz' 20
   }
 
-#id_about { min-height: 95px; }
+#id_about {
+    min-height: 95px;
+    max-height: 95px;
+}
 
 .reg-photo {
     padding-left: 0px !important;
@@ -1119,19 +1124,55 @@ input[type="text"], input[type="email"], textarea {
     font-family: 'Merriweather', serif;
 }
 
+.reg-form-captcha {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    margin-top: 90px;
+}
+
+.reg-field-captcha {
+    width: 250px;
+    height: 50px;
+    padding-left: 10px;
+    border-radius: 5px;
+    margin-left: 20px;
+    border: 1px solid grey;
+}
+
+.captcha-image img {
+    border: 1px solid grey;
+    cursor: pointer;
+    margin-right: 5px;
+    border-radius: 8px;
+}
+
+.help-captcha { width: 200px !important; }
+
+.captcha-required {
+    font-family: 'Merriweather', serif;
+    margin-right: 60px;
+    font-size: 1.1rem;
+}
+
 .reg-button {
     display: flex;
     align-items: center;
-    width: 150px;
+    width: 250px;
     font-size: 1.2rem;
     background-color: #568EED;
     position: absolute;
-    bottom: 20px;
-    left: 15px;
+    bottom: 25px;
+    right: 25px;
     padding: 5px 10px;
     color: white;
-    border-radius: 5px;
+    border-radius: 8px;
     border: 1px solid;
+    justify-content: center;
+}
+
+.reg-button:hover {
+    background-color: #7fa2de;
 }
 
 .radio-gender {
@@ -1156,10 +1197,41 @@ input[type="text"], input[type="email"], textarea {
     width: 160px;
     position: relative;
     margin: 5px 0;
-    color: darkgray;
+    color:rgb(84, 82, 82);
 }
 
-/*horizontal manu*/
+/* Form for entering email in order to reset forgotten password */
+.reset-pass-form-captcha {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    margin-top: 15px;
+    margin-bottom: 20px;
+}
+
+.reset-pass-field-captcha {
+    width: 155px;
+    height: 50px;
+    padding-left: 10px;
+    border-radius: 5px;
+    border: 1px solid grey;
+    text-align: center;
+}
+
+.captcha-required-reset-pass {
+    font-family: 'Merriweather', serif;
+    font-size: 1.1rem;
+    margin-right: 5px;
+}
+
+.help-captcha-reset-pass {
+    width: 140px;
+    font-size: 0.7rem !important;
+}
+
+
+
+/*horizontal menu*/
 .sidebar-customer-horizontal {
     display: flex;
     flex-direction: row;
