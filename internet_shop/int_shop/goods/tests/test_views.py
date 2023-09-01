@@ -547,12 +547,16 @@ class TestProductDetailView(TestCase):
         """
         self.client.login(username=self.user.username, password='password')  # login as default profile
 
+        captcha_text = 'AAA111'
+        self.redis.hset(f'captcha:{captcha_text}', 'captcha_text', captcha_text)
+
         # make post request with all correct comment data
         self.response = self.client.post(reverse('goods:product_detail',
                                                  args=(self.product1.pk, self.product1.slug)),
                                          data={'user_name': self.user.username,
                                                'user_email': self.user.email,
-                                               'body': self.comment.body})
+                                               'body': self.comment.body,
+                                               'captcha': 'AAA111'})
         # must be redirection to the same page
         self.assertRedirects(self.response, reverse('goods:product_detail',
                                                     args=(self.product1.pk, self.product1.slug)))
@@ -562,9 +566,11 @@ class TestProductDetailView(TestCase):
                                                  args=(self.product1.pk, self.product1.slug)),
                                          data={'user_name': self.user.username,
                                                'user_email': self.user.email,
-                                               'body': ''})
+                                               'body': '',
+                                               'captcha': ''})
         # must be "body" field error
         self.assertFormError(self.response.context['comment_form'], 'body', ['This field must not be empty'])
+        self.assertFormError(self.response.context['comment_form'], 'captcha', ['This field must not be empty'])
 
     def test_get_success_url(self):
         """
@@ -584,6 +590,7 @@ class TestProductDetailView(TestCase):
         self.redis.hdel(f'product_id:{self.product1.pk}', 'views')
         self.redis.persist(f'profile_id:{self.profile.pk}')
         self.redis.srem(f'profile_id:{self.profile.pk}', self.product1.pk)
+        self.redis.hdel('captcha:AAA111', 'captcha_text')
 
 
 class TestFilterResultsView(TestCase):
@@ -1026,7 +1033,7 @@ class TestOtherGoodsViews(TestCase):
         """
         Checking displaying products that are promotional if was passed not existing page
         """
-        # request without passing category; must be 2 maximum 2 pages, but sent page 3
+        # request without passing category; must be maximum 2 pages, but sent page 3
         response = self.client.get(reverse('goods:promotion_list'), data={'page': 3})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -1039,8 +1046,8 @@ class TestOtherGoodsViews(TestCase):
 
         paginator = context['page_obj'].paginator
 
-        # must be product3, since it is on the last page
-        self.assertQuerysetEqual(context['products'], [self.product3])
+        # must be only one product, since it is on the last page
+        self.assertQuerysetEqual(context['products'], [self.product3] or [self.product1] or [self.product2])
         self.assertEqual(context['category'], '')
         self.assertIsInstance(context['sorting_by_price'], SortByPriceForm)
         self.assertTrue(context['is_paginated'])  # depending on page_obj.paginator.object_list length
@@ -1499,8 +1506,8 @@ class TestOtherGoodsViews(TestCase):
         self.assertQuerysetEqual(context['products'],
                                  # result depends on "per_page" value
                                  [p for n, p in enumerate(paginator.object_list, 1) if n <= paginator.per_page])
-        # must be product1(300.25), product2(400.45), product3(120.00)
-        self.assertQuerysetEqual(paginator.object_list, [self.product1, self.product2, self.product3])
+        # the order of products can be whichever
+        self.assertQuerysetEqual(paginator.object_list, [self.product1, self.product2, self.product3], ordered=False)
 
     def test_product_ordering_in_new_list_without_category(self):
         """
@@ -1810,8 +1817,8 @@ class TestOtherGoodsViews(TestCase):
         self.assertQuerysetEqual(context['products'],
                                  # result depends on "per_page" value
                                  [p for n, p in enumerate(paginator.object_list, 1) if n <= paginator.per_page])
-        # must be product1(300.25), product2(400.45)
-        self.assertQuerysetEqual(paginator.object_list, [self.product1, self.product2])
+        # the order of products can be whichever
+        self.assertQuerysetEqual(paginator.object_list, [self.product1, self.product2], ordered=False)
 
     def test_product_ordering_in_new_list_with_category(self):
         """

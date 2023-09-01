@@ -47,15 +47,15 @@ class TestOrderCreateForm(TestCase):
         Checking displaying form error if entered phone number is incorrect
         """
 
-        self.data_order_form.update({'order_form-phone': '+38 (099) 123 45 678'})  # в номере телефона больше цифр
+        self.data_order_form.update({'order_form-phone': '+38 (099) 123 45 678'})  # phone number has extra digit
         self.instance = OrderCreateForm(self.data_order_form)
 
         self.client.login(username=self.user.username, password=self.user.password)
         self.factory.post(reverse('orders:order_create'), data=self.data_order_form)
-        # проверка валидности данных в форме и наличие ошибки поля с телефоном
+        # checking the validity of the form data and an error of the phone number field
         self.instance.is_valid()
         self.assertTrue(self.instance.has_error('phone'))
-        # получение текста ошибки с json данных и ее соответствие
+        # obtain error text from json
         error_data = self.instance.errors.as_json()
         data_json = json.loads(error_data)
         self.assertEqual(data_json['phone'][0]['message'], 'Invalid phone number')

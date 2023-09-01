@@ -6,14 +6,14 @@ from goods.models import Product
 
 def get_max_min_price(category_slug: str) -> tuple:
     """
-    Returns maximum and minimum products price for category_slug category
+    Returns maximum and minimum products price for category with category_slug
     """
 
     # get prices from cache if they are existing
     max_price = cache.get(f'max_price_{category_slug}')
     min_price = cache.get(f'min_price_{category_slug}')
 
-    # caching prices by categories, if they no in cache yet
+    # caching prices by categories, if they are no in the cache yet
     if max_price and min_price:
         return max_price['max_price'], min_price['min_price']
     else:

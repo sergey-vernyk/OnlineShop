@@ -65,6 +65,9 @@ class TestAccountViews(TestCase):
         """
         Checking profile registration, when all fields are filling correct
         """
+        captcha_text = 'AAA111'
+        self.redis.hset(f'captcha:{captcha_text}', 'captcha_text', captcha_text)
+
         register_data = {
             'username': 'testuser',
             'email': 'example@example.com',
@@ -76,6 +79,7 @@ class TestAccountViews(TestCase):
             'date_of_birth': datetime.strftime(datetime(1990, 1, 12).date(), '%d-%m-%Y'),
             'about': 'About Me',
             'gender': 'M',
+            'captcha': 'AAA111'
         }
 
         response = self.client.post(reverse('register_user'), data=register_data)
@@ -88,7 +92,7 @@ class TestAccountViews(TestCase):
             favorite = Favorite.objects.filter(profile=profile).exists()
             self.assertTrue(favorite)
 
-        # checking getting message to user fronend after successfully registration
+        # checking getting message to user frontend after successfully registration
         messages = get_messages(request)
         for n, s in enumerate(messages, 1):
             if n == 1:
@@ -113,6 +117,7 @@ class TestAccountViews(TestCase):
             'date_of_birth': datetime.strftime(datetime(1990, 1, 12).date(), '%d-%m-%Y'),
             'about': 'About Me',
             'gender': 'M',
+            'captcha': '',
         }
 
         response = self.client.post(reverse('register_user'), data=register_data)
@@ -121,15 +126,19 @@ class TestAccountViews(TestCase):
         # fields must fill
         self.assertFormError(response.context['form'], 'email', ['This field is required.'])
         self.assertFormError(response.context['form'], 'password2', ['This field is required.'])
+        self.assertFormError(response.context['form'], 'captcha', ['This field is required.'])
 
     def test_activate_user_account(self):
         """
         Checking registered user's account activation after user followed to link in his/her email
         """
+        captcha_text = 'AAA111'
+        self.redis.hset(f'captcha:{captcha_text}', 'captcha_text', captcha_text)
+
         register_data = {
             'username': 'testuser',
             'email': 'example@example.com',
-            'phone_number': '+380991234567',
+            'phone_number': '+38 (099) 123 45 67',
             'password1': 'pg4B~H8PSP',
             'password2': 'pg4B~H8PSP',
             'first_name': 'Name',
@@ -137,6 +146,7 @@ class TestAccountViews(TestCase):
             'date_of_birth': datetime.strftime(datetime(1990, 1, 12).date(), '%d-%m-%Y'),
             'about': 'About Me',
             'gender': 'M',
+            'captcha': 'AAA111'
         }
 
         # successfully activation test
@@ -154,7 +164,7 @@ class TestAccountViews(TestCase):
         # redirecting to the login page after successfully activation
         self.assertRedirects(activate_response, reverse('login'))
 
-        user.refresh_from_db(fields=['is_active'])  # получение обновленных данных в БД
+        user.refresh_from_db(fields=['is_active'])  # get updated data from DB
         self.assertTrue(user.is_active)
 
         messages = get_messages(request)
@@ -406,4 +416,5 @@ class TestAccountViews(TestCase):
     @classmethod
     def tearDownClass(cls):
         settings.CELERY_TASK_ALWAYS_EAGER = False
+        cls.redis.hget('captcha:aaa111', 'captcha_text')
         super().tearDownClass()

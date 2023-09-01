@@ -258,8 +258,8 @@ def save_social_user_to_profile(backend, user, response, *args, **kwargs):
             photo_name = f'google_{account_id}_photo.jpeg'
 
             # creating profile from received data
-            create_profile_from_social(date_of_birth=date_of_birth,
-                                       gender=gender[0],
+            create_profile_from_social(date_of_birth=date_of_birth or '',
+                                       gender=gender[0] or '',
                                        user_id=user.pk,
                                        photo_name=photo_name,
                                        photo=bytes_inst)

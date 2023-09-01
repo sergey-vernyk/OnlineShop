@@ -1,8 +1,14 @@
-from django.test import TestCase, Client, RequestFactory
-from django.shortcuts import reverse
-from account.forms import LoginForm, RegisterUserForm, ForgotPasswordForm
-from django.contrib.auth.models import User
+import json
+from unittest.mock import patch
 
+import redis
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.contrib.messages import get_messages
+from django.shortcuts import reverse
+from django.test import TestCase, Client, RequestFactory
+
+from account.forms import LoginForm, RegisterUserForm, ForgotPasswordForm
 from account.models import Profile
 from goods.models import Favorite
 
@@ -19,6 +25,18 @@ class TestAccountForms(TestCase):
         self.user.set_password('password')
         self.client = Client()
         self.factory = RequestFactory()
+
+        redis_instance = redis.StrictRedis(host=settings.REDIS_HOST,
+                                           port=settings.REDIS_PORT,
+                                           db=settings.REDIS_DB_NUM,
+                                           charset='utf-8',
+                                           decode_responses=True,
+                                           socket_timeout=30)
+
+        redis_patcher = patch('common.moduls_init.redis', redis_instance)
+        self.redis = redis_patcher.start()
+
+        self.captcha_text = 'AAA111'
 
     def test_successfully_login(self):
         """
@@ -93,3 +111,64 @@ class TestAccountForms(TestCase):
         request = self.factory.post(reverse('password_reset'), {'email': 'no_exists@example.com'})
         instance = ForgotPasswordForm(request.POST)
         self.assertTrue(instance.has_error('email', code='No_exists_user'))
+
+    def test_clean_phone_number_register_user_form(self):
+        """
+        Checking whether a user entered correct phone number.
+        Returns entered phone number or raise validation error otherwise
+        """
+        # phone number is correct
+        request = self.factory.post(reverse('register_user'), {'phone_number': '+38 (097) 123 45 67'})
+        instance = RegisterUserForm(request.POST)
+        self.assertFalse(instance.has_error('phone_number'))
+
+        # phone number has extra digit
+        request = self.factory.post(reverse('register_user'), {'phone_number': '+38 (097) 123 45 672'})
+        instance = RegisterUserForm(request.POST)
+        error_data = instance.errors.as_json()
+        data_json = json.loads(error_data)
+        self.assertEqual(data_json['phone_number'][0]['message'], 'Invalid phone number')
+
+        # phone number field wasn't filled
+        request = self.factory.post(reverse('register_user'), {'phone_number': ''})
+        instance = RegisterUserForm(request.POST)
+        error_data = instance.errors.as_json()
+        data_json = json.loads(error_data)
+        self.assertEqual(data_json['phone_number'][0]['message'], 'This field must not be empty')
+
+    def test_forgot_password_form(self):
+        """
+        Checking whether user can will reset his/her forgotten password
+        """
+        self.redis.hset(f'captcha:{self.captcha_text}', 'captcha_text', self.captcha_text)
+
+        # successful send data for the reset password
+        response = self.client.post(reverse('password_reset'),
+                                    data={'email': self.user.email, 'captcha': 'AAA111'})
+        self.assertRedirects(response, reverse('password_reset'))  # redirected to the same page
+
+        request = response.wsgi_request
+        messages = get_messages(request)
+        for m in messages:
+            # massage to frontend
+            self.assertEqual(
+                m.message, "We've emailed you instructions for setting your password. "
+                           "If you don't receive an email, please make sure you've entered"
+                           " the address you registered with"
+            )
+
+        # passing the not exists email in the system
+        response = self.client.post(reverse('password_reset'),
+                                    data={'email': 'mail@mail.com', 'captcha': 'AAA111'})
+        self.assertEqual(response.status_code, 200)  # must return form with the error about wrong email
+        self.assertFormError(response.context['form'], 'email',
+                             ['Current email doesn\'t registered or user not active'])
+
+        # passing the wrong captcha
+        response = self.client.post(reverse('password_reset'),
+                                    data={'email': self.user.email, 'captcha': 'HJE696'})
+        self.assertEqual(response.status_code, 200)  # must return form with the error about wrong captcha
+        self.assertFormError(response.context['form'], 'captcha', ['Captcha is not correct'])
+
+    def tearDown(self) -> None:
+        self.redis.hdel(f'captcha:{self.captcha_text}', 'captcha_text')

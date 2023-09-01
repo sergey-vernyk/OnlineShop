@@ -25,6 +25,11 @@ class CommentProductForm(forms.ModelForm, forms.Form):
     """
     captcha = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': 'comment-field-captcha'}))
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # override error message of custom field
+        self.fields['captcha'].error_messages['required'] = 'This field must not be empty'
+
     class Meta:
         model = Comment
         fields = ('user_name', 'user_email', 'body', 'captcha')

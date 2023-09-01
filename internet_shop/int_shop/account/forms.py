@@ -166,6 +166,10 @@ class RegisterUserForm(UserCreationForm):
         Checking whether phone number is valid in the register form
         """
         phone_number_in = self.cleaned_data.get('phone_number')
+        if not phone_number_in:
+            self.add_error('phone_number', error='This field must not be empty')
+            return
+
         phone_number_output = check_phone_number(phone_number_in)
         if phone_number_output:
             return phone_number_output
@@ -219,16 +223,14 @@ class SetNewPasswordForm(SetPasswordForm):
 
     new_password1 = forms.CharField(
         label='New password',
-        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password',
-                                          'class': 'pass-field'}),
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password', 'class': 'pass-field'}),
         help_text=help_messages[0]
     )
     new_password2 = forms.CharField(
         label='Confirm new password',
-        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password',
-                                          'class': 'pass-field'}),
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password', 'class': 'pass-field'}),
         help_text=help_messages[1])
 
     error_messages = {
-        "password_mismatch": 'The two password fields didn’t match.',
+        'password_mismatch': 'The two password fields didn’t match.',
     }
