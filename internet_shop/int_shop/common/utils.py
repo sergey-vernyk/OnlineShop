@@ -66,7 +66,7 @@ def check_phone_number(phone_number: str) -> Union[str, bool]:
 def create_captcha_image(request,
                          width: int = 200,
                          height: int = 60,
-                         font_size: int = 35) -> Union[base64, JsonResponse]:
+                         font_size: int = 35) -> Union[str, JsonResponse]:
     """
     Method returns image for captcha in base64 format or Json response with this image
     """
