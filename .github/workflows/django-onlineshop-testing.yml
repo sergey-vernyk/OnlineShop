@@ -1,4 +1,4 @@
-name: OnlineShopProj CI
+name: OnlineShop Tests
 
 on: workflow_dispatch
 
@@ -48,7 +48,7 @@ jobs:
     - name: Run tests with Coverage
       run: |
         cd internet_shop/int_shop
-        coverage run --source '.' --omit '*/migrations/*,*/tests/*,*/settings/*' manage.py test --exclude-tag social_profiles
+        coverage run --source '.' --omit '*/migrations/*,*/tests/*,*/settings/*,int_shop/*' manage.py test
     - name: Coverage report
       run: |
         cd internet_shop/int_shop
