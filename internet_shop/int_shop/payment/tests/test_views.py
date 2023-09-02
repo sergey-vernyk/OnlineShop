@@ -228,8 +228,14 @@ class TestViewsPayment(TestCase):
         when user will follows up with not successfully order payment (payment was decline)
         """
         client = Client()
+        session = client.session
+        session.update({'order_id': self.order.pk})
+        session.save()
+
         response = client.get(reverse('payment:payment_cancel'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('order_id', response.context)
+        self.assertEqual(response.context['order_id'], self.order.pk)
         self.assertTemplateUsed(response, 'payment/cancel.html')
 
     @patch('stripe.Webhook.construct_event')

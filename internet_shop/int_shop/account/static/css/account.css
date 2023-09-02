@@ -236,6 +236,12 @@ input[type="text"], input[type="email"], textarea {
     margin-right: 0;
 }
 
+.order-paid-icon {
+    position: absolute;
+    top: 4px;
+    right: 3px;
+}
+
 .expander-header {
     cursor: default;
     display: flex;

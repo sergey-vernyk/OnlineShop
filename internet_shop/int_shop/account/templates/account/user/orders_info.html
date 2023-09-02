@@ -7,6 +7,9 @@
             <div id="min-max-detail-{{ order.pk }}" role="button">
                 <div class{% if forloop.counter > 4 and orders.count > 4 %}="all-order-info collapse-order"{% else %}="all-order-info expand-order"{% endif %}>
                     <div class="expander-header">
+                        {% if order.is_paid %}
+                            <img class="order-paid-icon" src="{% static 'img/paid_order_icon.png' %}" width="32" height="30" alt="order-paid-icon">
+                        {% endif %}
                         <div class="order-pk">
                             № {{ order.pk }}
                         </div>

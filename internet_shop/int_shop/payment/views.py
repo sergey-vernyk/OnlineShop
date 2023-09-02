@@ -131,7 +131,8 @@ def payment_cancel(request):
     """
     View for displaying decline payment status
     """
-    return render(request, 'payment/cancel.html')
+    order_id = request.session.get('order_id')
+    return render(request, 'payment/cancel.html', {'order_id': order_id})
 
 
 @require_POST

@@ -13,12 +13,10 @@
     align-items: center;
 }
 
-.success-payment p b:before, .success-payment p b:after {
-    content: "\00a0";
-}
+.success-payment p b:before, .success-payment p b:after { content: "\00a0"; }
 
 .payment-go-home {
-    display: flex;
+    display: inline-flex;
     text-decoration: none;
     color: #2050ED;
     text-transform: title;
@@ -46,4 +44,47 @@
     font-weight: bold;
 }
 
-.amount-payment:before { content: "\00a0" }
+.amount-payment:before { content: "\00a0"; }
+
+/* Page with info about cancel payment*/
+.cancel-payment {
+    border: 1px solid grey;
+    border-radius: 10px;
+    padding: 1rem;
+    background-color: #eff4f9;
+}
+
+.cancel-payment p {
+    font-family: 'Merriweather', serif;
+    font-size: 1.0rem;
+    text-align: center;
+}
+
+.header-cancel-payment {
+    text-align: center;
+    text-decoration: underline;
+    font-family: 'Merriweather', serif;
+    margin-bottom: 20px;
+}
+
+.cancel-payment-email-info {
+    text-decoration: none;
+    font-weight: bold;
+    color: green;
+    font-size: 1.1rem;
+}
+
+.cancel-payment-tel-info {
+    text-decoration: none;
+    font-weight: bold;
+    color: green;
+    font-size: 1.1rem;
+}
+
+.cancel-payment span:nth-child(2) { content: "\00a0"; }
+.cancel-payment span:nth-child(2) { content: "\00a0"; }
+
+.cancel-payment-email-info:before { content: "\00a0"; }
+.cancel-payment-email-info:after { content: "\00a0"; }
+
+.cancel-payment-tel-info:before { content: "\00a0"; }
