@@ -20,7 +20,7 @@ upstream django_app {
     server {
         # secure protocol ssl with pathes to key and certificate
         listen 443 ssl;
-        server_name             ${DOMAIN} www.${DOMAIN}; # certbot wiil be saved key and cerificate file to this path
+        server_name             ${DOMAIN} www.${DOMAIN}; # certbot will save key and cerificate file to this path
 
         ssl_certificate         /home/nginx/letsencrypt/live/${DOMAIN}/fullchain.pem;
         ssl_certificate_key     /home/nginx/letsencrypt/live/${DOMAIN}/privkey.pem;

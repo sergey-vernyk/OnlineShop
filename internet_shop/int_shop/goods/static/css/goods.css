@@ -282,6 +282,7 @@ input[type="text"], input[type="email"], textarea {
     background-color: #eff4f9;
     margin: 1rem;
     border-radius: 10px;
+    min-width: 740px;
 }
 
 .back-link-main {

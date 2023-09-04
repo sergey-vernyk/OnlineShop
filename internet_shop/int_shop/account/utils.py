@@ -6,7 +6,7 @@ import requests
 from account.models import Profile
 from goods.models import Favorite
 
-USER_FIELDS = ["username", "email"]
+USER_FIELDS = ["username", "email", "first_name", "last_name"]
 
 
 def get_image_from_url(url: str) -> BinaryIO:
@@ -59,6 +59,7 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
             if k == 'username' and '.' in v:
                 new_v = v.replace('.', '_')  # creating a new username
                 fields[k] = new_v
+                break
 
     else:
         return

@@ -58,7 +58,7 @@ services:
       test: [ "CMD", "redis-cli", "ping" ]
 
   rabbitmq:
-    image: rabbitmq:3.10-alpine
+    image: rabbitmq:3.12-alpine
     restart: always
     user: "rabbitmq"
     container_name: rabbitmq_broker
@@ -87,7 +87,7 @@ services:
     container_name: stripe_payments
     env_file:
       - ./int_shop/settings/.env
-    command: listen --forward-to https://onlineshopproj.pp.ua/payment/webhook/
+    entrypoint: echo "Skipping... No needs in production."
     volumes:
       - wsgi_socket:/var/run/wsgi
     depends_on:

@@ -1,3 +1,9 @@
+import os
+import shutil
+from decimal import Decimal
+from random import randint
+
+from django.conf import settings
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
 from django.test import TestCase
@@ -6,8 +12,9 @@ from django.utils import timezone
 from account.models import Profile
 from coupons.models import Category as Coupon_category
 from coupons.models import Coupon
+from goods.models import Product, Category, Manufacturer
 from orders.admin import OrderAdmin, DeliveryAdmin
-from orders.models import Order, Delivery
+from orders.models import Order, Delivery, OrderItem
 from present_cards.models import Category as Card_category
 from present_cards.models import PresentCard
 
@@ -30,7 +37,7 @@ class TestOrdersAdmin(TestCase):
         self.card = PresentCard.objects.create(code='card_code',
                                                valid_from=timezone.now(),
                                                valid_to=timezone.now() + timezone.timedelta(days=10),
-                                               amount=250.50,
+                                               amount=100,
                                                category=Card_category.objects.create(name='For men', slug='for-men'))
 
         self.site = AdminSite()
@@ -66,6 +73,48 @@ class TestOrdersAdmin(TestCase):
 
         self.assertEqual(self.instance_order.get_discount(order),
                          f'<a href="/admin/present_cards/presentcard/{self.card.pk}/change/">Present Card</a>')
+
+    def test_get_total_order_cost(self):
+        """
+        Checking displaying the order total cost and discount if exists,
+        with each order in orders list
+        """
+        random_number = randint(1, 50)
+
+        category = Category.objects.create(name=f'Category_{random_number}', slug=f'category-{random_number}')
+
+        manufacturer = Manufacturer.objects.create(name=f'Manufacturer_{random_number}',
+                                                   slug=f'manufacturer_{random_number}',
+                                                   description='Description')
+
+        product = Product.objects.create(name=f'Product_{random_number}',
+                                         slug=f'product_{random_number}',
+                                         manufacturer=manufacturer,
+                                         price=Decimal('300.25'),
+                                         description='Description',
+                                         category=category)
+
+        order = Order.objects.create(first_name='Name',
+                                     last_name='Surname',
+                                     email='example@example.com',
+                                     phone='+38 (099) 123 45 67',
+                                     pay_method='Online',
+                                     profile=self.profile,
+                                     present_card=self.card)
+
+        order_item = OrderItem.objects.create(order=order,
+                                              product=product,
+                                              price=Decimal('250'),
+                                              quantity=2)
+
+        expected_result = (
+            f'${(order_item.price * order_item.quantity) - Decimal(self.card.amount).quantize(Decimal("0.01"))}'
+            f' ( -${Decimal(self.card.amount).quantize(Decimal("0.01"))} )'
+        )
+        self.assertEqual(self.instance_order.get_total_order_cost(order), expected_result)
+
+        # deleting product directory from media root
+        shutil.rmtree(os.path.join(settings.MEDIA_ROOT, f'products/product_{product.name}'))
 
     def test_get_full_name_order_customer(self):
         """

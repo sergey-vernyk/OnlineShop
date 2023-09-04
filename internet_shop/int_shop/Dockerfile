@@ -12,7 +12,7 @@ ARG user=shop_admin
 # packages for connection to postgresql
 RUN apk update && \
     apk add --update --no-cache postgresql-client \
-        build-base postgresql-dev linux-headers
+        build-base postgresql-dev linux-headers fontconfig
 
 # creating and assigning user from which will starts commands in the docker
 RUN adduser -D $user && \
@@ -21,11 +21,16 @@ RUN adduser -D $user && \
 # directories for sockets, logs files and result file with hash media files
 # set owner for created directries and files
 RUN mkdir -p /var/run/postgresql /var/run/wsgi /vol/web/static /vol/web/media /code/scripts /code/coverage && \
+    mkdir -p /usr/share/fonts && \
     touch /code/main_log.log /code/scripts/result_hash.txt && \
     chmod -R 755 /code/main_log.log /code/scripts/result_hash.txt /vol /code/coverage && \
     chown -R $user:$user /vol /code/main_log.log /code/scripts/result_hash.txt && \
     chown -R postgres:postgres /var/run/postgresql && \
     chown -R $user:www-data /var/run/wsgi
+
+# copy and install font to docker image (necessary for captcha)
+COPY ./static/JetBrainsMono-Thin.ttf /usr/share/fonts
+RUN /bin/sh -c "fc-cache -f"
 
 USER $user
 
