@@ -53,6 +53,15 @@ body {
     border-radius: 30%;
 }
 
+.pagination .last { 
+    background-color: rgb(214, 210, 210); 
+    color: black;
+}
+
+.pagination .last:hover { 
+    background-color: rgb(188, 183, 183); 
+    color: rgb(242, 240, 240);
+}
 
 .form-select option { font-size: 15px !important; }
 

@@ -4,12 +4,22 @@ from decimal import Decimal
 from random import randint
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.http import QueryDict
 from django.shortcuts import reverse
 from django.template import Template, Context
-from django.test import TestCase, Client
+from django.test import TestCase, Client, RequestFactory
 
-from goods.models import Product, Category, Manufacturer, PropertyCategory, Property
+from account.models import Profile
+from goods.models import (
+    Product,
+    Category,
+    Manufacturer,
+    PropertyCategory,
+    Property,
+    Favorite
+)
+from goods.views import ProductListView
 
 
 class TestTemplatetagsGoods(TestCase):
@@ -18,18 +28,32 @@ class TestTemplatetagsGoods(TestCase):
     """
 
     def setUp(self) -> None:
-        random_number = randint(1, 50)
+        self.random_number = randint(1, 50)
 
         self.category_1 = Category.objects.create(name='Smart Gadgets',
                                                   slug='smart-gadgets')
-        self.manufacturer1 = Manufacturer.objects.create(name=f'Manufacturer_{random_number}',
-                                                         slug=f'manufacturer_{random_number}',
+        self.manufacturer1 = Manufacturer.objects.create(name=f'Manufacturer_{self.random_number}',
+                                                         slug=f'manufacturer_{self.random_number}',
                                                          description='Description')
 
-        self.product1 = Product.objects.create(name=f'Product_{random_number}',
-                                               slug=f'product_{random_number}',
+        self.product1 = Product.objects.create(name=f'Product_{self.random_number}',
+                                               slug=f'product_{self.random_number}',
                                                manufacturer=self.manufacturer1,
                                                price=Decimal('300.25'),
+                                               description='Description',
+                                               category=self.category_1)
+
+        self.product2 = Product.objects.create(name=f'Product_{self.random_number + 1}',
+                                               slug=f'product_{self.random_number + 1}',
+                                               manufacturer=self.manufacturer1,
+                                               price=Decimal('100.00'),
+                                               description='Description',
+                                               category=self.category_1)
+
+        self.product3 = Product.objects.create(name=f'Product_{self.random_number + 2}',
+                                               slug=f'product_{self.random_number + 2}',
+                                               manufacturer=self.manufacturer1,
+                                               price=Decimal('650.80'),
                                                description='Description',
                                                category=self.category_1)
 
@@ -39,6 +63,11 @@ class TestTemplatetagsGoods(TestCase):
                                                  units='Gb',
                                                  category_property=self.property_category1,
                                                  product=self.product1)
+
+        self.user = User.objects.create_user(username='testuser', password='password')
+        self.user.set_password('password')
+        self.profile = Profile.objects.create(user=self.user)
+        Favorite.objects.create(profile=self.profile)
 
     def test_check_request_tag_return_true(self):
         """
@@ -129,6 +158,40 @@ class TestTemplatetagsGoods(TestCase):
 
         self.assertEqual(template.render(context), '/goods/smart-gadgets/filter')
 
+    def test_get_elided_page_range_paginator(self):
+        """
+        Checking custom tag, which has to return list of page numbers,
+        and in this list may be ellipsis
+        """
+        factory = RequestFactory()
+        request = factory.get(reverse('goods:product_list'))
+        request.user = self.user
+
+        instance = ProductListView()
+        setattr(instance, 'object_list', [self.product1, self.product2, self.product3])
+        setattr(instance, 'profile', self.profile)
+        setattr(instance, 'paginate_by', 1)  # override paginate_by class attribute
+        instance.setup(request)
+
+        context = instance.get_context_data()
+
+        context = Context({
+            'data': {
+                'paginator': context['paginator'],
+                'number': context['page_obj'].number,
+                'on_each_side': 1,
+                'on_ends': 1,
+            }})
+
+        template = Template('{% load get_elided_page_range_paginator %}'
+                            '{% get_elided_page_range_paginator data.paginator data.number'
+                            ' data.on_each_side data.on_ends as elided_page_range %}'
+                            '{% for p in elided_page_range %}?page={{ p }}{% endfor %}')
+
+        self.assertEqual(template.render(context), '?page=1?page=2?page=3')
+
     def tearDown(self) -> None:
         # deleting product directory from media root
         shutil.rmtree(os.path.join(settings.MEDIA_ROOT, f'products/product_{self.product1.name}'))
+        shutil.rmtree(os.path.join(settings.MEDIA_ROOT, f'products/product_{self.product2.name}'))
+        shutil.rmtree(os.path.join(settings.MEDIA_ROOT, f'products/product_{self.product3.name}'))
