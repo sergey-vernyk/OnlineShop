@@ -4,10 +4,20 @@ from decimal import Decimal
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models.query import QuerySet
 from django.urls import reverse
 
 from account.models import Profile
 from common.moduls_init import redis
+
+
+class AvailableProductsManager(models.Manager):
+    """
+    Custom manager, which returns products, which marked as available
+    """
+
+    def get_queryset(self) -> QuerySet:
+        return super().get_queryset().filter(available=True)
 
 
 def get_product_image_path(instance, filename):
@@ -45,6 +55,9 @@ class Product(models.Model):
     category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='products')
     rating = models.DecimalField(default=0.0, max_digits=2, decimal_places=1,
                                  validators=[MinValueValidator(Decimal(0.0)), MaxValueValidator(Decimal(5.0))])
+
+    available_objects = AvailableProductsManager()
+    objects = models.Manager()
 
     def __str__(self):
         return self.name

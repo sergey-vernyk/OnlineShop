@@ -27,9 +27,15 @@
                     {% for product in products %}
                         {% include 'goods/product/card.html' with product=product %}
                     {% empty %}
-                        <div class="d-flex justify-content-center">
-                            <h4>There are no results for your query <b>"{{ request.GET.query }}"</b></h4>
-                        </div>
+                        {% if place == 'mainlist' %}
+                            <div class="d-flex justify-content-center">
+                                <h4>There are no results for your query <b>"{{ request.GET.query }}"</b></h4>
+                            </div>
+                        {% elif place == 'filter_list'%}
+                            <div class="d-flex justify-content-center">
+                                <h4>There are no results by passed filter parameters</h4>
+                            </div>
+                        {% endif %}
                     {% endfor %}
                 </div>
                 <!--Pagination-->

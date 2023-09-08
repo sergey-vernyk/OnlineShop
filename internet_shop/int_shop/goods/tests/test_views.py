@@ -1612,8 +1612,8 @@ class TestOtherGoodsViews(TestCase):
         self.assertQuerysetEqual(context['products'],
                                  # result depends on "per_page" value
                                  [p for n, p in enumerate(paginator.object_list, 1) if n <= paginator.per_page])
-        # must be product1(300.25), product2(400.45)
-        self.assertQuerysetEqual(paginator.object_list, [self.product1, self.product2])
+        # the order of products can be whichever
+        self.assertQuerysetEqual(paginator.object_list, [self.product1, self.product2], ordered=False)
 
     def test_product_ordering_in_promotional_list_without_category(self):
         """
@@ -1703,8 +1703,8 @@ class TestOtherGoodsViews(TestCase):
         self.assertQuerysetEqual(context['products'],
                                  # result depends on "per_page" value
                                  [p for n, p in enumerate(paginator.object_list, 1) if n <= paginator.per_page])
-        # must be product2(400.45), product3(120.00)
-        self.assertQuerysetEqual(paginator.object_list, [self.product2, self.product3])
+        # the order of products can be whichever
+        self.assertQuerysetEqual(paginator.object_list, [self.product2, self.product3], ordered=False)
 
     def test_product_ordering_in_popular_list_with_category(self):
         """

@@ -870,7 +870,10 @@ input[type="text"], input[type="email"], textarea {
     border-bottom-left-radius: 10px;
     background-color: #eff4f9;
     padding: 15px;
+    text-align: center;
 }
+
+.photos-column img { margin: 2px;}
 
 .top-info-row {
     display: flex;

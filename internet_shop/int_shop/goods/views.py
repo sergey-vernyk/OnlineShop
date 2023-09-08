@@ -41,7 +41,7 @@ class ProductListView(ListView):
     model = Product
     template_name = 'goods/product/list.html'
     context_object_name = 'products'
-    paginate_by = 3
+    paginate_by = 8
 
     def __init__(self):
         """
@@ -127,7 +127,7 @@ class ProductListView(ListView):
         else:
             q = Q(similarity__gte=0.3)
 
-        products = Product.objects.annotate(
+        products = Product.available_objects.annotate(
             similarity=TrigramSimilarity('name', query), ).filter(q).order_by('-similarity')
 
         product_ids = [product.pk for product in products]
@@ -135,7 +135,7 @@ class ProductListView(ListView):
         # compose "order_by" condition for sorting products by descending of the views
         product_views = [int(redis.hget(f'product_id:{pk}', 'views') or 0) for pk in product_ids]
         order_condition = Case(*[When(pk=pk, then=Value(views)) for pk, views in zip(product_ids, product_views)])
-        result = Product.objects.filter(id__in=product_ids).order_by(-order_condition)
+        result = Product.available_objects.filter(id__in=product_ids).order_by(-order_condition)
         return result
 
 
@@ -299,7 +299,7 @@ def add_or_remove_product_favorite(request) -> JsonResponse:
     """
     product_id = request.POST.get('product_id')
     action = request.POST.get('action')
-    product = Product.objects.get(pk=product_id)
+    product = Product.available_objects.get(pk=product_id)
 
     profile = Profile.objects.get(user=request.user)
 
@@ -376,7 +376,7 @@ class FilterResultsView(ListView):
                          properties__numeric_value__in=props_dict['numeric_values'])
 
         # getting in the queryset only the unique results
-        result_queryset = Product.objects.distinct().filter(lookups)
+        result_queryset = Product.available_objects.distinct().filter(lookups)
 
         self.queryset_filter = result_queryset  # save queryset to the class property
         return result_queryset
@@ -421,7 +421,7 @@ def promotion_list(request, category_slug: str = None):
     """
     category = Category.objects.get(slug=category_slug) if category_slug else ''
     lookup = Q(category__slug=category_slug, promotional=True) if category_slug else Q(promotional=True)
-    products = Product.objects.filter(lookup)
+    products = Product.available_objects.filter(lookup)
     page = request.GET.get('page')  # getting current page from the request
     # list pagination
     page_obj = get_page_obj(per_pages=1, page=page, queryset=products)
@@ -446,7 +446,7 @@ def new_list(request, category_slug: str = None):
     diff = now - timezone.timedelta(weeks=2)  # calculate the difference
     lookup = Q(created__gt=diff, category__slug=category_slug) if category_slug else Q(created__gt=diff)
 
-    products = Product.objects.filter(lookup)
+    products = Product.available_objects.filter(lookup)
     # saving ids of the new products to redis
     redis.hset('new_prods', 'ids', ','.join(str(prod.pk) for prod in products))
     page = request.GET.get('page')  # getting current page from the request
@@ -526,9 +526,7 @@ def product_ordering(request, place: str, category_slug: str = 'all', page: int 
     )
     if place == 'promotion':
         lookup = Q(category__slug=category_slug, promotional=True) if category_slug != 'all' else Q(promotional=True)
-        product_ids_promotion = [p.pk for p in Product.objects.filter(lookup)]
-
-    sorting_by_price = SortByPriceForm()  # add the form to the page after form has been submitted
+        product_ids_promotion = [p.pk for p in Product.available_objects.filter(lookup)]
 
     if request.method == 'GET':
         sort = request.GET.get('sort')
@@ -539,14 +537,14 @@ def product_ordering(request, place: str, category_slug: str = 'all', page: int 
                 lookups = Q(category=category,
                             id__in=product_ids_popular or product_ids_new or product_ids_promotion or redis.smembers(
                                 'products_ids'))
-                products = Product.objects.filter(lookups).annotate(sort_order=Case(
+                products = Product.available_objects.filter(lookups).annotate(sort_order=Case(
                     When(promotional=True, then='promotional_price'),
                     default='price')
                 ).order_by('sort_order' if sort == 'p_asc' else '-sort_order')
             else:
                 lookups = Q(id__in=product_ids_popular or product_ids_new or product_ids_promotion or redis.smembers(
                     'products_ids'))
-                products = Product.objects.filter(lookups).annotate(sort_order=Case(
+                products = Product.available_objects.filter(lookups).annotate(sort_order=Case(
                     When(promotional=True, then='promotional_price'),
                     default='price')
                 ).order_by('sort_order' if sort == 'p_asc' else '-sort_order')
@@ -560,11 +558,27 @@ def product_ordering(request, place: str, category_slug: str = 'all', page: int 
                 lookups = Q(id__in=product_ids_popular or product_ids_new or product_ids_promotion or redis.smembers(
                     'products_ids'))
 
-            products = Product.objects.filter(lookups)
+            products = Product.available_objects.filter(lookups)
 
     # list pagination
     page_obj = get_page_obj(per_pages=2, page=page, queryset=products)
     products = page_obj.object_list
+
+    sorting_by_price = SortByPriceForm()  # add the form to the page after form has been submitted
+
+    max_price, min_price = get_max_min_price(category_slug=category_slug)
+    filter_price = FilterByPriceForm(initial={
+        'price_min': min_price,
+        'price_max': max_price
+    })
+
+    manufacturers_info = get_collections_with_manufacturers_info(qs=products)
+    filter_manufacturers = FilterByManufacturerForm()
+    # updating manufacturer's queryset
+    filter_manufacturers.fields['manufacturer'].queryset = next(manufacturers_info)
+    manufacturers_prod_qnty = next(manufacturers_info)  # products quantity for each manufacturer
+
+    category_properties = get_property_for_category(category.name)
 
     return render(request, f'goods/product/{templates[place]}', {'products': products,
                                                                  'category': category,
@@ -573,7 +587,11 @@ def product_ordering(request, place: str, category_slug: str = 'all', page: int 
                                                                  'page_obj': page_obj,
                                                                  'is_paginated': page_obj.has_other_pages(),
                                                                  'is_sorting': True,
-                                                                 'place': place})
+                                                                 'place': place,
+                                                                 'filter_price': filter_price,
+                                                                 'filter_manufacturers': filter_manufacturers,
+                                                                 'manufacturers_prod_qnty': manufacturers_prod_qnty,
+                                                                 'category_properties': category_properties})
 
 
 @require_POST
@@ -584,7 +602,7 @@ def set_product_rating(request) -> JsonResponse:
     """
     star = Decimal(request.POST.get('star'))  # rating, that user has installed (1 - 5)
     product_id = request.POST.get('product_id')
-    product = Product.objects.get(pk=product_id)
+    product = Product.available_objects.get(pk=product_id)
     current_rating = product.rating
     if not current_rating:
         product.rating = f'{star:.1f}'

@@ -8,8 +8,6 @@ $(document).ready(function() {
         const height = $(this).data('height') || 60;
         const fontSize = $(this).data('fontSize') || 30;
 
-        // user email as identifier for storing captcha text
-        var userEmail = $('.reg-form-fields').find('input[name=email]').val();
         const csrftoken = getCookie('csrftoken');
 
         $.ajax({
@@ -20,7 +18,6 @@ $(document).ready(function() {
                 width: width,
                 height: height,
                 font_size: fontSize,
-                user_email: userEmail,
                 csrfmiddlewaretoken: csrftoken,
             },
             success: function(response) {

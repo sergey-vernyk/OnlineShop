@@ -45,7 +45,7 @@ def auth_profile_required(func):
 
         # getting transition address after authentication
         if ('product_pk' and 'product_slug') in match.kwargs:
-            obj = Product.objects.get(pk=match.kwargs['product_pk'], slug=match.kwargs['product_slug'])
+            obj = Product.available_objects.get(pk=match.kwargs['product_pk'], slug=match.kwargs['product_slug'])
             url_next = obj.get_absolute_url()
         else:
             url_next = reverse(match.view_name, kwargs=match.kwargs)

@@ -177,7 +177,7 @@ class DetailUserView(DetailView):
         elif location == 'watched':
             # products viewed by profile
             products_ids = (int(pk) for pk in redis.smembers(f'profile_id:{self.object.pk}'))
-            context['watched'] = Product.objects.filter(pk__in=products_ids)
+            context['watched'] = Product.available_objects.filter(pk__in=products_ids)
 
         return context
 

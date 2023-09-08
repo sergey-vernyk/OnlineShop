@@ -69,7 +69,9 @@ def get_property_for_category(products_category: str, prods_queryset=None) -> di
     all_props = cache.get(f'category_{slugify(products_category)}_props')  # getting queryset from cache
     if not all_props:
         properties_categories = PropertyCategory.objects.prefetch_related('product_categories')
-        lookup &= Q(category_property__in=properties_categories, product__category__name__iexact=products_category)
+        lookup &= Q(category_property__in=properties_categories,
+                    product__category__name__iexact=products_category,
+                    product__available=True)
         all_props = Property.objects.select_related('category_property').filter(lookup)
         cache.set(f'category_{slugify(products_category)}_props', all_props)  # saving queryset to cache
 

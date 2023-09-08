@@ -69,7 +69,7 @@ def get_products_sorted_by_views(list_ids: list) -> Tuple[list, dict]:
     which are sorted by amount views and contains dictionary with these products
     """
     # getting all products, which linked with categories and then sort their by id
-    products = Product.objects.select_related('category').filter(id__in=list_ids).order_by('pk')
+    products = Product.available_objects.select_related('category').filter(id__in=list_ids).order_by('pk')
     # dictionary with keys as product id and value as a dictionary with views quantity and product category
     # {pk: {views: int, category: str}}
     products_views = {}
@@ -87,6 +87,6 @@ def get_products_sorted_by_views(list_ids: list) -> Tuple[list, dict]:
 
     products_ids_sorted = [pk for pk in products_views_sorted.keys()]  # the keys of sorted products
     # dict with the sorted products by number of views
-    products = Product.objects.select_related('category').in_bulk(products_ids_sorted)
+    products = Product.available_objects.select_related('category').in_bulk(products_ids_sorted)
 
     return products_ids_sorted, products

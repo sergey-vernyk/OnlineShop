@@ -73,7 +73,7 @@ class Cart:
         products_ids = [pk for pk in self.cart]
         products_ids_ordered = Case(*[When(pk=pk, then=Value(position)) for position, pk in enumerate(products_ids)])
         # getting goods in order their id in products_ids
-        products = Product.objects.filter(id__in=products_ids).order_by(products_ids_ordered)
+        products = Product.available_objects.filter(id__in=products_ids).order_by(products_ids_ordered)
         cart = deepcopy(self.cart)
 
         for pk, prod in zip(products_ids, products):

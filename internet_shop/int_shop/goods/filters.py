@@ -17,7 +17,7 @@ def get_max_min_price(category_slug: str) -> tuple:
     if max_price and min_price:
         return max_price['max_price'], min_price['min_price']
     else:
-        max_price = Product.objects.filter(category__slug=category_slug).aggregate(max_price=Max('price'))
-        min_price = Product.objects.filter(category__slug=category_slug).aggregate(min_price=Min('price'))
+        max_price = Product.available_objects.filter(category__slug=category_slug).aggregate(max_price=Max('price'))
+        min_price = Product.available_objects.filter(category__slug=category_slug).aggregate(min_price=Min('price'))
         cache.set_many({f'max_price_{category_slug}': max_price, f'min_price_{category_slug}': min_price}, None)
         return max_price['max_price'], min_price['min_price']

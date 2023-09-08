@@ -84,6 +84,12 @@ class ProductSummernoteAdmin(SummernoteModelAdmin):
         """
         return mark_safe(f'<img src="{obj.image.url}" width="100" height="100"/>')
 
+    def get_queryset(self, request):
+        """
+        Using built-in model manager as default in order to get products
+        """
+        return Product.objects.all()
+
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
