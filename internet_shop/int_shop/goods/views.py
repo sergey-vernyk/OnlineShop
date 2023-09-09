@@ -562,7 +562,7 @@ def product_ordering(request, place: str, category_slug: str = 'all', page: int 
 
     # list pagination
     page_obj = get_page_obj(per_pages=2, page=page, queryset=products)
-    products = page_obj.object_list
+    page_products = page_obj.object_list
 
     sorting_by_price = SortByPriceForm()  # add the form to the page after form has been submitted
 
@@ -580,7 +580,7 @@ def product_ordering(request, place: str, category_slug: str = 'all', page: int 
 
     category_properties = get_property_for_category(category.name)
 
-    return render(request, f'goods/product/{templates[place]}', {'products': products,
+    return render(request, f'goods/product/{templates[place]}', {'products': page_products,
                                                                  'category': category,
                                                                  'sorting_by_price': sorting_by_price,
                                                                  'selected_sort': sort,

@@ -33,6 +33,8 @@ audio_video_necessary_props = (
     {'Communications': ('Bluetooth', 'WI-FI'),
      'Battery': ('Work Time', 'Charging',),
      'Audio': ('Channels', 'Power', 'Inputs'),
+     'Video': ('Resolution', ),
+     'Photo': ('Resolution', 'Image sensor'),
      'Body': ('Form Factor',)}
 )
 

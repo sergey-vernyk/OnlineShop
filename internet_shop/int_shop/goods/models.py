@@ -215,6 +215,8 @@ class Property(models.Model):
         ('Firmware', 'Firmware'),
         # Video
         ('Form Factor', 'Form Factor'),
+        # Photo
+        ('FOV', 'FOV'), ('Image sensor', 'Image sensor'),
         # Internal Memory
         ('Card slot', 'Card slot'),
         # Features
