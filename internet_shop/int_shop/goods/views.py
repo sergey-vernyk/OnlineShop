@@ -516,6 +516,7 @@ def product_ordering(request, place: str, category_slug: str = 'all', page: int 
     products = None
     category = None
     sort = None
+    category_properties = None
     product_ids_promotion = []
 
     product_ids_popular = (
@@ -578,7 +579,8 @@ def product_ordering(request, place: str, category_slug: str = 'all', page: int 
     filter_manufacturers.fields['manufacturer'].queryset = next(manufacturers_info)
     manufacturers_prod_qnty = next(manufacturers_info)  # products quantity for each manufacturer
 
-    category_properties = get_property_for_category(category.name)
+    if category_slug != 'all':
+        category_properties = get_property_for_category(category.name)
 
     return render(request, f'goods/product/{templates[place]}', {'products': page_products,
                                                                  'category': category,
