@@ -34,7 +34,8 @@ urlpatterns = [
     path('summernote/', include('django_summernote.urls')),
     path('delivery/', TemplateView.as_view(template_name='./delivery.html'), name='delivery_services'),
     path('contacts/', TemplateView.as_view(template_name='./contacts.html'), name='contacts'),
-    path('ajax/update_captcha/', create_captcha_image, name='update_captcha')
+    path('ajax/update_captcha/', create_captcha_image, name='update_captcha'),
+    path('api/goods/', include('goods.api.urls'))
 ]
 
 if settings.DEBUG:  # save files will be happened to this path only in debug mode

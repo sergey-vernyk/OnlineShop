@@ -41,9 +41,10 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'django.contrib.postgres',
     'social_django',
-    'rest_framework.authtoken',
+    'rest_framework',
     'django_summernote',
     'storages',
+    'django_filters',
 
     'goods.apps.GoodsConfig',
     'orders.apps.OrdersConfig',
@@ -210,4 +211,16 @@ SUMMERNOTE_CONFIG = {
         'width': '80%',
         'height': '480',
     }
+}
+
+# DRF settings
+REST_FRAMEWORK = {
+    # 'DEFAULT_RENDERER_CLASSES': (
+    #     'rest_framework.renderers.JSONRenderer',
+    # ),
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.JSONParser',
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
 }
