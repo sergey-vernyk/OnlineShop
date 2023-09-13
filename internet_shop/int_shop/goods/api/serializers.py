@@ -1,36 +1,64 @@
 from rest_framework import serializers
 
-from goods.models import Product, Category, Property
+from goods.models import Product, Category, Property, Manufacturer, PropertyCategory
 
 
 class ProductSerializer(serializers.ModelSerializer):
     """
-    Serializer for obtaining product information with names of category and manufacturer belongs it
+    Serializer with product information about names of category and manufacturer which product belongs to
     """
-    category = serializers.PrimaryKeyRelatedField(read_only=True, source='category.name')
-    manufacturer = serializers.PrimaryKeyRelatedField(read_only=True, source='manufacturer.name')
+    category = serializers.PrimaryKeyRelatedField(read_only=False, queryset=Category.objects.all())
+    manufacturer = serializers.PrimaryKeyRelatedField(read_only=False, queryset=Manufacturer.objects.all())
+    comments = serializers.StringRelatedField(many=True, required=False)
 
     class Meta:
         model = Product
         exclude = ('star', 'description')
 
+    def validate(self, attrs):
+        """
+        Additional validate both "price" and "promotional price" fields
+        """
+        price = attrs.get('price')
+        promotional_price = attrs.get('promotional_price')
+
+        if price and price < 0:
+            raise serializers.ValidationError({'price': 'Price must be greater than zero'})
+
+        if promotional_price and promotional_price < 0:
+            raise serializers.ValidationError({'promotional_price': 'Price must be greater than zero'})
+        elif promotional_price and promotional_price > price:
+            raise serializers.ValidationError(
+                {'promotional_price': 'Promotional price must not be greater than default price'}
+            )
+        return attrs
+
 
 class ProductsCategorySerializer(serializers.ModelSerializer):
     """
-    Serializer for obtaining all products categories
+    Serializer for products categories
     """
 
     class Meta:
         model = Category
-        fields = ('id', 'name', 'slug')
+        fields = '__all__'
 
 
-class ProductPropertiesSerializer(serializers.ModelSerializer):
+class ProductPropertySerializer(serializers.ModelSerializer):
     """
-    Serializer for obtaining all products properties
+    Serializer for products properties
     """
-    product = serializers.PrimaryKeyRelatedField(read_only=True, source='product.name')
 
     class Meta:
         model = Property
         fields = '__all__'
+
+
+class ManufacturersSerializer(serializers.ModelSerializer):
+    """
+    Serializer for products manufacturers
+    """
+
+    class Meta:
+        model = Manufacturer
+        exclude = ('description',)

@@ -29,7 +29,7 @@ class ProductFilter(filters.FilterSet):
     category_prop_name = filters.CharFilter(field_name='properties',
                                             label='Category property',
                                             lookup_expr='category_property__name__iexact',
-                                            distinct=True, )
+                                            distinct=True)
     prop_value_lte = filters.NumberFilter(method='properties_filter_value', label='Value <=')
     prop_value_gte = filters.NumberFilter(method='properties_filter_value', label='Value >=')
     prop_value_text = filters.CharFilter(field_name='properties__text_value', lookup_expr='iexact', label='Text value')
@@ -37,7 +37,7 @@ class ProductFilter(filters.FilterSet):
     def properties_filter_value(self, queryset, name, value):
         """
         Returns queryset with products, which have specific property name "property_name" ,
-        and the property name value within "lte" and "gte"
+        and the property name numeric value within "lte" and "gte"
         """
         lookup = Q()
         if name.endswith('lte'):

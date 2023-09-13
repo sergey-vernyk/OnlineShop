@@ -6,24 +6,25 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from common.moduls_init import redis
-from goods.models import Product, Category, Property
+from goods.models import Product, Category, Property, Manufacturer
 from . import serializers
 from .product_filters import ProductFilter
 from ..utils import get_products_sorted_by_views
 
 
-class ProductList(viewsets.ReadOnlyModelViewSet):
+class ProductSet(viewsets.ModelViewSet):
     """
     Model view, which allows to obtain all products, or products, that belongs to particular category,
     also allows performs filter products, search products, ordering products
     """
     queryset = Product.available_objects.all()
     serializer_class = serializers.ProductSerializer
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
     filterset_class = ProductFilter
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     ordering = ['name']
     ordering_fields = ['price', 'promotional_price']
+    search_fields = ['name', 'id']
 
     def get_queryset(self):
         queryset = Product.available_objects.select_related('category', 'manufacturer')
@@ -76,9 +77,10 @@ class ProductList(viewsets.ReadOnlyModelViewSet):
             url_path='popular_products(?:/(?P<category_slug>[a-zA-Z-]+))?')
     def get_popular_products(self, request, category_slug=None):
         """
-        Action allows to display products in decreasing order of their views
+        Action allows to display products in descending order of their views
         for a certain category or all products in that order
         """
+
         products_ids = [int(pk) for pk in redis.smembers('products_ids')]  # ids of all products
         products_ids_sorted, products = get_products_sorted_by_views(products_ids)
 
@@ -102,7 +104,7 @@ class ProductList(viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
-class ProductCategoryList(viewsets.ReadOnlyModelViewSet):
+class ProductCategorySet(viewsets.ReadOnlyModelViewSet):
     """
     Model view, which allows to obtain all products categories
     """
@@ -111,14 +113,25 @@ class ProductCategoryList(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
-class PropertiesList(viewsets.ReadOnlyModelViewSet):
+class PropertySet(viewsets.ReadOnlyModelViewSet):
     """
     Model view, which allows to obtain all products properties
     """
     queryset = Property.objects.select_related('category_property', 'product').order_by('product__name')
-    serializer_class = serializers.ProductPropertiesSerializer
+    serializer_class = serializers.ProductPropertySerializer
 
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['product__name']
     filterset_fields = ['text_value', 'numeric_value', 'name', 'category_property__name']
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+
+class ManufacturerSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Model view, which allows to obtain all products manufacturers
+    """
+    serializer_class = serializers.ManufacturersSerializer
+    queryset = Manufacturer.objects.all()
+    filter_backends = [filters.SearchFilter]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    search_fields = ['name']
