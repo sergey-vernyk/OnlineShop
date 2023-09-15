@@ -15,7 +15,7 @@ from ..utils import get_products_sorted_by_views
 class ProductSet(viewsets.ModelViewSet):
     """
     Model view, which allows to obtain all products, or products, that belongs to particular category,
-    also allows performs filter products, search products, ordering products
+    also allows performs filter products, search products, ordering products, create, delete, update product
     """
     queryset = Product.available_objects.all()
     serializer_class = serializers.ProductSerializer
@@ -104,18 +104,18 @@ class ProductSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class ProductCategorySet(viewsets.ReadOnlyModelViewSet):
+class ProductCategorySet(viewsets.ModelViewSet):
     """
-    Model view, which allows to obtain all products categories
+    Model view, which allows to obtain all products categories and also create, updated or delete category
     """
     queryset = Category.objects.all()
     serializer_class = serializers.ProductsCategorySerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
-class PropertySet(viewsets.ReadOnlyModelViewSet):
+class PropertySet(viewsets.ModelViewSet):
     """
-    Model view, which allows to obtain all products properties
+    Model view, which allows to obtain all products properties and also create, updated or delete property
     """
     queryset = Property.objects.select_related('category_property', 'product').order_by('product__name')
     serializer_class = serializers.ProductPropertySerializer
@@ -126,9 +126,9 @@ class PropertySet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
-class ManufacturerSet(viewsets.ReadOnlyModelViewSet):
+class ManufacturerSet(viewsets.ModelViewSet):
     """
-    Model view, which allows to obtain all products manufacturers
+    Model view, which allows to obtain all products manufacturers and also create, updated or delete manufacturer
     """
     serializer_class = serializers.ManufacturersSerializer
     queryset = Manufacturer.objects.all()

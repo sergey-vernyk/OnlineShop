@@ -5,7 +5,8 @@ from goods.models import Product, Category, Property, Manufacturer, PropertyCate
 
 class ProductSerializer(serializers.ModelSerializer):
     """
-    Serializer with product information about names of category and manufacturer which product belongs to
+    Serializer with product information about names of category, manufacturer which product belongs to,
+    and comments, that belongs to the product
     """
     category = serializers.PrimaryKeyRelatedField(read_only=False, queryset=Category.objects.all())
     manufacturer = serializers.PrimaryKeyRelatedField(read_only=False, queryset=Manufacturer.objects.all())
