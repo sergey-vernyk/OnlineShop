@@ -64,16 +64,13 @@ def cart_remove(request):
     """
     Deleting product from cart
     """
-    prev_url = None
     product_id = request.POST.get('product_id')
     cart = Cart(request)
     cart.remove(product_id)
     if not cart:  # if there are no products in the cart - delete applied coupon or present card
         cart.clear()
-        prev_url = request.session.get('urls')['previous_url']
     return JsonResponse({'success': True,
                          'cart_len': len(cart),
                          'total_price': cart.get_total_price(),
                          'total_price_discounts': cart.get_total_price_with_discounts(),
-                         'total_discount': cart.get_total_discount(),
-                         'prev_url': prev_url})
+                         'total_discount': cart.get_total_discount()})

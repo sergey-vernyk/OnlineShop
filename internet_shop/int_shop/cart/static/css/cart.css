@@ -240,3 +240,14 @@ input[type="text"] {
 #checkout-btn .material-symbols-outlined {
     margin-right: 10px;
 }
+
+.empty-cart {
+    text-align: center;
+    margin-top: 1rem !important;
+}
+
+.empty-cart img {
+    border: 1px solid rgb(194, 191, 191);
+    border-radius: 50%;
+    background-color: rgb(247, 255, 255);
+}

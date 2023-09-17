@@ -1,5 +1,9 @@
 import getCookie from '/static/js/getCSRFToken.js';
 
+const emptyCartPic = `<div class="empty-cart">
+                          <img src="/static/img/your-cart-is-empty.png" width="350" height="350">
+                      </div>`
+
 $(document).ready(function() {
     $('.cart-remove').click(function(event) {
         event.preventDefault();
@@ -26,10 +30,9 @@ $(document).ready(function() {
                 //if all goods were deleted from the cart
                 if(totalPrice === 0 ) {
                      $('.total-price').text('');
-                     $('.block-cart-items').remove();  //deleting blocks, which are without products cards
                      $('.block-totals').remove();
-                     //redirecting to previous page, from which was transition to the cart
-                     window.open(response['prev_url'], '_self');
+                     $('.block-cart-items').parent().prepend(emptyCartPic);  //added picture with text "your cart is empty"
+                     $('.block-cart-items').remove();
                 } else {
                     $('.total-price, .amount-items > span:nth-child(2)').text(totalPriceDiscount > 0 ? `$${totalPriceDiscount}` : 'Free');
                     $('.discounts-total > .discount-value').text('-$' + totalDiscount);

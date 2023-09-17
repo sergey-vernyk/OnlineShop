@@ -63,7 +63,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.sites.middleware.CurrentSiteMiddleware',
-    'common.middleware.previous_and_current_urls_middleware',  # save current and previous URLs in session
 ]
 
 ROOT_URLCONF = 'int_shop.urls'
