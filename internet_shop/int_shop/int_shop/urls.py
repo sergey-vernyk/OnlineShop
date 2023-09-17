@@ -36,7 +36,8 @@ urlpatterns = [
     path('contacts/', TemplateView.as_view(template_name='./contacts.html'), name='contacts'),
     path('ajax/update_captcha/', create_captcha_image, name='update_captcha'),
     path('api/goods/', include('goods.api.urls')),
-    path('api/account/', include('account.api.urls'))
+    path('api/account/', include('account.api.urls')),
+    path('api/cart/', include('cart.api.urls')),
 ]
 
 if settings.DEBUG:  # save files will be happened to this path only in debug mode
