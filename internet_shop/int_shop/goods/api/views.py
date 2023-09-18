@@ -12,7 +12,7 @@ from .product_filters import ProductFilter
 from ..utils import get_products_sorted_by_views
 
 
-class ProductSet(viewsets.ModelViewSet):
+class ProductViewSet(viewsets.ModelViewSet):
     """
     Model view, which allows to obtain all products, or products, that belongs to particular category,
     also allows performs filter products, search products, ordering products, create, delete, update product
@@ -104,7 +104,7 @@ class ProductSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class ProductCategorySet(viewsets.ModelViewSet):
+class ProductCategoryViewSet(viewsets.ModelViewSet):
     """
     Model view, which allows to obtain all products categories and also create, updated or delete category
     """
@@ -113,7 +113,7 @@ class ProductCategorySet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
-class PropertySet(viewsets.ModelViewSet):
+class PropertyViewSet(viewsets.ModelViewSet):
     """
     Model view, which allows to obtain all products properties and also create, updated or delete property
     """
@@ -126,7 +126,7 @@ class PropertySet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
-class ManufacturerSet(viewsets.ModelViewSet):
+class ManufacturerViewSet(viewsets.ModelViewSet):
     """
     Model view, which allows to obtain all products manufacturers and also create, updated or delete manufacturer
     """

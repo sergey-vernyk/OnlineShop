@@ -17,7 +17,7 @@ from .permissions import IsTheSameUserThatMakeAction
 from .tasks import send_email_for_set_new_account_password
 
 
-class AccountSet(viewsets.ModelViewSet):
+class AccountViewSet(viewsets.ModelViewSet):
     """
     View allows obtaining all profiles, create, delete, update profile
     """

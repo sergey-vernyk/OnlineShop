@@ -33,7 +33,10 @@ def cart_items_view(request):
 
     # allow to see what coupon or present card was applied if any
     if not isinstance(request.user, AnonymousUser):
-        content.update({'coupon': cart.coupon, 'present_card': cart.present_card})
+        content.update(
+            {'coupon': cart.coupon.pk if cart.coupon else None,
+             'present_card': cart.present_card.pk if cart.present_card else None}
+        )
 
     return Response(content, status.HTTP_200_OK)
 

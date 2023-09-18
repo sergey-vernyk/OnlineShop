@@ -5,7 +5,7 @@ from rest_framework.authtoken import views as auth_views
 from . import views
 
 router = routers.DefaultRouter()
-router.register(r'profile', views.AccountSet, basename='profile')
+router.register(r'profile', views.AccountViewSet, basename='profile')
 
 app_name = 'account_api'
 
