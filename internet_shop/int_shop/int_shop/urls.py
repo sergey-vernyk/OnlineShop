@@ -40,6 +40,7 @@ urlpatterns = [
     path('api/cart/', include('cart.api.urls')),
     path('api/coupons/', include('coupons.api.urls')),
     path('api/present_cards/', include('present_cards.api.urls')),
+    path('api/orders/', include('orders.api.urls')),
 ]
 
 if settings.DEBUG:  # save files will be happened to this path only in debug mode

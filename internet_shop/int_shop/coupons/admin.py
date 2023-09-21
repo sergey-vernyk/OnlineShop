@@ -14,7 +14,7 @@ class CouponAdmin(admin.ModelAdmin):
     """
     Coupons
     """
-    list_display = ['code', 'category', 'valid_from', 'valid_to', 'is_valid', 'discount']
+    list_display = ['pk', 'code', 'category', 'valid_from', 'valid_to', 'is_valid', 'discount']
     list_filter = [ValidCouponListFilter, 'category']
 
     @admin.display(description='Valid status')
