@@ -35,7 +35,7 @@ class CouponViewSet(viewsets.ModelViewSet):
         profile = Profile.objects.get(user=request.user)
         if 'cart' in session and session['cart']:
             if act == 'apply':
-                session.update({'coupon_id': coupon_pk})
+                session.update({'coupon_id': int(coupon_pk)})
                 profile.coupons.add(coupon)
             elif act == 'cancel':
                 del session['coupon_id']

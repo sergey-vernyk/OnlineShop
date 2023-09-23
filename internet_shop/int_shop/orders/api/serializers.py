@@ -110,6 +110,8 @@ class OrderSerializer(serializers.ModelSerializer):
                                      price=item['price'],
                                      quantity=item['quantity'])
 
+        self.context['request'].session['order_id'] = order.pk
+
         return order
 
     def update(self, instance, validated_data):

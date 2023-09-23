@@ -35,7 +35,7 @@ class PresentCardViewSet(viewsets.ModelViewSet):
         profile = Profile.objects.get(user=request.user)
         if 'cart' in session and session['cart']:
             if act == 'apply':
-                session.update({'present_card_id': card_pk})
+                session.update({'present_card_id': int(card_pk)})
                 present_card.profile = profile
             elif act == 'cancel':
                 del session['present_card_id']
