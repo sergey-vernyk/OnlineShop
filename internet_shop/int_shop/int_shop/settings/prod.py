@@ -17,16 +17,11 @@ CSRF_COOKIE_SECURE = True  # browsers will transfer cookies only over HTTPS
 SOCIAL_AUTH_REDIRECT_IS_HTTPS = True  # force using HTTPS while login through "social auth"
 
 # sending email to users in list below, when server errors occurred
-ADMINS = (
-    ('Sergey V', 'volt.awp@gmail.com'),
-)
+ADMINS = [tuple(user.split(':')) for user in env('ADMIN_USERS').split(',')]
 
 # sending email to users in list below, when occurred 404 pages links errors
 # when request has Referer header
-# MANAGERS = (
-#     ('John Doe', 'sergey.vernyk@petalmail.com'),
-# )
-
+MANAGERS = [tuple(user.split(':')) for user in env('MANAGERS_USERS').split(',')]
 
 # middleware for list MANAGERS
 MIDDLEWARE.insert(0, 'django.middleware.common.BrokenLinkEmailsMiddleware')
