@@ -14,7 +14,7 @@
     <div class="cart-top">
         <h2 class="mb-1 d-block">Shopping cart</h2>
         <div class="d-block align-self-center">
-            <a class="back-link" href="{{ request.session.urls.previous_url }}">
+            <a class="back-link" href="{% url 'goods:product_list' %}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
                      class="bi bi-arrow-left-short" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0
