@@ -15,10 +15,10 @@ MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # print all email messages to shell (without SMTP)
-EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
-EMAIL_HOST_USER = '46817091728879'
-EMAIL_HOST_PASSWORD = '1110aaff92a1c8'
-EMAIL_PORT = '2525'
+EMAIL_HOST = env('TEST_EMAIL_HOST')
+EMAIL_HOST_USER = env('TEST_EMAIL_USER')
+EMAIL_HOST_PASSWORD = env('TEST_EMAIL_PASSWORD')
+EMAIL_PORT = env('TEST_EMAIL_PORT')
 
 DATABASES = {
     'default': {
