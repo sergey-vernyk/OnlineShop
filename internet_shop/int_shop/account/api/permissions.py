@@ -1,7 +1,7 @@
 from rest_framework.permissions import BasePermission
 
 
-class IsTheSameUserThatMakeAction(BasePermission):
+class IsTheSameUserThatMakesAction(BasePermission):
     """
     Allow to perform action, when user in request is the same which makes this action
     """

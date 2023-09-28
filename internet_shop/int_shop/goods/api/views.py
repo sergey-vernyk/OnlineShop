@@ -1,13 +1,14 @@
 from django.db.models import Q
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, filters, permissions
+from rest_framework import viewsets, filters, authentication
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from common.moduls_init import redis
 from goods.models import Product, Category, Property, Manufacturer
 from . import serializers
+from .persmissions import ObjectEditPermission
 from .product_filters import ProductFilter
 from ..utils import get_products_sorted_by_views
 
@@ -21,20 +22,21 @@ class ProductViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ProductSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
     filterset_class = ProductFilter
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    authentication_classes = [authentication.TokenAuthentication, authentication.BasicAuthentication]
+    permission_classes = [ObjectEditPermission]
     ordering = ['name']
     ordering_fields = ['price', 'promotional_price']
     search_fields = ['name', 'id']
 
     def get_queryset(self):
-        queryset = Product.available_objects.select_related('category', 'manufacturer')
+        queryset = Product.available_objects.prefetch_related('category', 'manufacturer', 'comments')
         slug = self.request.query_params.get('slug')
         if slug is not None:
             queryset = queryset.filter(category__slug=slug)
 
         return queryset
 
-    @action(detail=False, methods=['GET', 'HEAD'], name='Get new products',
+    @action(detail=False, methods=['GET'], name='Get new products',
             url_path='new_products(?:/(?P<category_slug>[a-zA-Z-]+))?')
     def get_new_products(self, request, category_slug=None):
         """
@@ -55,7 +57,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(products, many=True)
         return Response(serializer.data)
 
-    @action(detail=False, methods=['GET', 'HEAD'], name='Get promotional products',
+    @action(detail=False, methods=['GET'], name='Get promotional products',
             url_path='promo_products(?:/(?P<category_slug>[a-zA-Z-]+))?')
     def get_promotional_products(self, request, category_slug=None):
         """
@@ -73,7 +75,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(products, many=True)
         return Response(serializer.data)
 
-    @action(detail=False, methods=['GET', 'HEAD'], name='Get popular products',
+    @action(detail=False, methods=['GET'], name='Get popular products',
             url_path='popular_products(?:/(?P<category_slug>[a-zA-Z-]+))?')
     def get_popular_products(self, request, category_slug=None):
         """
@@ -110,7 +112,8 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
     """
     queryset = Category.objects.all()
     serializer_class = serializers.ProductsCategorySerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [ObjectEditPermission]
+    authentication_classes = [authentication.TokenAuthentication, authentication.BasicAuthentication]
 
 
 class PropertyViewSet(viewsets.ModelViewSet):
@@ -119,11 +122,12 @@ class PropertyViewSet(viewsets.ModelViewSet):
     """
     queryset = Property.objects.select_related('category_property', 'product').order_by('product__name')
     serializer_class = serializers.ProductPropertySerializer
+    authentication_classes = [authentication.TokenAuthentication, authentication.BasicAuthentication]
 
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['product__name']
     filterset_fields = ['text_value', 'numeric_value', 'name', 'category_property__name']
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [ObjectEditPermission]
 
 
 class ManufacturerViewSet(viewsets.ModelViewSet):
@@ -133,5 +137,6 @@ class ManufacturerViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ManufacturersSerializer
     queryset = Manufacturer.objects.all()
     filter_backends = [filters.SearchFilter]
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [ObjectEditPermission]
+    authentication_classes = [authentication.TokenAuthentication, authentication.BasicAuthentication]
     search_fields = ['name']

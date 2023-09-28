@@ -10,21 +10,27 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
+from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase, APIClient
 
 from goods.api.serializers import ProductSerializer
 from goods.models import Product, Category, Manufacturer
 
 
-class TestGoodsAPI(APITestCase):
+class TestGoodsProductAPI(APITestCase):
     """
-    Testing whether we can retrieve, create, update, partial update, delete objects using API
+    Testing whether we can retrieve, create, update, partial update, delete product using API
     """
 
     def setUp(self) -> None:
         self.random_number = randint(1, 50)
         self.user = User.objects.create_user(username='testuser', password='password')
+        self.user.is_staff = True
         self.user.set_password('password')
+        self.user.save()
+
+        token = Token.objects.get(user__username=self.user.username)
+
         category_1 = Category.objects.create(name=f'Category_{self.random_number}',
                                              slug=f'category-{self.random_number}')
         category_2 = Category.objects.create(name=f'category_{self.random_number + 1}',
@@ -60,7 +66,7 @@ class TestGoodsAPI(APITestCase):
                                                category=category_2)
 
         self.client = APIClient()
-        self.client.login(username=self.user, password='password')
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token.key}')  # authenticate user using Token
 
     def test_get_products(self):
         """
@@ -139,6 +145,7 @@ class TestGoodsAPI(APITestCase):
         mock_redis1.smembers.side_effect = lambda key: members.get(key)
         mock_redis1.hset.return_value = 0
         mock_redis2.hget.side_effect = lambda hash_key, field: views.get((hash_key, field))
+
         # that expected order means, that product3 has more views than others, and product2 has lower views than other
         serializer = ProductSerializer(instance=[self.product3, self.product1, self.product2], many=True)
         response = self.client.get(reverse('goods_api:product-get-popular-products'))
@@ -173,6 +180,7 @@ class TestGoodsAPI(APITestCase):
         }
 
         json_data_update = json.dumps(update_data)
+        # user is staff by default - it can update product
         response = self.client.patch(reverse('goods_api:product-detail', args=(self.product1.pk,)),
                                      data=json_data_update,
                                      content_type='application/json')
@@ -180,6 +188,17 @@ class TestGoodsAPI(APITestCase):
         self.product1.refresh_from_db()
         self.assertEqual(self.product1.price, Decimal(update_data['price']))
         self.assertEqual(self.product1.rating, Decimal(update_data['rating']))
+
+        # user is not staff - it can't update product
+        self.user.is_staff = False
+        self.user.save()
+        response = self.client.patch(reverse('goods_api:product-detail', args=(self.product1.pk,)),
+                                     data=json_data_update,
+                                     content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        self.user.is_staff = True
+        self.user.save()
 
         # deleting products directory from media root
         shutil.rmtree(os.path.join(settings.MEDIA_ROOT, f'products/product_{self.product1.name}'))
@@ -192,7 +211,7 @@ class TestGoodsAPI(APITestCase):
                                      content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(json.loads(response.content),
-                         {"promotional_price": ["Promotional price must not be greater than default price"]})
+                         {'promotional_price': ['Promotional price must not be greater than default price']})
 
     def test_full_update_product(self):
         """
@@ -210,7 +229,7 @@ class TestGoodsAPI(APITestCase):
             'rating': '3.0'
         }
         json_update_data = json.dumps(new_product_data)
-
+        # user is staff by default - it can update product
         # deleting product directory from media root, because after update the product, it will have new name
         # and its directory will not delete after test will be complete
         shutil.rmtree(os.path.join(settings.MEDIA_ROOT, f'products/product_{self.product1.name}'))
@@ -227,6 +246,14 @@ class TestGoodsAPI(APITestCase):
         self.assertTrue(new_product_data['promotional'])
         self.assertEqual(Decimal(new_product_data['promotional_price']), self.product1.promotional_price)
         self.assertEqual(Decimal(new_product_data['rating']), self.product1.rating)
+
+        # user is not staff - it can't update product
+        self.user.is_staff = False
+        self.user.save()
+        response = self.client.put(reverse('goods_api:product-detail', args=(self.product1.pk,)),
+                                   data=json_update_data,
+                                   content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         # deleting product directory from media root
         shutil.rmtree(os.path.join(settings.MEDIA_ROOT, f'products/product_{self.product1.name}'))
@@ -247,6 +274,7 @@ class TestGoodsAPI(APITestCase):
         }
         json_data = json.dumps(product_data)
 
+        # user is staff by default - it can create product
         response = self.client.post(reverse('goods_api:product-list'),
                                     data=json_data,
                                     content_type='application/json')
@@ -260,6 +288,14 @@ class TestGoodsAPI(APITestCase):
         self.assertEqual(new_product.promotional_price, Decimal(product_data['promotional_price'])),
         self.assertEqual(new_product.rating, Decimal(product_data['rating']))
 
+        # user is not staff - it can't create product
+        self.user.is_staff = False
+        self.user.save()
+        response = self.client.post(reverse('goods_api:product-list'),
+                                    data=json_data,
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
         # deleting product directory from media root
         shutil.rmtree(os.path.join(settings.MEDIA_ROOT, f'products/product_{product_data["name"]}'))
 
@@ -267,9 +303,16 @@ class TestGoodsAPI(APITestCase):
         """
         Check removing product from db using DELETE request
         """
+        # user is staff by default - it can delete product
         response = self.client.delete(reverse('goods_api:product-detail', args=(self.product2.pk,)))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Product.objects.filter(pk=self.product2.pk).exists())
+
+        # user is not staff - it can't delete product
+        self.user.is_staff = False
+        self.user.save()
+        response = self.client.delete(reverse('goods_api:product-detail', args=(self.product2.pk,)))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def tearDown(self):
         # deleting products directory from media root

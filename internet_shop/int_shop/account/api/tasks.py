@@ -1,8 +1,8 @@
 from celery import shared_task
-from django.template.loader import render_to_string
-from django.core.mail import EmailMessage
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
 
 
 @shared_task
