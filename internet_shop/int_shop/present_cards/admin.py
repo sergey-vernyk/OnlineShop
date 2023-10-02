@@ -26,7 +26,7 @@ class PresentCardAdmin(admin.ModelAdmin):
         })
     )
 
-    list_display = ['code', 'amount', 'valid_from', 'valid_to', 'is_valid']
+    list_display = ['id', 'code', 'amount', 'valid_from', 'valid_to', 'is_valid']
     list_filter = [ValidCardListFilter]
 
     @admin.display(description='Valid status')

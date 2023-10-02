@@ -3,6 +3,7 @@ from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 
 from account.models import Profile
+from common.moduls_init import redis
 from common.utils import check_phone_number
 from orders.models import Order, OrderItem, Delivery
 
@@ -43,6 +44,16 @@ class OrderSerializer(serializers.ModelSerializer):
                   'phone', 'comment', 'pay_method', 'call_confirm',
                   'is_paid', 'is_done', 'stripe_id', 'present_card', 'coupon',
                   'profile', 'created', 'updated', 'items', 'delivery')
+
+    def get_fields(self):
+        """
+        Override the method in order to remove delivery info
+        from response in custom action `get_orders_by_user`
+        """
+        fields = super().get_fields()
+        if self.context['view'].action == 'get_orders_by_user':
+            del fields['delivery']
+        return fields
 
     def validate(self, attrs):
         """
@@ -88,12 +99,24 @@ class OrderSerializer(serializers.ModelSerializer):
         delivery_info = validated_data.pop('delivery')
         # get data from the serializer's context
         cart_items = self.context['cart_items']
-        coupon = self.context['request'].session.get('coupon_id')
-        present_card = self.context['request'].session.get('present_card')
-        profile = Profile.objects.get(user=self.context['request'].user)
+        current_user_pk = self.context['request'].user.pk
+
+        if self.context['request'].headers.get('User-Agent') == 'coreapi':
+            coupon = redis.hget('coupon_id', f'user_id:{current_user_pk}')
+            present_card = redis.hget('present_card_id', f'user_id:{current_user_pk}')
+        else:
+            coupon = self.context['request'].session.get('coupon_id')
+            present_card = self.context['request'].session.get('present_card')
+
+        profile = Profile.objects.get(user_id=current_user_pk)
 
         # delete cart content, coupon_id or present_card_id if they were existed
-        self.context['request'].session['cart'].clear()
+        if self.context['request'].headers.get('User-Agent') == 'coreapi':
+            redis.hdel('session_cart', f'user_id:{current_user_pk}')
+            redis.hdel('coupon_id', f'user_id:{current_user_pk}')
+            redis.hdel('present_card_id', f'user_id:{current_user_pk}')
+        else:
+            self.context['request'].session['cart'].clear()
 
         delivery = Delivery.objects.create(**delivery_info)
         # create order and assign to it profile, delivery, coupon or present card
@@ -110,7 +133,10 @@ class OrderSerializer(serializers.ModelSerializer):
                                      price=item['price'],
                                      quantity=item['quantity'])
 
-        self.context['request'].session['order_id'] = order.pk
+        if self.context['request'].headers.get('User-Agent') == 'coreapi':
+            redis.hset('order_id', f'user_id:{current_user_pk}', order.pk)
+        else:
+            self.context['request'].session['order_id'] = order.pk
 
         return order
 
@@ -118,7 +144,7 @@ class OrderSerializer(serializers.ModelSerializer):
         """
         Update order info
         """
-        delivery_info = validated_data.pop('delivery') if 'delivery' in validated_data else None
+        delivery_info = validated_data.pop('delivery', None)
 
         if delivery_info:
             delivery_instance = Delivery.objects.get(pk=instance.delivery_id)

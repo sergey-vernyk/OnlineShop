@@ -8,6 +8,7 @@ from django.shortcuts import redirect, get_object_or_404, reverse, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
+from common.moduls_init import redis
 from orders.models import Order
 from .tasks import order_paid
 
@@ -52,7 +53,12 @@ def create_checkout_session(request) -> Union[redirect, str]:
     """
     Checkout session is customer session, when customer paying one-time purchases
     """
-    order_id = request.session.get('order_id')
+    if request.headers.get('User-Agent') == 'coreapi':
+        order_id = redis.hget('order_id', f'user_id:{request.user.pk}')
+        redis.hdel('order_id', f'user_id:{request.user.pk}')
+    else:
+        order_id = request.session.get('order_id')
+
     order = get_object_or_404(Order, pk=order_id)
     line_items = create_session_line_items(order)
     # параметры для создания CheckoutSession

@@ -9,7 +9,7 @@ from . import views
 
 # generate schema view for the app
 schema_view = get_schema_view(title='Account API',
-                              url='https://127.0.0.1:8001/api/account/',
+                              url='/api/account/',
                               urlconf='account.api.urls',
                               generator_class=SchemaGenerator,
                               renderer_classes=[CoreJSONRenderer],

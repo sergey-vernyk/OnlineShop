@@ -28,4 +28,3 @@ class PaymentSerializer(serializers.Serializer):
     product_id = ProductNameField()
     quantity = serializers.IntegerField()
     price = serializers.DecimalField(max_digits=10, decimal_places=2)
-    total_cost = serializers.DecimalField(max_digits=10, decimal_places=2)

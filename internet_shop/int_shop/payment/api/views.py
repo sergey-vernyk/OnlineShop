@@ -1,13 +1,12 @@
-from functools import reduce
-from operator import add
-
 from rest_framework import status
 from rest_framework.authentication import BasicAuthentication, TokenAuthentication
+from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from orders.models import OrderItem
+from common.moduls_init import redis
+from orders.models import OrderItem, Order
 from .serializers import PaymentSerializer
 from ..views import create_checkout_session
 
@@ -21,22 +20,21 @@ class MakePaymentView(APIView):
 
     def post(self, request, *args, **kwargs):
         content = None
-        order_items = OrderItem.objects.select_related('product', 'order').filter(
-            order_id=request.session['order_id']).order_by('id')
+        if request.headers.get('User-Agent') == 'coreapi':
+            order_id = redis.hget('order_id', f'user_id:{request.user.pk}')
+        else:
+            order_id = request.session['order_id']
+
+        order = get_object_or_404(Order, id=order_id)
+        order_items = OrderItem.objects.select_related('product', 'order').filter(order_id=order_id).order_by('id')
         checkout_session_response = create_checkout_session(request, *args, **kwargs)
-        url = checkout_session_response.url  # the redirect url for further purchase
-        order_items_copy = list(order_items.values())
+        url = checkout_session_response.url  # the redirect url for further pay
 
-        for i in range(len(order_items)):
-            # save total cost of each item taking in account it quantity
-            order_items_copy[i]['total_cost'] = order_items[i].get_cost()
-
-        # calculate amount total cost for purchase
-        total_purchase_cost = reduce(add, [item['total_cost'] for item in order_items_copy], 0)
-
-        serializer = PaymentSerializer(data=order_items_copy, many=True)
+        serializer = PaymentSerializer(data=list(order_items.values()), many=True)
         if serializer.is_valid(raise_exception=True):
             # add to content extra data along with serializer data
-            content = serializer.data + [{'total_purchase_cost': total_purchase_cost, 'url': url}]
+            content = serializer.data + [
+                {'total_purchase_cost': order.get_total_values()['total_cost_with_discounts'], 'url': url}
+            ]
 
         return Response(content, status=status.HTTP_200_OK)

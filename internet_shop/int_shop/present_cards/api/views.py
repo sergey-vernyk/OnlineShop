@@ -5,8 +5,10 @@ from rest_framework.response import Response
 from rest_framework.validators import ValidationError
 
 from account.models import Profile
+from common.moduls_init import redis
 from present_cards.models import PresentCard, Category
 from . import serializers
+from .schemas import PresentCardActionsSchema
 
 
 class PresentCardViewSet(viewsets.ModelViewSet):
@@ -22,7 +24,8 @@ class PresentCardViewSet(viewsets.ModelViewSet):
             detail=False,
             url_path='(?P<act>[a-zA-Z-_]+)?/(?P<card_pk>[0-9]+)?',
             url_name='apply_cancel_present_card',
-            name='Apply or Cancel Present Card')
+            name='Apply or Cancel Present Card',
+            schema=PresentCardActionsSchema())
     def apply_cancel_present_card(self, request, act: str, card_pk: int):
         """
         Action provides an opportunity to apply present card or to cancel applied present card to cart
@@ -33,12 +36,17 @@ class PresentCardViewSet(viewsets.ModelViewSet):
 
         session = request.session
         profile = Profile.objects.get(user=request.user)
-        if 'cart' in session and session['cart']:
+        if ('cart' in session and session['cart']) or redis.hget('session_cart', f'user_id:{request.user.pk}'):
             if act == 'apply':
-                session.update({'present_card_id': int(card_pk)})
+                session.update({'present_card_id': int(card_pk)}) if request.headers.get(
+                    'User-Agent') != 'coreapi' else redis.hset('present_card_id', f'user_id:{request.user.pk}', card_pk)
                 present_card.profile = profile
             elif act == 'cancel':
-                del session['present_card_id']
+                if request.headers.get('User-Agent') == 'coreapi':
+                    redis.hdel('present_card_id', f'user_id:{request.user.pk}')
+                else:
+                    del session['present_card_id']
+
                 present_card.profile = None
 
             session.save()
