@@ -55,7 +55,7 @@ def create_checkout_session(request) -> Union[redirect, str]:
     order_id = request.session.get('order_id')
     order = get_object_or_404(Order, pk=order_id)
     line_items = create_session_line_items(order)
-    # параметры для создания CheckoutSession
+    # parameters for creating checkout session
     session_params = dict(line_items=line_items,
                           mode='payment',
                           success_url=request.build_absolute_uri(reverse('payment:payment_success')),
