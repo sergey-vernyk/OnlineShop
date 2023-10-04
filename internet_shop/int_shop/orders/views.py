@@ -1,5 +1,3 @@
-from typing import NoReturn
-
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http.response import HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -65,7 +63,7 @@ class OrderCreateView(LoginRequiredMixin, FormView):
             return self.render_to_response(context={'form': order_form,
                                                     'delivery_form': delivery_form})
 
-    def create_order_items_from_cart(self, order: Order) -> NoReturn:
+    def create_order_items_from_cart(self, order: Order):
         """
         Creating order items in DB from cart items, linked with current order
         """

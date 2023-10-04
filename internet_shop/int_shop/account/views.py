@@ -18,7 +18,6 @@ from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from django.utils.safestring import mark_safe
 from django.views.generic import CreateView, DetailView
-from django.views.generic.edit import FormMixin
 
 from account.models import Profile
 from common.moduls_init import redis

@@ -2,8 +2,6 @@ from django import forms
 
 from common.utils import validate_captcha_text
 from goods.models import Product, Comment, Manufacturer
-from django.core.validators import ValidationError
-from common.moduls_init import redis
 
 
 class RatingSetForm(forms.ModelForm):

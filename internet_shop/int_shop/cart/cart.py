@@ -1,6 +1,6 @@
 from copy import deepcopy
 from decimal import Decimal
-from typing import NoReturn, Generator, Union
+from typing import Generator, Union
 
 from django.conf import settings
 from django.db.models import Case, When, Value
@@ -47,7 +47,7 @@ class Cart:
         self.coupon_id = self.session.get('coupon_id')
         self.present_card_id = self.session.get('present_card_id')
 
-    def add(self, product: Product, quantity: int = 1) -> NoReturn:
+    def add(self, product: Product, quantity: int = 1):
         """
         Method adds product to the cart
         """
@@ -85,7 +85,7 @@ class Cart:
         for item in cart:
             yield cart[item]
 
-    def remove(self, product_id: int) -> NoReturn:
+    def remove(self, product_id: int):
         """
         Deleting info about product from the cart by product id
         """
@@ -94,7 +94,7 @@ class Cart:
 
             self.session.modified = True
 
-    def clear(self) -> NoReturn:
+    def clear(self):
         """
         Clearing the cart with deleting coupon and present card from session
         """

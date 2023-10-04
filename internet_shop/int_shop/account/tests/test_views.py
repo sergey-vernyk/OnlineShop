@@ -409,9 +409,9 @@ class TestAccountViews(TestCase):
         for n, s in enumerate(messages, 1):
             if n == 5:
                 self.assertEqual(
-                    s.message, f"We've emailed you instructions for setting your password. "
-                               f"If you don't receive an email, please make sure you've entered the"
-                               f" address you registered with")
+                    s.message, "We've emailed you instructions for setting your password. "
+                               "If you don't receive an email, please make sure you've entered the"
+                               " address you registered with")
 
     @classmethod
     def tearDownClass(cls):

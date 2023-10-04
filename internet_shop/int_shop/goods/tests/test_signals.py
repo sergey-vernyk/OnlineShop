@@ -164,7 +164,7 @@ class TestGoodsSignals(TestCase):
         self.assertEqual(mocked_handler.call_count, 1)
         self.assertFalse(self.redis.sismember('products_ids', product_id))  # must be no product id in redis set
         self.assertNotIn(f'product_{self.product1.name}',
-                         os.listdir(os.path.join(settings.MEDIA_ROOT, f'products/')))
+                         os.listdir(os.path.join(settings.MEDIA_ROOT, 'products/')))
 
     def tearDown(self) -> None:
         try:
