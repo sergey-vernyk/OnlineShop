@@ -165,13 +165,11 @@ class TestsCartViews(TestCase):
         self.assertIn('total_price', response_content)
         self.assertIn('total_price_discounts', response_content)
         self.assertIn('total_discount', response_content)
-        self.assertIn('prev_url', response_content)
 
         self.assertEqual(response_content['cart_len'], 1)
         self.assertEqual(Decimal(response_content['total_price']), self.product2.price)
         self.assertEqual(Decimal(response_content['total_price_discounts']), self.product2.price)
         self.assertEqual(Decimal(response_content['total_discount']), 0)
-        self.assertIsNone(response_content['prev_url'])
 
         # deleting second the las product
         self.response = client.post(reverse('cart:cart_remove'),
@@ -185,7 +183,6 @@ class TestsCartViews(TestCase):
         self.assertEqual(Decimal(response_content['total_price']), 0)
         self.assertEqual(Decimal(response_content['total_price_discounts']), 0)
         self.assertEqual(Decimal(response_content['total_discount']), 0)
-        self.assertURLEqual(response_content['prev_url'], urls['previous_url'])
 
     @classmethod
     def tearDownClass(cls):

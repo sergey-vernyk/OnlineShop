@@ -1,11 +1,14 @@
 from datetime import datetime
 from io import BytesIO
-from unittest import skip
 
 import requests
 from django.contrib.auth.models import User
+from django.shortcuts import reverse
+from django.test import RequestFactory, Client
 from django.test import TestCase
+from social_core.backends.facebook import FacebookOAuth2
 from social_core.backends.google import GoogleOAuth2
+from social_django.models import DjangoStorage
 from social_django.strategy import DjangoStrategy
 
 from account.models import Profile
@@ -53,16 +56,69 @@ class TestAccountUtilities(TestCase):
         self.assertTrue(Profile.objects.filter(user_id=kwargs['user_id']).exists())
         self.assertTrue(Favorite.objects.filter(profile=Profile.objects.get(user=kwargs['user_id'])))
 
-    @skip
-    def test_create_social_user_pipeline(self):  # TODO
+    def test_create_social_user_pipeline(self):
+        """
+        Checking overriden pipeline, which create built-in user instance,
+        and replace dot (.) in username with underscore (_)
+        """
+
         details = {
-            'username': 'Username',
+            'username': 'superuser.123',
             'email': 'example@example.com',
-            'fullname': 'Name Surname',
-            'first_name': 'Name',
-            'lst_name': 'Surname'
+            'fullname': 'Super User',
+            'first_name': 'Super',
+            'last_name': 'User'
         }
 
-        kwargs = {'username': 'Username', 'email': 'example@example.com'}
+        kwargs = {
+            'username': 'superuser.123',
+            'email': 'example@example.com',
+            'first_name': 'Super',
+            'last_name': 'User'
+        }
 
-        create_user(strategy=DjangoStrategy, details=details, backend=GoogleOAuth2(DjangoStrategy), kwargs=kwargs)
+        self.client = Client()
+        self.factory = RequestFactory()
+        self.storage = DjangoStorage()
+
+        # test to create user through Google
+        request = self.factory.get(reverse('social:complete', kwargs={'backend': 'google-oauth2'}))
+        request.session = self.client.session
+
+        instance_strategy = DjangoStrategy(storage=self.storage, request=request)
+        result = create_user(strategy=instance_strategy,
+                             details=details,
+                             backend=GoogleOAuth2(instance_strategy),
+                             kwargs=kwargs)
+
+        self.assertTrue(User.objects.filter(username='superuser_123').exists())
+        created_user = User.objects.get(username='superuser_123')
+        self.assertDictEqual(result, {'is_new': True, 'user': created_user})
+
+        for field, value in created_user.__dict__.items():
+            if field in details:
+                if field == 'username':
+                    self.assertEqual(value, details[field].replace('.', '_'))
+                else:
+                    self.assertEqual(value, details[field])
+
+        # test to create user through Facebook
+        request = self.factory.get(reverse('social:complete', kwargs={'backend': 'facebook'}))
+        request.session = self.client.session
+
+        instance_strategy = DjangoStrategy(storage=self.storage, request=request)
+        result = create_user(strategy=instance_strategy,
+                             details=details,
+                             backend=FacebookOAuth2(instance_strategy),
+                             kwargs=kwargs)
+
+        self.assertTrue(User.objects.filter(username='superuser_123').exists())
+        created_user = User.objects.get(username='superuser_123')
+        self.assertDictEqual(result, {'is_new': True, 'user': created_user})
+
+        for field, value in created_user.__dict__.items():
+            if field in details:
+                if field == 'username':
+                    self.assertEqual(value, details[field].replace('.', '_'))
+                else:
+                    self.assertEqual(value, details[field])

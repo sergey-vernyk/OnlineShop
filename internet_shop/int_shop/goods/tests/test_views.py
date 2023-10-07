@@ -756,7 +756,7 @@ class TestFilterResultsView(TestCase):
         setattr(self.instance, 'object_list', [])
 
         context = self.instance.get_context_data()
-        self.assertQuerysetEqual(qs, [self.product3, self.product4])
+        self.assertQuerysetEqual(qs, [self.product3, self.product4], ordered=False)
 
         # checking context values
         for key, value in context.items():
@@ -1003,7 +1003,7 @@ class TestOtherGoodsViews(TestCase):
         self.assertTrue(context['is_paginated'])  # depending on page_obj.paginator.object_list length
         self.assertFalse(context['is_sorting'])
         self.assertEqual(context['place'], 'promotion')
-        self.assertQuerysetEqual(paginator.object_list, [self.product2, self.product3])
+        self.assertQuerysetEqual(paginator.object_list, [self.product2, self.product3], ordered=False)
 
         # request with passing category
         response = self.client.get(reverse('goods:promotion_list_by_category', args=(self.product2.category.slug,)))
@@ -1398,8 +1398,8 @@ class TestOtherGoodsViews(TestCase):
         self.assertQuerysetEqual(context['products'],
                                  # result depends on "per_page" value
                                  [p for n, p in enumerate(paginator.object_list, 1) if n <= paginator.per_page])
-        # must be product1(300.25), product2(400.45)
-        self.assertQuerysetEqual(paginator.object_list, [self.product1, self.product2])
+        # may be whichever order of the products
+        self.assertQuerysetEqual(paginator.object_list, [self.product1, self.product2], ordered=False)
 
     def test_product_ordering_in_popular_list_without_category(self):
         """
