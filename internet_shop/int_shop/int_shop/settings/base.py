@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django_summernote',
     'storages',
     'django_filters',
+    'drf_yasg',
 
     'goods.apps.GoodsConfig',
     'orders.apps.OrdersConfig',
@@ -145,7 +146,7 @@ STRIPE_WEBHOOK_SECRET = env('STRIPE_WEBHOOK_SECRET')
 
 FROM_EMAIL = env('FROM_EMAIL')
 
-# duration for validity link for reset password
+# duration for validity link for reset password (validity of token)
 PASSWORD_RESET_TIMEOUT = 14400
 
 # config Redis as simple DB
@@ -222,4 +223,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+    'DEFAULT_AUTHENTICATION_CLASSES':
+        ('rest_framework.authentication.TokenAuthentication',
+         'rest_framework.authentication.BasicAuthentication')
 }

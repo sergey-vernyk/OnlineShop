@@ -1,20 +1,18 @@
 from django.urls import path
 from rest_framework import routers
-from rest_framework.authentication import TokenAuthentication, BasicAuthentication
 from rest_framework.renderers import CoreJSONRenderer
 from rest_framework.schemas import SchemaGenerator, get_schema_view
 
 from . import views
 
 # generate schema view for app
-schema_view = get_schema_view(title='Goods API',
-                              url='/api/goods/',
-                              urlconf='goods.api.urls',
-                              generator_class=SchemaGenerator,
-                              renderer_classes=[CoreJSONRenderer],
-                              authentication_classes=[TokenAuthentication, BasicAuthentication],
-                              description='API for interactions with products, categories, manufacturers'
-                                          'new, popular, promotional products.')
+coreapi_schema_view = get_schema_view(title='Goods API',
+                                      url='/api/goods/',
+                                      urlconf='goods.api.urls',
+                                      generator_class=SchemaGenerator,
+                                      renderer_classes=[CoreJSONRenderer],
+                                      description='API for interactions with products, categories, manufacturers'
+                                                  'new, popular, promotional products.')
 
 router = routers.DefaultRouter()
 router.register(r'product', views.ProductViewSet, basename='product')
@@ -25,7 +23,7 @@ router.register(r'manufacturer', views.ManufacturerViewSet, basename='product_ma
 app_name = 'goods_api'
 
 urlpatterns = [
-    path('schema/', schema_view)
+    path('schema/', coreapi_schema_view),
 ]
 
 urlpatterns += router.urls

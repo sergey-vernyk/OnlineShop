@@ -2,14 +2,12 @@ import coreapi
 import coreschema
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.auth.tokens import default_token_generator
-from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, permissions, status, views, parsers
-from rest_framework.authentication import TokenAuthentication, BasicAuthentication
-from rest_framework.decorators import api_view, authentication_classes, action
-from rest_framework.exceptions import NotFound
+from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from rest_framework.schemas import AutoSchema
 from rest_framework.validators import ValidationError
@@ -19,28 +17,51 @@ from common.moduls_init import redis
 from goods.api.serializers import ProductSerializer
 from goods.models import Product
 from . import serializers
-from .permissions import IsTheSameUserThatMakesAction
+from .permissions import ActionsWithOwnProfilePermission, IsNotAuthenticated
 from .schemas import FavoriteActionsSchema
+from .serializers import PhotoUploadSerializer, ResetPasswordSerializer
 from .tasks import send_email_for_set_new_account_password
 
 
 class AccountViewSet(viewsets.ModelViewSet):
     """
-    View allows obtaining all profiles, create, delete, update profile
+    Viewset that provides `retrieve`, `create`, `delete`, `list` and `update` actions.
+
+    * get - obtain all profiles
+    * post - create new profile
+    * get/{id} - retrieve profile with `id`
+    * patch/{id} - update one or several fields of profile with `id`
+    * put/{id} - update all fields of profile with id
+    * delete/{id} - delete profile with id
+
     """
     queryset = Profile.objects.prefetch_related('coupons').select_related('user')
     serializer_class = serializers.ProfileSerializer
-    permission_classes = [IsTheSameUserThatMakesAction]
-    authentication_classes = [TokenAuthentication, BasicAuthentication]
+    permission_classes = [ActionsWithOwnProfilePermission]
 
     @action(methods=['GET'],
             detail=False,
-            url_path=r'favorite/me',
-            url_name='favorite_products_list',
-            name='Favorites list')
-    def list_favorites(self, request):
+            url_path=r'me',
+            url_name='profile_detail',
+            name='Profile detail',
+            permission_classes=[permissions.IsAuthenticated])
+    def get_profile_info(self, request):
         """
-        Displaying profile's favorite list
+        Get all info about current profile
+        """
+        current_profile = Profile.objects.get(user=request.user)
+        serializer = self.get_serializer(instance=current_profile)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(methods=['GET'],
+            detail=False,
+            url_path=r'me/favorite',
+            url_name='favorite_products_list',
+            name='Favorites list',
+            permission_classes=[permissions.IsAuthenticated])
+    def get_list_favorites(self, request):
+        """
+        Obtain profile's favorite list
         """
         current_profile = get_object_or_404(Profile, user_id=request.user.pk)
         products = current_profile.profile_favorite.product.prefetch_related('comments')
@@ -49,12 +70,13 @@ class AccountViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'],
             detail=False,
-            url_path=r'watched/me',
+            url_path=r'me/watched_products',
             url_name='watched_products_list',
-            name='Watched list')
-    def list_watched_products(self, request):
+            name='Watched list',
+            permission_classes=[permissions.IsAuthenticated])
+    def get_list_watched_products(self, request):
         """
-        Displaying products which profile has watched
+        Obtain products which profile has watched
         """
         current_profile = get_object_or_404(Profile, user_id=request.user.pk)
         products_ids = (int(pk) for pk in redis.smembers(f'profile_id:{current_profile.pk}'))
@@ -64,11 +86,12 @@ class AccountViewSet(viewsets.ModelViewSet):
 
     @action(methods=['POST'],
             detail=False,
-            url_path=r'favorite/me/(?P<product_pk>[0-9]+)?/(?P<act>[a-zA-Z]+)/?',
-            url_name='favorite_actions',
-            name='Add Or Remove Favorite Item',
-            schema=FavoriteActionsSchema())
-    def actions_with_favorite_products(self, request, product_pk: int, act: str):
+            url_path=r'favorite/me/(?P<product_pk>[0-9]+)?/(?P<act>(add|remove))?',
+            url_name='add_remove_product_favorite',
+            name='Add Or Remove Favorite Product',
+            schema=FavoriteActionsSchema(),
+            permission_classes=[permissions.IsAuthenticated])
+    def add_or_remove_favorite_product(self, request, product_pk: int, act: str):
         """
         Add or remove product with `product_id` into/from own favorites list
         """
@@ -81,27 +104,56 @@ class AccountViewSet(viewsets.ModelViewSet):
 
         return Response({'success': f"Product '{product.name}' has been successfully {act}"})
 
+    @action(methods=['DELETE'],
+            detail=False,
+            url_path='me/delete',
+            url_name='delete_own_profile',
+            name='Delete Own Profile',
+            permission_classes=[ActionsWithOwnProfilePermission])
+    def delete_own_profile(self, request):
+        """
+        Delete own profile with build-in user from the system
+        """
+        current_profile = Profile.objects.get(user=request.user)
+        current_profile.delete()
+        return Response({'success': 'Your profile was successfully removed from the system'},
+                        status=status.HTTP_204_NO_CONTENT)
+
+    def update(self, request, *args, **kwargs):
+        """
+        User can update only own profile
+        """
+        profile_to_update = Profile.objects.get(pk=kwargs['pk'])
+        self.check_object_permissions(request, profile_to_update)
+        return super().update(request, *args, **kwargs)
+
 
 class ResetUserAccountPasswordView(views.APIView):
     """
-    API view allows to reset forgot user password and set new password
+    Reset forgot user's password and set new password using `post` method.
+    At the beginning must send only `email`, then after response must send only new `password`, `token` and `uid`
     """
+    permission_classes = [IsNotAuthenticated]
     schema = AutoSchema(manual_fields=[
         coreapi.Field(
             name='email',
             required=False,
             type='string',
             location='form',
-            schema=coreschema.String(description='Field for email address in order to reset password. '
-                                                 'Type only for the first time and either without password, uid or token', )
+            schema=coreschema.String(
+                description='Field for email address in order to reset password. '
+                            'Type only for the first time and either without password, uid or token',
+            )
         ),
         coreapi.Field(
             name='password',
             required=False,
             type='string',
             location='form',
-            schema=coreschema.String(description='Field for new password after old password has been reset'
-                                                 ' Typed along with token and uid.'),
+            schema=coreschema.String(
+                description='Field for new password after old password has been reset'
+                            ' Typed along with token and uid.'
+            ),
         ),
         coreapi.Field(
             name='token',
@@ -109,7 +161,8 @@ class ResetUserAccountPasswordView(views.APIView):
             type='string',
             location='form',
             schema=coreschema.String(
-                description='Field for enter received token for set new password. Type along with password and uid.'),
+                description='Field for enter received token for set new password. Type along with password and uid.'
+            ),
         ),
         coreapi.Field(
             name='uid',
@@ -117,10 +170,13 @@ class ResetUserAccountPasswordView(views.APIView):
             type='string',
             location='form',
             schema=coreschema.String(
-                description='Field for enter received uid for set new password. Type along with token and password.'),
+                description='Field for enter received uid for set new password. Type along with token and password.'
+            ),
         ),
     ])
 
+    @swagger_auto_schema(method='post', request_body=ResetPasswordSerializer)
+    @action(detail=False, methods=['POST'])
     def post(self, request, *args, **kwargs):
         email = request.data.get('email')
         token = request.data.get('token')
@@ -156,32 +212,28 @@ class ResetUserAccountPasswordView(views.APIView):
 
 
 @api_view(['GET'])
-@authentication_classes([TokenAuthentication, BasicAuthentication])
-def auth_user(request):
+def check_user_is_authenticate(request):
     """
-    API view attempts to authenticate user using passed token or username with password
+    Checking whether user can be authenticated with passed in headers `token` or `username` with `password`
     """
-    content = {'success': f"User '{request.user.username}' was successfully authenticated"}
+    content = {'success': 'Credentials are correct'}
     if not isinstance(request.user, AnonymousUser):
         return Response(content, status=status.HTTP_202_ACCEPTED)
     else:
-        raise ValidationError({'error': 'Credentials are wrong'}, code='authentication')
+        return Response({'error': 'Credentials are wrong'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class PhotoUploadView(views.APIView):
     """
-    View allows upload profile's photo
+    Upload profile's photo
     """
-    parser_classes = [parsers.FileUploadParser]
-    permission_classes = [permissions.IsAuthenticated, IsTheSameUserThatMakesAction]
+    parser_classes = [parsers.MultiPartParser]
+    permission_classes = [permissions.IsAuthenticated]
 
-    def put(self, request, filename, instance_pk, format=None):
-        file_obj = request.data['file']
-        try:
-            instance = get_object_or_404(Profile, pk=instance_pk)
-            self.check_object_permissions(request, instance)
-        except Http404:
-            raise NotFound(f'Object with id {instance_pk} was not found')
-        else:
-            instance.photo.save(filename, file_obj)  # save photo to DB
-            return Response(status=status.HTTP_200_OK)
+    @swagger_auto_schema(method='put', request_body=PhotoUploadSerializer)
+    @action(detail=False, methods=['put'])
+    def put(self, request, photo_name: str):
+        photo_obj = request.data['photo']
+        profile = Profile.objects.get(user=request.user)
+        profile.photo.save(photo_name, photo_obj)  # save photo to DB
+        return Response(status=status.HTTP_200_OK)

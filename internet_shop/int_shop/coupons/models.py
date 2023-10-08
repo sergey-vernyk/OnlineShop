@@ -25,6 +25,9 @@ class Coupon(models.Model):
         now = timezone.now()
         return self.valid_from <= now <= self.valid_to
 
+    class Meta:
+        ordering = ('id',)
+
 
 class Category(models.Model):
     """
@@ -39,3 +42,4 @@ class Category(models.Model):
     class Meta:
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
+        ordering = ('name',)

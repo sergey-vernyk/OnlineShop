@@ -25,6 +25,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = '__all__'
+        read_only_fields = ('email_confirm',)
 
     def create(self, validated_data):
         """
@@ -38,7 +39,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
         # check whether user with passed username or email doesn't exist
         if User.objects.filter(Q(username=username) | Q(email=email)).exists():
-            raise ValidationError(f"User with username '{username}' or email '{email}' exists", code='exists_user')
+            raise ValidationError(f"User with username '{username}' or email '{email}' exists", code='exist_user')
 
         # check passed passwords
         if password1 == password2:
@@ -49,7 +50,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             except DjangoValidationError as e:
                 raise ValidationError(e)  # replacing django ValidationError to DRF ValidationError
         else:
-            raise ValidationError('Passwords are mismatch', code='mismatch_password')
+            raise ValidationError('Passwords are mismatch', code='mismatch_passwords')
 
         user = User.objects.create_user(**user_data)
         validated_data['user'] = user
@@ -64,7 +65,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         """
         Update profile's info or built-in user's info, which relates with profile
         """
-        user_data = validated_data.pop('user')
+        user_data = validated_data.pop('user', None)
         if user_data:
             for field, value in user_data.items():
                 setattr(instance.user, field, value)
@@ -77,3 +78,31 @@ class ProfileSerializer(serializers.ModelSerializer):
         instance.save(update_fields=[*validated_data.keys()])
 
         return instance
+
+    def get_fields(self):
+        """
+        Remove fields with password when request methods either `put` or `patch`
+        """
+        if self.context.get('request') and self.context['request'].method in ('PUT', 'PATCH'):
+            fields = super().get_fields()
+            fields.pop('password1')
+            fields.pop('password2')
+            return fields
+        return super().get_fields()
+
+
+class PhotoUploadSerializer(serializers.Serializer):
+    """
+    Serializer for upload profile's photo
+    """
+    photo = serializers.FileField()
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    """
+    Serializer for reset forgot user password
+    """
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+    token = serializers.CharField(write_only=True)
+    uid = serializers.CharField(write_only=True)

@@ -2,7 +2,7 @@ import coreapi
 import coreschema
 from rest_framework.schemas import ManualSchema
 
-add_update_cart_schema = ManualSchema(fields=[
+add_or_update_cart_schema = ManualSchema(fields=[
     coreapi.Field(
         name='product_id',
         required=True,

@@ -1,8 +1,7 @@
-from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, permissions, authentication, status
+from django.core.exceptions import ObjectDoesNotExist
+from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.validators import ValidationError
 
 from account.models import Profile
 from common.moduls_init import redis
@@ -13,33 +12,42 @@ from ..models import Coupon, Category
 
 class CouponViewSet(viewsets.ModelViewSet):
     """
-    API views for obtaining, create, update and delete coupon
+    Viewset that provides `retrieve`, `create`, `delete`, `list` and `update` actions.
+
+    * get - obtain all coupons
+    * post - create new coupon
+    * get/{id} - retrieve coupon with `id`
+    * patch/{id} - update one or several fields of coupon with `id`
+    * put/{id} - update all fields of coupon with id
+    * delete/{id} - delete coupon with `id`
     """
     serializer_class = serializers.CouponSerializer
     queryset = Coupon.objects.select_related('category').prefetch_related('profile_coupons')
     permission_classes = [permissions.IsAdminUser]
-    authentication_classes = [authentication.BasicAuthentication, authentication.TokenAuthentication]
 
     @action(methods=['POST'],
             detail=False,
-            url_path='(?P<act>[a-zA-Z-_]+)?/(?P<coupon_pk>[0-9]+)?',
+            url_path=r'(?P<act>(apply|cancel))?/(?P<code>[A-Za-z _0-9]+)?',
             url_name='apply_cancel_coupon',
             name='Apply or Cancel Coupon',
-            schema=CouponActionsSchema())
-    def apply_cancel_coupon(self, request, act: str, coupon_pk: int):
+            schema=CouponActionsSchema(),
+            permission_classes=[permissions.IsAuthenticated])
+    def apply_or_cancel_coupon(self, request, act: str, code: str):
         """
-        Action provides an opportunity to apply coupon or to cancel applied coupon to cart
+        Action provides an opportunity to apply coupon to cart or to cancel applied coupon.
+        To apply coupon need to send `apply` or `cancel` to cancel it, and send coupon `code` itself
         """
-        coupon = get_object_or_404(Coupon, pk=coupon_pk)
-        if not coupon.is_valid:
-            raise ValidationError('Coupon is not valid', code='invalid_code')
+        try:
+            coupon = Coupon.objects.get(code=code.strip())
+        except ObjectDoesNotExist:
+            return Response({'error': f"Coupon with code '{code}' is not found"}, status=status.HTTP_404_NOT_FOUND)
 
         session = request.session
         profile = Profile.objects.get(user=request.user)
         if 'cart' in session and session['cart'] or redis.hget('session_cart', f'user_id:{request.user.pk}'):
             if act == 'apply':
-                session.update({'coupon_id': int(coupon_pk)}) if request.headers.get(
-                    'User-Agent') != 'coreapi' else redis.hset('coupon_id', f'user_id:{request.user.pk}', coupon_pk)
+                session.update({'coupon_id': coupon.pk}) if request.headers.get(
+                    'User-Agent') != 'coreapi' else redis.hset('coupon_id', f'user_id:{request.user.pk}', coupon.pk)
                 profile.coupons.add(coupon)
             elif act == 'cancel':
                 if request.headers.get('User-Agent') == 'coreapi':
@@ -56,9 +64,14 @@ class CouponViewSet(viewsets.ModelViewSet):
 
 class CouponCategoryViewSet(viewsets.ModelViewSet):
     """
-    API view for obtaining, create, update and delete coupon category
+    Viewset that provides `retrieve`, `create`, `delete`, `list` and `update` actions.
+
+    * get - obtain all coupons categories
+    * post - create new coupon category
+    * get/{id} - retrieve coupon category with `id`
+    * put/{id} - update all fields of coupon category with id
+    * delete/{id} - delete coupon category with id
     """
     serializer_class = serializers.CouponCategorySerializer
     queryset = Category.objects.all()
     permission_classes = [permissions.IsAdminUser]
-    authentication_classes = [authentication.BasicAuthentication, authentication.TokenAuthentication]

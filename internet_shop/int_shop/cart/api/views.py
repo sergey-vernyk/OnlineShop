@@ -1,10 +1,11 @@
 import json
 
 from django.contrib.auth.models import AnonymousUser
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 from django.shortcuts import get_object_or_404
-from rest_framework import status, parsers, authentication
-from rest_framework.decorators import api_view, parser_classes, authentication_classes, schema
+from rest_framework import status
+from rest_framework.decorators import api_view, schema
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 
@@ -12,22 +13,25 @@ from cart.cart import Cart
 from common.moduls_init import redis
 from goods.models import Product
 from . import serializers
-from .schemas import add_update_cart_schema
+from .schemas import add_or_update_cart_schema
 
 
 @api_view(['GET'])
-@parser_classes([parsers.JSONParser])
-@authentication_classes([authentication.TokenAuthentication, authentication.BasicAuthentication])
-def cart_items_view(request):
+def cart_items(request):
     """
-    API allows to obtain all products in the cart and info about total products in the cart,
-    total discount, total cost with discount, and coupon or present card if they exists
+    Get follow info in response about:
+
+    * All products in the cart
+    * Total products in the cart
+    * Total discount
+    * Total cost with discount
+    * Applied coupon or present card if any was
     """
     if request.headers.get('User-Agent') == 'coreapi':
         coupon_id = redis.hget('present_card_id', f'user_id:{request.user.pk}')
         present_card_id = redis.hget('coupon_id', f'user_id:{request.user.pk}')
-        cart_items = redis.hget('session_cart', f'user_id:{request.user.pk}')
-        request.session['cart'] = json.loads(cart_items) if cart_items else {}
+        items_in_cart = redis.hget('session_cart', f'user_id:{request.user.pk}')
+        request.session['cart'] = json.loads(items_in_cart) if items_in_cart else {}
         request.session['present_card_id'] = None if not coupon_id else int(coupon_id)
         request.session['coupon_id'] = None if not present_card_id else int(present_card_id)
         request.session.save()
@@ -46,26 +50,25 @@ def cart_items_view(request):
 
     # allow to see what coupon or present card was applied if any
     if not isinstance(request.user, AnonymousUser):
-        content.update(
-            {'coupon': cart.coupon.pk if cart.coupon else None,
-             'present_card': cart.present_card.pk if cart.present_card else None}
-        )
+        content.update({
+            'coupon': cart.coupon.pk if cart.coupon else None,
+            'present_card': cart.present_card.pk if cart.present_card else None
+        })
 
     return Response(content, status.HTTP_200_OK)
 
 
 @api_view(['POST'])
-@authentication_classes([authentication.TokenAuthentication, authentication.BasicAuthentication])
-@schema(add_update_cart_schema)
+@schema(add_or_update_cart_schema)
 def cart_add_or_update(request, product_id: int, quantity: int = 1):
     """
-    API view allows to add product to cart
+    Add product to the cart or update existed product's quantity in the cart
     """
     cart = Cart(request)
     try:
-        product = get_object_or_404(Product, pk=product_id)
-    except Http404 as e:
-        raise NotFound(e)
+        product = Product.available_objects.get(pk=product_id)
+    except ObjectDoesNotExist:
+        return Response({'error': f"Product with id '{product_id}' does not exist"}, status=status.HTTP_404_NOT_FOUND)
     else:
         cart.add(product, int(quantity))
         # since while using CoreAPI the session is not saving, we need to save cart with items in redis
@@ -80,10 +83,9 @@ def cart_add_or_update(request, product_id: int, quantity: int = 1):
 
 
 @api_view(['POST'])
-@authentication_classes([authentication.TokenAuthentication, authentication.BasicAuthentication])
 def cart_remove(request, product_id: int):
     """
-    API view allows to remove product from cart
+    Remove product from the cart
     """
     if request.headers.get('User-Agent') == 'coreapi':
         request.session['cart'] = json.loads(redis.hget('session_cart', f'user_id:{request.user.pk}'))

@@ -44,6 +44,9 @@ class OrderSerializer(serializers.ModelSerializer):
                   'phone', 'comment', 'pay_method', 'call_confirm',
                   'is_paid', 'is_done', 'stripe_id', 'present_card', 'coupon',
                   'profile', 'created', 'updated', 'items', 'delivery')
+        read_only_fields = ('stripe_id', 'present_card', 'coupon',
+                            'profile', 'created', 'updated', 'items'
+                            'is_paid', 'is_done')
 
     def get_fields(self):
         """

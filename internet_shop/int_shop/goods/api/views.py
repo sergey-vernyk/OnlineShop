@@ -1,7 +1,7 @@
 from django.db.models import Q
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, filters, authentication
+from rest_framework import viewsets, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -22,7 +22,6 @@ class ProductViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ProductSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
     filterset_class = ProductFilter
-    authentication_classes = [authentication.TokenAuthentication, authentication.BasicAuthentication]
     permission_classes = [ObjectEditPermission]
     ordering = ['name']
     ordering_fields = ['price', 'promotional_price']
@@ -64,7 +63,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         Action allows displaying promotional products with particular category or all promotional products
         """
         lookup = Q(category__slug=category_slug, promotional=True) if category_slug else Q(promotional=True)
-        products = Product.available_objects.filter(lookup)
+        products = Product.available_objects.prefetch_related('comments').filter(lookup)
 
         # if page contains results - returns only products on this page, otherwise returns all products
         page = self.paginate_queryset(products)
@@ -113,7 +112,6 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = serializers.ProductsCategorySerializer
     permission_classes = [ObjectEditPermission]
-    authentication_classes = [authentication.TokenAuthentication, authentication.BasicAuthentication]
 
 
 class PropertyViewSet(viewsets.ModelViewSet):
@@ -122,7 +120,6 @@ class PropertyViewSet(viewsets.ModelViewSet):
     """
     queryset = Property.objects.select_related('category_property', 'product').order_by('product__name')
     serializer_class = serializers.ProductPropertySerializer
-    authentication_classes = [authentication.TokenAuthentication, authentication.BasicAuthentication]
 
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['product__name']
@@ -138,5 +135,4 @@ class ManufacturerViewSet(viewsets.ModelViewSet):
     queryset = Manufacturer.objects.all()
     filter_backends = [filters.SearchFilter]
     permission_classes = [ObjectEditPermission]
-    authentication_classes = [authentication.TokenAuthentication, authentication.BasicAuthentication]
     search_fields = ['name']

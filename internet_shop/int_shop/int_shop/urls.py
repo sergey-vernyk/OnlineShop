@@ -13,13 +13,29 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path, include
-
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib import admin
+from django.urls import path, include
 from django.views.generic import TemplateView
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+from rest_framework.permissions import AllowAny
+
 from common.utils import create_captcha_image
+
+swagger_schema_view = get_schema_view(
+    openapi.Info(
+        title="OnlineShop API",
+        default_version='v1',
+        description='API allows interact with products, accounts, coupons, present cards, '
+                    'cart, orders, payment',
+        contact=openapi.Contact(email='volt.awp@gmail.com'),
+        license=openapi.License(name="BSD License"),
+    ),
+    public=False,
+    permission_classes=[AllowAny],
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -42,6 +58,8 @@ urlpatterns = [
     path('api/present_cards/', include('present_cards.api.urls')),
     path('api/orders/', include('orders.api.urls')),
     path('api/payment/', include('payment.api.urls')),
+    path('api/swagger<format>/', swagger_schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    path('api/swagger/', swagger_schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 ]
 
 if settings.DEBUG:  # save files will be happened to this path only in debug mode

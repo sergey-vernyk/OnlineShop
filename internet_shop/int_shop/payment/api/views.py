@@ -1,5 +1,4 @@
 from rest_framework import status
-from rest_framework.authentication import BasicAuthentication, TokenAuthentication
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -13,9 +12,8 @@ from ..views import create_checkout_session
 
 class MakePaymentView(APIView):
     """
-    API view for performing online payment
+    Performing online payment
     """
-    authentication_classes = [BasicAuthentication, TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):

@@ -19,6 +19,7 @@ class CouponSerializer(serializers.ModelSerializer):
         fields = ('code', 'is_valid', 'valid_from', 'valid_to',
                   'discount', 'category', 'category_name',
                   'profile_coupons')
+        read_only_fields = ('profile_coupons',)
 
 
 class CouponCategorySerializer(serializers.ModelSerializer):

@@ -76,9 +76,10 @@ class TestGoodsProductAPI(APITestCase):
         response = self.client.get(reverse('goods_api:product-list'), format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # results may be different, when used pagination
-        result = response.data['results'] if settings.REST_FRAMEWORK.get(
-            'DEFAULT_PAGINATION_CLASS') or hasattr(serializer, 'pagination_class') else response.data
-        self.assertEqual(serializer.data, result)
+        view = response.renderer_context['view']
+        actual_result = response.data['results'] if settings.REST_FRAMEWORK.get(
+            'DEFAULT_PAGINATION_CLASS') or hasattr(view, 'pagination_class') else response.data
+        self.assertEqual(serializer.data, actual_result)
 
     def test_get_products_if_passed_category(self):
         """
@@ -88,9 +89,10 @@ class TestGoodsProductAPI(APITestCase):
         response = self.client.get(f"{reverse('goods_api:product-list')}?slug={self.product2.category.slug}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # results may be different, when used pagination
-        result = response.data['results'] if settings.REST_FRAMEWORK.get(
-            'DEFAULT_PAGINATION_CLASS') or hasattr(serializer, 'pagination_class') else response.data
-        self.assertEqual(json.dumps(serializer.data), json.dumps(result))
+        view = response.renderer_context['view']
+        actual_result = response.data['results'] if settings.REST_FRAMEWORK.get(
+            'DEFAULT_PAGINATION_CLASS') or hasattr(view, 'pagination_class') else response.data
+        self.assertEqual(serializer.data, actual_result)
 
     def test_get_new_products_action(self):
         """
@@ -105,9 +107,10 @@ class TestGoodsProductAPI(APITestCase):
         serializer = ProductSerializer(instance=[self.product1, self.product2], many=True)
         response = self.client.get(reverse('goods_api:product-get-new-products'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        result = response.data['results'] if settings.REST_FRAMEWORK.get(
-            'DEFAULT_PAGINATION_CLASS') or hasattr(serializer, 'pagination_class') else response.data
-        self.assertEqual(serializer.data, result)
+        view = response.renderer_context['view']
+        actual_result = response.data['results'] if settings.REST_FRAMEWORK.get(
+            'DEFAULT_PAGINATION_CLASS') or hasattr(view, 'pagination_class') else response.data
+        self.assertEqual(serializer.data, actual_result)
 
     def test_get_promotional_products_action(self):
         """
@@ -121,9 +124,10 @@ class TestGoodsProductAPI(APITestCase):
 
         response = self.client.get(reverse('goods_api:product-get-promotional-products'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        result = response.data['results'] if settings.REST_FRAMEWORK.get(
-            'DEFAULT_PAGINATION_CLASS') or hasattr(serializer, 'pagination_class') else response.data
-        self.assertEqual(serializer.data, json.loads(json.dumps(result[0])))
+        view = response.renderer_context['view']
+        actual_result = response.data['results'] if settings.REST_FRAMEWORK.get(
+            'DEFAULT_PAGINATION_CLASS') or hasattr(view, 'pagination_class') else response.data
+        self.assertEqual(serializer.data, actual_result[0])
 
     @patch('goods.utils.redis')
     @patch('goods.api.views.redis')
@@ -150,12 +154,11 @@ class TestGoodsProductAPI(APITestCase):
         serializer = ProductSerializer(instance=[self.product3, self.product1, self.product2], many=True)
         response = self.client.get(reverse('goods_api:product-get-popular-products'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        result = response.data['results'] if settings.REST_FRAMEWORK.get(
-            'DEFAULT_PAGINATION_CLASS') or hasattr(serializer, 'pagination_class') else response.data
-        received_result = json.loads(json.dumps(result))
-        expected_result = json.loads(json.dumps(serializer.data))
-        self.assertEqual(received_result, expected_result)
+        view = response.renderer_context['view']
+        actual_result = response.data['results'] if settings.REST_FRAMEWORK.get(
+            'DEFAULT_PAGINATION_CLASS') or hasattr(view, 'pagination_class') else response.data
+        expected_result = serializer.data
+        self.assertEqual(actual_result, expected_result)
 
     def test_retrieve_product(self):
         """
@@ -163,10 +166,10 @@ class TestGoodsProductAPI(APITestCase):
         """
         serializer = ProductSerializer(instance=self.product1)
         response = self.client.get(reverse('goods_api:product-detail', args=(self.product1.pk,)))
-        expected_result = json.dumps(serializer.data)
-        result = json.dumps(response.data)
+        expected_result = serializer.data
+        actual_result = response.data
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(result, expected_result)
+        self.assertEqual(actual_result, expected_result)
 
     def test_partial_update_product(self):
         """
@@ -210,7 +213,7 @@ class TestGoodsProductAPI(APITestCase):
                                      data=json_data_update,
                                      content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(json.loads(response.content),
+        self.assertEqual(response.data,
                          {'promotional_price': ['Promotional price must not be greater than default price']})
 
     def test_full_update_product(self):

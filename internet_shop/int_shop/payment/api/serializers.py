@@ -22,7 +22,7 @@ class ProductNameField(serializers.RelatedField):
 class PaymentSerializer(serializers.Serializer):
     """
     Serializer for displaying info with products, which customer going to buy,
-    its quantities, and possible discounts. Also, url for payment.
+    its quantities, and possible discounts.
     """
 
     product_id = ProductNameField()
