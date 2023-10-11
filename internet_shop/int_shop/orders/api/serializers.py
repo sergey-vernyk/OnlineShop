@@ -13,11 +13,12 @@ class OrderItemsSerializer(serializers.ModelSerializer):
     Serializer for items of order
     """
 
+    product_id = serializers.IntegerField(read_only=True, source='product.id')
     product_name = serializers.StringRelatedField(read_only=True, source='product.name')
 
     class Meta:
         model = OrderItem
-        exclude = ('order',)
+        fields = ('product_id', 'product_name', 'quantity', 'price')
 
 
 class DeliverySerializer(serializers.ModelSerializer):
@@ -45,18 +46,15 @@ class OrderSerializer(serializers.ModelSerializer):
                   'is_paid', 'is_done', 'stripe_id', 'present_card', 'coupon',
                   'profile', 'created', 'updated', 'items', 'delivery')
         read_only_fields = ('stripe_id', 'present_card', 'coupon',
-                            'profile', 'created', 'updated', 'items'
+                            'profile', 'created', 'updated', 'items',
                             'is_paid', 'is_done')
 
-    def get_fields(self):
+    def remove_fields(self, fields: list):
         """
-        Override the method in order to remove delivery info
-        from response in custom action `get_orders_by_user`
+        Remove serializer's fields from response, which names in passed list
         """
-        fields = super().get_fields()
-        if self.context['view'].action == 'get_orders_by_user':
-            del fields['delivery']
-        return fields
+        for field_name in fields:
+            self.fields.pop(field_name)
 
     def validate(self, attrs):
         """

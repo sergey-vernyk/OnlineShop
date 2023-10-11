@@ -32,7 +32,7 @@ class CouponViewSet(viewsets.ModelViewSet):
             name='Apply or Cancel Coupon',
             schema=CouponActionsSchema(),
             permission_classes=[permissions.IsAuthenticated])
-    def apply_or_cancel_coupon(self, request, act: str, code: str):
+    def apply_or_cancel_coupon(self, request, act: str, code: str, version: str = 'v1'):
         """
         Action provides an opportunity to apply coupon to cart or to cancel applied coupon.
         To apply coupon need to send `apply` or `cancel` to cancel it, and send coupon `code` itself

@@ -69,13 +69,13 @@ class TestCouponsAPI(APITestCase):
         """
         # user is not staff and authorized
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
-        response = self.client.get(reverse('coupons_api:coupon-list'))
+        response = self.client.get(reverse('coupons_api:coupon-list', kwargs={'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         # user is staff
         self.user.is_staff = True
         self.user.save()
-        response = self.client.get(reverse('coupons_api:coupon-list'))
+        response = self.client.get(reverse('coupons_api:coupon-list', kwargs={'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         serializer = CouponSerializer(instance=self.coupon)
@@ -100,7 +100,7 @@ class TestCouponsAPI(APITestCase):
 
         # user is not staff and authorized
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
-        response = self.client.post(reverse('coupons_api:coupon-list'),
+        response = self.client.post(reverse('coupons_api:coupon-list', kwargs={'version': 'v1'}),
                                     data=coupon_data,
                                     format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -108,7 +108,7 @@ class TestCouponsAPI(APITestCase):
         # user is staff
         self.user.is_staff = True
         self.user.save()
-        response = self.client.post(reverse('coupons_api:coupon-list'),
+        response = self.client.post(reverse('coupons_api:coupon-list', kwargs={'version': 'v1'}),
                                     data=coupon_data,
                                     format='json')
 
@@ -126,14 +126,16 @@ class TestCouponsAPI(APITestCase):
         """
         # user is not staff and authorized
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
-        response = self.client.get(reverse('coupons_api:coupon-detail', args=(self.coupon.pk,)),
+        response = self.client.get(reverse('coupons_api:coupon-detail',
+                                           kwargs={'pk': self.coupon.pk, 'version': 'v1'}),
                                    format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         # user is staff
         self.user.is_staff = True
         self.user.save()
-        response = self.client.get(reverse('coupons_api:coupon-detail', args=(self.coupon.pk,)),
+        response = self.client.get(reverse('coupons_api:coupon-detail',
+                                           kwargs={'pk': self.coupon.pk, 'version': 'v1'}),
                                    format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         serializer = CouponSerializer(instance=self.coupon)
@@ -150,7 +152,8 @@ class TestCouponsAPI(APITestCase):
 
         # user is not staff and authorized
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
-        response = self.client.patch(reverse('coupons_api:coupon-detail', args=(self.coupon.pk,)),
+        response = self.client.patch(reverse('coupons_api:coupon-detail',
+                                             kwargs={'pk': self.coupon.pk, 'version': 'v1'}),
                                      data=coupon_data,
                                      format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -158,7 +161,8 @@ class TestCouponsAPI(APITestCase):
         # user is staff
         self.user.is_staff = True
         self.user.save()
-        response = self.client.patch(reverse('coupons_api:coupon-detail', args=(self.coupon.pk,)),
+        response = self.client.patch(reverse('coupons_api:coupon-detail',
+                                             kwargs={'pk': self.coupon.pk, 'version': 'v1'}),
                                      data=coupon_data,
                                      format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -180,7 +184,8 @@ class TestCouponsAPI(APITestCase):
 
         # user is not staff and authorized
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
-        response = self.client.put(reverse('coupons_api:coupon-detail', args=(self.coupon.pk,)),
+        response = self.client.put(reverse('coupons_api:coupon-detail',
+                                           kwargs={'pk': self.coupon.pk, 'version': 'v1'}),
                                    data=coupon_data,
                                    format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -188,7 +193,8 @@ class TestCouponsAPI(APITestCase):
         # user is staff
         self.user.is_staff = True
         self.user.save()
-        response = self.client.put(reverse('coupons_api:coupon-detail', args=(self.coupon.pk,)),
+        response = self.client.put(reverse('coupons_api:coupon-detail',
+                                           kwargs={'pk': self.coupon.pk, 'version': 'v1'}),
                                    data=coupon_data,
                                    format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -203,13 +209,15 @@ class TestCouponsAPI(APITestCase):
         """
         # user is not staff and authorized
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
-        response = self.client.delete(reverse('coupons_api:coupon-detail', args=(self.coupon.pk,)))
+        response = self.client.delete(reverse('coupons_api:coupon-detail',
+                                              kwargs={'pk': self.coupon.pk, 'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         # user is staff
         self.user.is_staff = True
         self.user.save()
-        response = self.client.delete(reverse('coupons_api:coupon-detail', args=(self.coupon.pk,)))
+        response = self.client.delete(reverse('coupons_api:coupon-detail',
+                                              kwargs={'pk': self.coupon.pk, 'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         with self.assertRaises(ObjectDoesNotExist):
@@ -223,14 +231,14 @@ class TestCouponsAPI(APITestCase):
         # when cart is empty
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
         response = self.client.post(reverse('coupons_api:coupon-apply_cancel_coupon',
-                                            kwargs={'act': 'apply', 'code': self.coupon.code}))
+                                            kwargs={'act': 'apply', 'code': self.coupon.code, 'version': 'v1'}))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {'detail': 'Cart is empty'})
 
         # when cart is not empty
         request = APIRequestFactory().post(reverse('coupons_api:coupon-apply_cancel_coupon',
-                                                   kwargs={'act': 'apply', 'code': self.coupon.code}))
+                                                   kwargs={'act': 'apply', 'code': self.coupon.code, 'version': 'v1'}))
         request.session = self.client.session
         request.user = self.user
         cart = Cart(request)
@@ -253,7 +261,7 @@ class TestCouponsAPI(APITestCase):
 
         # when coupon is invalid
         response = self.client.post(reverse('coupons_api:coupon-apply_cancel_coupon',
-                                            kwargs={'act': 'apply', 'code': 'invalid_code'}))
+                                            kwargs={'act': 'apply', 'code': 'invalid_code', 'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data, {'error': f"Coupon with code 'invalid_code' is not found"})
 
@@ -264,13 +272,13 @@ class TestCouponsAPI(APITestCase):
         """
         # user is not staff and authorized
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
-        response = self.client.get(reverse('coupons_api:category-list'))
+        response = self.client.get(reverse('coupons_api:category-list', kwargs={'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         # user is staff
         self.user.is_staff = True
         self.user.save()
-        response = self.client.get(reverse('coupons_api:category-list'))
+        response = self.client.get(reverse('coupons_api:category-list', kwargs={'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         serializer = CouponCategorySerializer(instance=self.coupon.category)
@@ -291,7 +299,7 @@ class TestCouponsAPI(APITestCase):
 
         # user is not staff and authorized
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
-        response = self.client.post(reverse('coupons_api:coupon-list'),
+        response = self.client.post(reverse('coupons_api:coupon-list', kwargs={'version': 'v1'}),
                                     data=category_data,
                                     format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -299,7 +307,7 @@ class TestCouponsAPI(APITestCase):
         # user is staff
         self.user.is_staff = True
         self.user.save()
-        response = self.client.post(reverse('coupons_api:category-list'),
+        response = self.client.post(reverse('coupons_api:category-list', kwargs={'version': 'v1'}),
                                     data=category_data,
                                     format='json')
 
@@ -317,14 +325,16 @@ class TestCouponsAPI(APITestCase):
         """
         # user is not staff and authorized
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
-        response = self.client.get(reverse('coupons_api:category-detail', args=(self.coupon.category.pk,)),
+        response = self.client.get(reverse('coupons_api:category-detail',
+                                           kwargs={'pk': self.coupon.category.pk, 'version': 'v1'}),
                                    format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         # user is staff
         self.user.is_staff = True
         self.user.save()
-        response = self.client.get(reverse('coupons_api:category-detail', args=(self.coupon.category.pk,)),
+        response = self.client.get(reverse('coupons_api:category-detail',
+                                           kwargs={'pk': self.coupon.category.pk, 'version': 'v1'}),
                                    format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         serializer = CouponCategorySerializer(instance=self.coupon.category)
@@ -340,7 +350,8 @@ class TestCouponsAPI(APITestCase):
 
         # user is not staff and authorized
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
-        response = self.client.patch(reverse('coupons_api:category-detail', args=(self.coupon.category.pk,)),
+        response = self.client.patch(reverse('coupons_api:category-detail',
+                                             kwargs={'pk': self.coupon.category.pk, 'version': 'v1'}),
                                      data=category_data,
                                      format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -348,7 +359,8 @@ class TestCouponsAPI(APITestCase):
         # user is staff
         self.user.is_staff = True
         self.user.save()
-        response = self.client.patch(reverse('coupons_api:category-detail', args=(self.coupon.category.pk,)),
+        response = self.client.patch(reverse('coupons_api:category-detail',
+                                             kwargs={'pk': self.coupon.category.pk, 'version': 'v1'}),
                                      data=category_data,
                                      format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -366,7 +378,8 @@ class TestCouponsAPI(APITestCase):
 
         # user is not staff and authorized
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
-        response = self.client.put(reverse('coupons_api:category-detail', args=(self.coupon.category.pk,)),
+        response = self.client.put(reverse('coupons_api:category-detail',
+                                           kwargs={'pk': self.coupon.category.pk, 'version': 'v1'}),
                                    data=category_data,
                                    format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -374,7 +387,8 @@ class TestCouponsAPI(APITestCase):
         # user is staff
         self.user.is_staff = True
         self.user.save()
-        response = self.client.put(reverse('coupons_api:category-detail', args=(self.coupon.category.pk,)),
+        response = self.client.put(reverse('coupons_api:category-detail',
+                                           kwargs={'pk': self.coupon.category.pk, 'version': 'v1'}),
                                    data=category_data,
                                    format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -389,13 +403,15 @@ class TestCouponsAPI(APITestCase):
         """
         # user is not staff and authorized
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
-        response = self.client.delete(reverse('coupons_api:category-detail', args=(self.coupon.category.pk,)))
+        response = self.client.delete(reverse('coupons_api:category-detail',
+                                              kwargs={'pk': self.coupon.category.pk, 'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         # user is staff
         self.user.is_staff = True
         self.user.save()
-        response = self.client.delete(reverse('coupons_api:category-detail', args=(self.coupon.category.pk,)))
+        response = self.client.delete(reverse('coupons_api:category-detail',
+                                              kwargs={'pk': self.coupon.category.pk, 'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         with self.assertRaises(ObjectDoesNotExist):

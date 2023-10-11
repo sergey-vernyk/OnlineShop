@@ -2,11 +2,9 @@ import json
 
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import Http404
-from django.shortcuts import get_object_or_404
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.decorators import api_view, schema
-from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 
 from cart.cart import Cart
@@ -16,8 +14,9 @@ from . import serializers
 from .schemas import add_or_update_cart_schema
 
 
+@swagger_auto_schema(method='get', operation_summary='Get items in the cart')
 @api_view(['GET'])
-def cart_items(request):
+def cart_items(request, version: str = 'v1'):
     """
     Get follow info in response about:
 
@@ -58,9 +57,12 @@ def cart_items(request):
     return Response(content, status.HTTP_200_OK)
 
 
+@swagger_auto_schema(method='post',
+                     operation_summary='Add product to cart with {product_id} and {quantity} or update '
+                                       '{quantity} of added product with {product_id}')
 @api_view(['POST'])
 @schema(add_or_update_cart_schema)
-def cart_add_or_update(request, product_id: int, quantity: int = 1):
+def cart_add_or_update(request, product_id: int, quantity: int = 1, version: str = 'v1'):
     """
     Add product to the cart or update existed product's quantity in the cart
     """
@@ -82,8 +84,10 @@ def cart_add_or_update(request, product_id: int, quantity: int = 1):
         )
 
 
+@swagger_auto_schema(method='post',
+                     operation_summary='Remove product with {product_id} from the cart')
 @api_view(['POST'])
-def cart_remove(request, product_id: int):
+def cart_remove(request, product_id: int, version: str = 'v1'):
     """
     Remove product from the cart
     """
@@ -93,9 +97,9 @@ def cart_remove(request, product_id: int):
         redis.hdel('session_cart', f'user_id:{request.user.pk}')
     cart = Cart(request)
     try:
-        product = get_object_or_404(Product, pk=product_id)
-    except Http404 as e:
-        raise NotFound(e)
+        product = Product.available_objects.get(pk=product_id)
+    except ObjectDoesNotExist:
+        return Response({'error': f"Product with id '{product_id}' does not exist"}, status=status.HTTP_404_NOT_FOUND)
     else:
         cart.remove(product_id)
         if not cart:

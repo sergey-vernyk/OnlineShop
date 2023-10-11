@@ -225,5 +225,23 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES':
         ('rest_framework.authentication.TokenAuthentication',
-         'rest_framework.authentication.BasicAuthentication')
+         'rest_framework.authentication.BasicAuthentication',
+         'rest_framework.authentication.SessionAuthentication'),
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning',
+    'DEFAULT_VERSION': 'v1',
+    'ALLOWED_VERSIONS': ['v1', 'v2'],
+}
+
+SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH': True,
+    'LOGIN_URL': '/account/login/',
+    'LOGOUT_URL': '/account/logout/',
+    'REFETCH_SCHEMA_WITH_AUTH': True,
+    'REFETCH_SCHEMA_ON_LOGOUT': True,
+    'DEFAULT_MODEL_RENDERING': 'example',
+    'VALIDATOR_URL': 'http://127.0.0.1:8189',
+}
+
+REDOC_SETTINGS = {
+    'PATH_IN_MIDDLE': True
 }

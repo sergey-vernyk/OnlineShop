@@ -43,28 +43,28 @@ class TestAccountAPI(APITestCase):
         self.user1 = User.objects.create_user(username='test_user1',
                                               first_name='Name',
                                               last_name='Surname')
-        
+
         self.user2 = User.objects.create_user(username='test_user2')
         self.user3 = User.objects.create_user(username='test_user3')
 
         self.profile1 = Profile.objects.create(user=self.main_user,
                                                gender='M',
                                                about='About')
-        
+
         self.profile2 = Profile.objects.create(user=self.user1,
                                                gender='M',
                                                phone_number='+380969998877')
-        
+
         self.profile3 = Profile.objects.create(user=self.user2)
         self.profile4 = Profile.objects.create(user=self.user3)
 
         category = Category.objects.create(name=f'Category_{random_number}',
                                            slug=f'category-{random_number}')
-        
+
         manufacturer = Manufacturer.objects.create(name=f'Manufacturer_{random_number}',
                                                    slug=f'manufacturer_{random_number}',
                                                    description='Description')
-        
+
         self.product = Product.objects.create(name=f'Product_{random_number}',
                                               slug=f'product_{random_number}',
                                               manufacturer=manufacturer,
@@ -81,23 +81,23 @@ class TestAccountAPI(APITestCase):
         """
         Checking, whether access to profile list allows just for authorized staff users
         """
-        response = self.client.get(reverse('account_api:profile-list'))
+        response = self.client.get(reverse('account_api:profile-list', kwargs={'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
-        response = self.client.get(reverse('account_api:profile-list'))
+        response = self.client.get(reverse('account_api:profile-list', kwargs={'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         self.main_user.is_staff = True  # make user as staff
         self.main_user.save()
-        response = self.client.get(reverse('account_api:profile-list'))
+        response = self.client.get(reverse('account_api:profile-list', kwargs={'version': 'v1'}))
         view = response.renderer_context['view']
         serializer = ProfileSerializer(instance=[self.profile1, self.profile2, self.profile3, self.profile4],
                                        many=True)
         actual_result = response.data['results'] if settings.REST_FRAMEWORK.get(
             'DEFAULT_PAGINATION_CLASS') or hasattr(view, 'pagination_class') else response.data
+        serializer.child.remove_fields(view.remove_fields_list_for_get_request)
         expected_result = serializer.data
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(actual_result), 4)
         self.assertListEqual(actual_result, expected_result)
@@ -118,7 +118,9 @@ class TestAccountAPI(APITestCase):
             'phone_number': '+380661111111'
         }
 
-        response = self.client.post(reverse('account_api:profile-list'), data=profile_data, format='json')
+        response = self.client.post(reverse('account_api:profile-list', kwargs={'version': 'v1'}),
+                                    data=profile_data,
+                                    format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(Profile.objects.filter(user__username='another_user').exists())
 
@@ -134,7 +136,7 @@ class TestAccountAPI(APITestCase):
         """
         profile_token = Token.objects.get(user__username=self.user1.username)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {profile_token.key}')
-        response = self.client.delete(reverse('account_api:profile-delete_own_profile'))
+        response = self.client.delete(reverse('account_api:profile-delete_own_profile', kwargs={'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         with self.assertRaises(ObjectDoesNotExist):
@@ -150,7 +152,8 @@ class TestAccountAPI(APITestCase):
             'about': 'Some about additional info',
         }
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
-        response = self.client.patch(reverse('account_api:profile-detail', args=(self.profile1.pk,)),
+        response = self.client.patch(reverse('account_api:profile-detail',
+                                             kwargs={'pk': self.profile1.pk, 'version': 'v1'}),
                                      data=profile_data,
                                      format='json')
 
@@ -175,7 +178,8 @@ class TestAccountAPI(APITestCase):
         }
 
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
-        response = self.client.put(reverse('account_api:profile-detail', args=(self.profile1.pk,)),
+        response = self.client.put(reverse('account_api:profile-detail',
+                                           kwargs={'pk': self.profile1.pk, 'version': 'v1'}),
                                    data=new_profile_data,
                                    format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -202,7 +206,7 @@ class TestAccountAPI(APITestCase):
         orig_stdout = sys.stdout
         sys.stdout = open('reset_password_email.txt', 'w', encoding='utf-8')
         # send email first
-        response = self.client.post(reverse('account_api:reset_user_password'),
+        response = self.client.post(reverse('account_api:reset_user_password', kwargs={'version': 'v1'}),
                                     data={'email': self.main_user.email},
                                     format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -217,7 +221,7 @@ class TestAccountAPI(APITestCase):
                 token, uid = split_line[3], split_line[7]
                 break
         # send received uid, token and new password
-        response = self.client.post(reverse('account_api:reset_user_password'),
+        response = self.client.post(reverse('account_api:reset_user_password', kwargs={'version': 'v1'}),
                                     data={'uid': uid, 'token': token, 'password': 'strong_password'},
                                     format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -226,7 +230,7 @@ class TestAccountAPI(APITestCase):
         # and try to get list profiles, which can be got only by staff users
         encode64_data = base64.b64encode(force_bytes(f'{self.main_user.username}:strong_password'))
         self.client.credentials(HTTP_AUTHORIZATION=f'Basic {force_str(encode64_data)}')
-        response = self.client.get(reverse('account_api:profile-list'))
+        response = self.client.get(reverse('account_api:profile-list', kwargs={'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         os.remove('reset_password_email.txt')
@@ -251,7 +255,7 @@ class TestAccountAPI(APITestCase):
         orig_stdout = sys.stdout
         sys.stdout = open('reset_password_email.txt', 'w', encoding='utf-8')
         # send email first
-        response = self.client.post(reverse('account_api:reset_user_password'),
+        response = self.client.post(reverse('account_api:reset_user_password', kwargs={'version': 'v1'}),
                                     data={'email': self.main_user.email},
                                     format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -266,7 +270,7 @@ class TestAccountAPI(APITestCase):
                 token, uid = split_line[3], split_line[7]
                 break
         # send received uid, token and new password
-        response = self.client.post(reverse('account_api:reset_user_password'),
+        response = self.client.post(reverse('account_api:reset_user_password', kwargs={'version': 'v1'}),
                                     data={'uid': uid, 'token': token, 'password': 'strong_password'},
                                     format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -282,7 +286,7 @@ class TestAccountAPI(APITestCase):
         token = Token.objects.get(user__username=self.user1.username)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token.key}')
 
-        response = self.client.get(reverse('account_api:profile-profile_detail'))
+        response = self.client.get(reverse('account_api:profile-profile_detail', kwargs={'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         serializer = ProfileSerializer(instance=self.profile2)
@@ -297,7 +301,7 @@ class TestAccountAPI(APITestCase):
         token = Token.objects.get(user__username=self.user1.username)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token.key}')
 
-        response = self.client.get(reverse('account_api:profile-favorite_products_list'))
+        response = self.client.get(reverse('account_api:profile-favorite_products_list', kwargs={'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         serializer = ProductSerializer(instance=self.product)
         actual_result = response.data
@@ -315,7 +319,7 @@ class TestAccountAPI(APITestCase):
         token = Token.objects.get(user__username=self.user1.username)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token.key}')
 
-        response = self.client.get(reverse('account_api:profile-watched_products_list'))
+        response = self.client.get(reverse('account_api:profile-watched_products_list', kwargs={'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         serializer = ProductSerializer(instance=self.product)
         actual_result = response.data
@@ -333,7 +337,7 @@ class TestAccountAPI(APITestCase):
         # add product into favorites
         response = self.client.post(
             reverse('account_api:profile-add_remove_product_favorite',
-                    kwargs={'product_pk': self.product.pk, 'act': 'add'}), format='json'
+                    kwargs={'product_pk': self.product.pk, 'act': 'add', 'version': 'v1'}), format='json'
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -343,7 +347,7 @@ class TestAccountAPI(APITestCase):
         # remove product from favorites
         response = self.client.post(
             reverse('account_api:profile-add_remove_product_favorite',
-                    kwargs={'product_pk': self.product.pk, 'act': 'remove'}), format='json'
+                    kwargs={'product_pk': self.product.pk, 'act': 'remove', 'version': 'v1'}), format='json'
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -352,7 +356,8 @@ class TestAccountAPI(APITestCase):
         # pass neither `remove` nor `add` in `act` param
         with self.assertRaises(NoReverseMatch):
             self.client.post(reverse('account_api:profile-add_remove_product_favorite',
-                                     kwargs={'product_pk': self.product.pk, 'act': 'other'}), format='json')
+                                     kwargs={'product_pk': self.product.pk, 'act': 'other', 'version': 'v1'}),
+                             format='json')
 
     def test_check_user_is_authenticate(self):
         """
@@ -361,12 +366,12 @@ class TestAccountAPI(APITestCase):
         token = Token.objects.get(user__username=self.main_user.username)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token.key}')
 
-        response = self.client.get(reverse('account_api:check_user_auth'))
+        response = self.client.get(reverse('account_api:check_user_auth', kwargs={'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
 
         # credentials are wrong
         self.client.credentials(username=self.main_user.username, password='pass')
-        response = self.client.get(reverse('account_api:check_user_auth'))
+        response = self.client.get(reverse('account_api:check_user_auth', kwargs={'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_upload_photo_for_profile_account(self):
@@ -380,7 +385,8 @@ class TestAccountAPI(APITestCase):
         image = open('./account/api/tests/avatar.png', 'rb')
         image_as_bytes = BytesIO(image.read())
 
-        response = self.client.put(reverse('account_api:upload_photo', args=(image_name,)),
+        response = self.client.put(reverse('account_api:upload_photo',
+                                           kwargs={'photo_name': image_name, 'version': 'v1'}),
                                    data={'photo': image_as_bytes},
                                    format='multipart')
         self.assertEqual(response.status_code, status.HTTP_200_OK)

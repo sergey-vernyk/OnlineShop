@@ -71,7 +71,8 @@ class TestCartAPI(APITestCase):
         """
         Checking add product to cart or update quantity of added product(s)
         """
-        response = self.client.post(reverse('cart_api:add_to_cart', args=(self.product1.pk, 2)))
+        response = self.client.post(reverse('cart_api:add_to_cart',
+                                            kwargs={'product_id': self.product1.pk, 'quantity': 2, 'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         content = json.loads(response.content)
         self.assertEqual(content,
@@ -85,7 +86,8 @@ class TestCartAPI(APITestCase):
         self.assertEqual(cart.cart[str(self.product1.pk)]['quantity'], 2)
 
         # update quantity of existed product in the cart
-        response = self.client.post(reverse('cart_api:add_to_cart', args=(self.product1.pk, 3)))
+        response = self.client.post(reverse('cart_api:add_to_cart',
+                                            kwargs={'product_id': self.product1.pk, 'quantity': 3, 'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         content = json.loads(response.content)
         self.assertEqual(content,
@@ -99,7 +101,7 @@ class TestCartAPI(APITestCase):
         self.assertEqual(cart.cart[str(self.product1.pk)]['quantity'], 3)
 
         # pass no exists product_id
-        response = self.client.post(reverse('cart_api:add_to_cart', args=(999,)))
+        response = self.client.post(reverse('cart_api:add_to_cart', kwargs={'product_id': 999, 'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data, {"error": "Product with id '999' does not exist"})
 
@@ -108,7 +110,8 @@ class TestCartAPI(APITestCase):
         Checking remove product from the cart
         """
         # add product to cart first
-        response = self.client.post(reverse('cart_api:add_to_cart', args=(self.product1.pk, 2)))
+        response = self.client.post(reverse('cart_api:add_to_cart',
+                                            kwargs={'product_id': self.product1.pk, 'quantity': 2, 'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         request = response.wsgi_request
@@ -116,7 +119,8 @@ class TestCartAPI(APITestCase):
         self.assertEqual(len(cart), 2)
 
         # remove product from the cart
-        response = self.client.post(reverse('cart_api:remove_from_cart', args=(self.product1.pk,)))
+        response = self.client.post(reverse('cart_api:remove_from_cart',
+                                            kwargs={'product_id': self.product1.pk, 'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         request = response.wsgi_request
@@ -130,18 +134,20 @@ class TestCartAPI(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
 
         # add one product
-        response = self.client.post(reverse('cart_api:add_to_cart', args=(self.product1.pk, 2)))
+        response = self.client.post(reverse('cart_api:add_to_cart',
+                                            kwargs={'product_id': self.product1.pk, 'quantity': 2, 'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # add second product
-        response = self.client.post(reverse('cart_api:add_to_cart', args=(self.product2.pk, 3)))
+        response = self.client.post(reverse('cart_api:add_to_cart',
+                                            kwargs={'product_id': self.product2.pk, 'quantity': 3, 'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         request = response.wsgi_request
         request.session['coupon_id'] = self.coupon.pk
         request.session.save()
 
-        response = self.client.get(reverse('cart_api:cart_items'))
+        response = self.client.get(reverse('cart_api:cart_items', kwargs={'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         content = json.loads(response.content)
 

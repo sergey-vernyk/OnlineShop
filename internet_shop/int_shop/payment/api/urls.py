@@ -13,6 +13,7 @@ schema_view = get_schema_view(title='Payment API',
                               renderer_classes=[CoreJSONRenderer],
                               authentication_classes=[TokenAuthentication, BasicAuthentication],
                               description='API for making online payment')
+app_name = 'payment_api'
 
 urlpatterns = [
     path('make_payment/', views.MakePaymentView.as_view(), name='make_payment'),

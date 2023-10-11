@@ -79,16 +79,12 @@ class ProfileSerializer(serializers.ModelSerializer):
 
         return instance
 
-    def get_fields(self):
+    def remove_fields(self, fields: list):
         """
-        Remove fields with password when request methods either `put` or `patch`
+        Remove serializer's fields from response, which names in passed list
         """
-        if self.context.get('request') and self.context['request'].method in ('PUT', 'PATCH'):
-            fields = super().get_fields()
-            fields.pop('password1')
-            fields.pop('password2')
-            return fields
-        return super().get_fields()
+        for field_name in fields:
+            self.fields.pop(field_name)
 
 
 class PhotoUploadSerializer(serializers.Serializer):

@@ -8,7 +8,7 @@ class UserPermission(BasePermission):
     """
 
     def has_permission(self, request, view):
-        if view.action in ('list', 'destroy', 'update', 'partial_update'):
+        if view.action in ('list', 'destroy', 'update', 'partial_update', 'retrieve'):
             return request.user.is_staff
         if view.action == 'create' and request.user.is_authenticated:
             return True
