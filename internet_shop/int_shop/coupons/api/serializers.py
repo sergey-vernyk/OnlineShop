@@ -16,10 +16,17 @@ class CouponSerializer(serializers.ModelSerializer):
         model = Coupon
         # `profile_coupons` field is reverse relation field in Profile model.
         # displays profile ids, where applied corresponds coupon
-        fields = ('code', 'is_valid', 'valid_from', 'valid_to',
+        fields = ('id', 'code', 'is_valid', 'valid_from', 'valid_to',
                   'discount', 'category', 'category_name',
                   'profile_coupons')
         read_only_fields = ('profile_coupons',)
+
+    def remove_fields(self, fields: list):
+        """
+        Remove serializer's fields from response, which names in passed list
+        """
+        for field_name in fields:
+            self.fields.pop(field_name)
 
 
 class CouponCategorySerializer(serializers.ModelSerializer):
@@ -31,3 +38,10 @@ class CouponCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
+
+    def remove_fields(self, fields: list):
+        """
+        Remove serializer's fields from response, which names in passed list
+        """
+        for field_name in fields:
+            self.fields.pop(field_name)

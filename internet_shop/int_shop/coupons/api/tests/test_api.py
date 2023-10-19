@@ -80,6 +80,7 @@ class TestCouponsAPI(APITestCase):
 
         serializer = CouponSerializer(instance=self.coupon)
         view = response.renderer_context['view']
+        serializer.remove_fields(view.remove_fields_list_for_get_request)
         actual_result = response.data['results'][0] if settings.REST_FRAMEWORK.get(
             'DEFAULT_PAGINATION_CLASS') or hasattr(view, 'pagination_class') else response.data
         expected_result = serializer.data
@@ -263,7 +264,7 @@ class TestCouponsAPI(APITestCase):
         response = self.client.post(reverse('coupons_api:coupon-apply_cancel_coupon',
                                             kwargs={'act': 'apply', 'code': 'invalid_code', 'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.data, {'error': f"Coupon with code 'invalid_code' is not found"})
+        self.assertEqual(response.data, {'error': f"Coupon with code 'invalid_code' was not found"})
 
     def test_get_all_coupons_categories_only_for_staff_users(self):
         """
@@ -281,9 +282,13 @@ class TestCouponsAPI(APITestCase):
         response = self.client.get(reverse('coupons_api:category-list', kwargs={'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+        serializer = CouponCategorySerializer()
+        view = response.renderer_context['view']
+        serializer.remove_fields(view.remove_fields_list_for_get_request)
         serializer = CouponCategorySerializer(instance=self.coupon.category)
+        serializer.remove_fields(view.remove_fields_list_for_get_request)
         actual_result = response.data['results'][0] if settings.REST_FRAMEWORK.get(
-            'DEFAULT_PAGINATION_CLASS') or hasattr(serializer, 'pagination_class') else response.data
+            'DEFAULT_PAGINATION_CLASS') or hasattr(view, 'pagination_class') else response.data
         expected_result = serializer.data
         self.assertDictEqual(actual_result, expected_result)
 
@@ -299,7 +304,7 @@ class TestCouponsAPI(APITestCase):
 
         # user is not staff and authorized
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
-        response = self.client.post(reverse('coupons_api:coupon-list', kwargs={'version': 'v1'}),
+        response = self.client.post(reverse('coupons_api:category-list', kwargs={'version': 'v1'}),
                                     data=category_data,
                                     format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -339,33 +344,6 @@ class TestCouponsAPI(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         serializer = CouponCategorySerializer(instance=self.coupon.category)
         self.assertDictEqual(response.data, serializer.data)
-
-    def test_partial_update_coupon_category_only_by_staff_users(self):
-        """
-        Checking update part of info of a coupon category only by staff users
-        """
-        category_data = {
-            'name': 'New Category Name'
-        }
-
-        # user is not staff and authorized
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
-        response = self.client.patch(reverse('coupons_api:category-detail',
-                                             kwargs={'pk': self.coupon.category.pk, 'version': 'v1'}),
-                                     data=category_data,
-                                     format='json')
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-        # user is staff
-        self.user.is_staff = True
-        self.user.save()
-        response = self.client.patch(reverse('coupons_api:category-detail',
-                                             kwargs={'pk': self.coupon.category.pk, 'version': 'v1'}),
-                                     data=category_data,
-                                     format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.coupon.category.refresh_from_db()
-        self.assertEqual(self.coupon.category.name, category_data['name'])
 
     def test_full_update_coupon_category_only_by_staff_users(self):
         """

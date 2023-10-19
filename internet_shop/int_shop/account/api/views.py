@@ -167,7 +167,7 @@ class AccountViewSet(viewsets.ModelViewSet):
         page = self.paginate_queryset(self.queryset)
         if page:
             serializer = self.get_serializer(instance=page, many=True)
-            serializer.child.remove_fields(self.remove_fields_list_for_get_request)
+            serializer.child.remove_fields(self.remove_fields_list_for_get_request)  # remove fields from response
             return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(instance=self.queryset, many=True)
@@ -178,7 +178,7 @@ class AccountViewSet(viewsets.ModelViewSet):
 class ResetUserAccountPasswordView(views.APIView):
     """
     Reset forgot user's password and set new password using `post` method.
-    At the beginning must send only `email`, then after response must send only new `password`, `token` and `uid`
+    At the beginning you must send only `email`, then after response must send only new `password`, `token` and `uid`.
     """
     permission_classes = [IsNotAuthenticated]
     schema = AutoSchema(manual_fields=[

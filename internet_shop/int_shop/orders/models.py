@@ -57,7 +57,8 @@ class Order(models.Model):
         elif present_card:
             totals['total_cost_with_discounts'] = totals['total_cost'] - present_card.amount
 
-        totals['total_discounts'] = totals['total_cost'] - totals['total_cost_with_discounts']
+        if any([coupon, present_card]):
+            totals['total_discounts'] = totals['total_cost'] - totals['total_cost_with_discounts']
 
         return {k: v.quantize(Decimal('0.01')) for k, v in totals.items()}  # rounds result to 2 signs
 

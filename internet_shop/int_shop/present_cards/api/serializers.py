@@ -17,6 +17,13 @@ class PresentCardSerializer(serializers.ModelSerializer):
         model = PresentCard
         fields = '__all__'
 
+    def remove_fields(self, fields: list):
+        """
+        Remove serializer's fields from response, which names in passed list.
+        """
+        for field_name in fields:
+            self.fields.pop(field_name)
+
 
 class PresentCardCategorySerializer(serializers.ModelSerializer):
     """
@@ -27,3 +34,10 @@ class PresentCardCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
+
+    def remove_fields(self, fields: list):
+        """
+        Remove serializer's fields from response, which names in passed list.
+        """
+        for field_name in fields:
+            self.fields.pop(field_name)

@@ -22,7 +22,7 @@ def create_discounts(discount_type: str = None, discount_value: int = None) -> U
     Coupon contains with discount in percentage from total goods cost.
     Present card contains with fixed amount from total goods cost.
     """
-    if not (discount_type and discount_value):
+    if not all([discount_type, discount_value]):
         return None
 
     discount = None
@@ -49,7 +49,7 @@ def create_discounts(discount_type: str = None, discount_value: int = None) -> U
 
 @require_POST
 @csrf_exempt
-def create_checkout_session(request) -> Union[redirect, str]:
+def create_checkout_session(request, *args, **kwargs) -> Union[redirect, str]:
     """
     Checkout session is customer session, when customer paying one-time purchases
     """
