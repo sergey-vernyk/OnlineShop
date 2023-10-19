@@ -13,7 +13,8 @@ coreapi_schema_view = get_schema_view(title='Orders API',
                                       generator_class=SchemaGenerator,
                                       renderer_classes=[CoreJSONRenderer],
                                       authentication_classes=[TokenAuthentication, BasicAuthentication],
-                                      description='API for orders. Contains with orders itself, order items and delivery')
+                                      description='API for orders. '
+                                                  'Contains with orders itself, order items and delivery')
 
 router = DefaultRouter()
 router.register(r'order', views.OrderViewSet, basename='order')

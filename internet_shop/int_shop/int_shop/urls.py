@@ -19,10 +19,23 @@ from django.contrib import admin
 from django.urls import path, include, re_path
 from django.views.generic import TemplateView
 from drf_yasg import openapi
+from drf_yasg.generators import OpenAPISchemaGenerator
 from drf_yasg.views import get_schema_view
 from rest_framework.permissions import AllowAny
 
 from common.utils import create_captcha_image
+
+
+class HttpsSchemaGenerator(OpenAPISchemaGenerator):
+    """
+    API schema generator for using API Swagger only over HTTPS protocol.
+    """
+
+    def get_schema(self, request=None, public=False):
+        schema = super().get_schema(request, public)
+        schema.schemes = ['https']
+        return schema
+
 
 swagger_schema_view = get_schema_view(
     openapi.Info(
@@ -34,6 +47,7 @@ swagger_schema_view = get_schema_view(
         license=openapi.License(name="BSD License"),
     ),
     public=False,
+    generator_class=HttpsSchemaGenerator,
     validators=['ssv'],
     permission_classes=[AllowAny],
 )

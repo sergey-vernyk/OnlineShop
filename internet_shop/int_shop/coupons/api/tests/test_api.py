@@ -264,7 +264,7 @@ class TestCouponsAPI(APITestCase):
         response = self.client.post(reverse('coupons_api:coupon-apply_cancel_coupon',
                                             kwargs={'act': 'apply', 'code': 'invalid_code', 'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.data, {'error': f"Coupon with code 'invalid_code' was not found"})
+        self.assertEqual(response.data, {'error': "Coupon with code 'invalid_code' was not found"})
 
     def test_get_all_coupons_categories_only_for_staff_users(self):
         """

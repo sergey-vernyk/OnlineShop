@@ -16,7 +16,7 @@ class ExtraSearchTerms(filters.SearchFilter):
         Overriden the method for add searching not only by model's fields, but also by model `property`.
         """
         # make copy to prevent removing items from original `search_fields` list of a class
-        search_fields = self.get_search_fields(view, request)[:] 
+        search_fields = self.get_search_fields(view, request)[:]
         search_terms = self.get_search_terms(request)
 
         if not search_fields or not search_terms:

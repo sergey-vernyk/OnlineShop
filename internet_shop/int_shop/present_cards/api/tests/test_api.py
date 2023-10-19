@@ -276,7 +276,7 @@ class TestPresentCardAPI(APITestCase):
         response = self.client.post(reverse('present_cards_api:present_card-apply_or_cancel_present_card',
                                             kwargs={'act': 'apply', 'code': 'invalid_code', 'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.data, {'error': f"Present card with code 'invalid_code' was not found"})
+        self.assertEqual(response.data, {'error': "Present card with code 'invalid_code' was not found"})
 
     def test_get_all_present_cards_categories_only_for_staff_users(self):
         """

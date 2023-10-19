@@ -1,5 +1,3 @@
-from copy import deepcopy
-
 from rest_framework.schemas import AutoSchema
 
 

@@ -4,9 +4,8 @@ import shutil
 from datetime import datetime
 from decimal import Decimal
 from random import randint
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 
-import stripe
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils import timezone
