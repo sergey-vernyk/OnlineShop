@@ -41,9 +41,12 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'django.contrib.postgres',
     'social_django',
+    'rest_framework',
     'rest_framework.authtoken',
     'django_summernote',
     'storages',
+    'django_filters',
+    'drf_yasg',
 
     'goods.apps.GoodsConfig',
     'orders.apps.OrdersConfig',
@@ -142,7 +145,7 @@ STRIPE_WEBHOOK_SECRET = env('STRIPE_WEBHOOK_SECRET')
 
 FROM_EMAIL = env('FROM_EMAIL')
 
-# duration for validity link for reset password
+# duration for validity link for reset password (validity of token)
 PASSWORD_RESET_TIMEOUT = 14400
 
 # config Redis as simple DB
@@ -209,4 +212,35 @@ SUMMERNOTE_CONFIG = {
         'width': '80%',
         'height': '480',
     }
+}
+
+# DRF settings
+REST_FRAMEWORK = {
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.JSONParser',
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+    'DEFAULT_AUTHENTICATION_CLASSES':
+        ('rest_framework.authentication.TokenAuthentication',
+         'rest_framework.authentication.BasicAuthentication',
+         'rest_framework.authentication.SessionAuthentication'),
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning',
+    'DEFAULT_VERSION': 'v1',
+    'ALLOWED_VERSIONS': ['v1', 'v2'],
+}
+
+SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH': True,
+    'LOGIN_URL': '/account/login/',
+    'LOGOUT_URL': '/account/logout/',
+    'REFETCH_SCHEMA_WITH_AUTH': True,
+    'REFETCH_SCHEMA_ON_LOGOUT': True,
+    'DEFAULT_MODEL_RENDERING': 'example',
+    'VALIDATOR_URL': 'http://127.0.0.1:8189',
+}
+
+REDOC_SETTINGS = {
+    'PATH_IN_MIDDLE': True
 }

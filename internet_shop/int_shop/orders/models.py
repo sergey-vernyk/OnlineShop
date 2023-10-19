@@ -57,7 +57,8 @@ class Order(models.Model):
         elif present_card:
             totals['total_cost_with_discounts'] = totals['total_cost'] - present_card.amount
 
-        totals['total_discounts'] = totals['total_cost'] - totals['total_cost_with_discounts']
+        if any([coupon, present_card]):
+            totals['total_discounts'] = totals['total_cost'] - totals['total_cost_with_discounts']
 
         return {k: v.quantize(Decimal('0.01')) for k, v in totals.items()}  # rounds result to 2 signs
 
@@ -86,7 +87,7 @@ class Delivery(models.Model):
     last_name = models.CharField(max_length=30)
     service = models.CharField(choices=DELIVERY_SERVICES, max_length=15, blank=True)
     method = models.CharField(choices=DELIVERY_METHOD, max_length=20)
-    office_number = models.IntegerField(default=1, blank=True, validators=[MinValueValidator(1)])
+    office_number = models.IntegerField(blank=True, validators=[MinValueValidator(0)], null=True)
     delivery_date = models.DateField()
 
     def __str__(self):

@@ -62,10 +62,10 @@ class DeliveryAdmin(admin.ModelAdmin):
     """
     Admin panel for delivery
     """
-    list_display = ['get_full_name', 'method', 'service', 'office_number', 'delivery_date']
+    list_display = ['pk', 'get_full_name', 'method', 'service', 'office_number', 'delivery_date']
     search_fields = ['last_name']
     date_hierarchy = 'delivery_date'
-    list_filter = ['service', 'method']
+    list_filter = ['service', 'method', 'office_number']
 
     @admin.display(description='Name')
     def get_full_name(self, obj):

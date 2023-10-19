@@ -7,3 +7,4 @@ class AccountConfig(AppConfig):
 
     def ready(self):
         from . import signals
+        from .api import signals
