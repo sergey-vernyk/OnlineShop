@@ -43,6 +43,7 @@ jobs:
         pip install -r requirements.txt
     - name: Lint by flake8
       run: |
+        cd internet_shop/int_shop
         flake8
     - name: Create env file
       run: |
