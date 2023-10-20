@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.translation import gettext_lazy as _
 
 from common.utils import validate_captcha_text
 from goods.models import Product, Comment, Manufacturer
@@ -73,9 +74,9 @@ class SortByPriceForm(forms.Form):
     Form for sorting products by price
     """
     sorting = forms.ChoiceField(label='Sorting', choices=(
-        ('default', 'Price: Default'),
-        ('p_asc', 'Price: Low To High'),
-        ('p_desc', 'Price: High To Low'),
+        ('default', _('Price: Default')),
+        ('p_asc', _('Price: Low To High')),
+        ('p_desc', _('Price: High To Low')),
     ), widget=forms.Select(attrs={'class': 'sorting-select'}))
 
 
@@ -83,5 +84,5 @@ class SearchForm(forms.Form):
     """
     Form for searching products on the site
     """
-    query = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'What find?',
+    query = forms.CharField(widget=forms.TextInput(attrs={'placeholder': _('What find?'),
                                                           'class': 'search-field-input'}))
