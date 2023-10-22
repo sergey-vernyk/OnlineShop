@@ -58,7 +58,8 @@ class ProductListView(ListView):
             context['category'] = Category.objects.get(slug=self.kwargs.get('category_slug'))
             context['filter_manufacturers'] = FilterByManufacturerForm()
 
-            context['category_properties'] = get_property_for_category(context['category'].name)
+            context['category_properties'] = get_property_for_category(context['category'].name,
+                                                                       language_code=self.request.LANGUAGE_CODE)
 
             if 'filter_price' in self.kwargs:
                 min_price = Decimal(self.kwargs['filter_price'][0])
@@ -175,6 +176,7 @@ class ProductDetailView(DetailView, FormMixin):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        language = self.request.LANGUAGE_CODE
         context['captcha_image'] = create_captcha_image(self.request, width=135, font_size=30)
         context['comment_form'] = CommentProductForm()
         context['quantity_form'] = CartQuantityForm()
@@ -183,7 +185,8 @@ class ProductDetailView(DetailView, FormMixin):
                                                                     'profiles_likes',
                                                                     'profiles_unlikes').order_by('-created')
         # getting all Property objects, that belongs to the current product
-        context['properties'] = self.object.properties.select_related('category_property')
+        context['properties'] = self.object.properties.prefetch_related('category_property').filter(
+            translations__language_code=language)
         # fill the name and email in the send comment form, if user is authenticated
         if self.request.user.is_authenticated:
             context['comment_form'].fields['user_name'].initial = self.request.user.first_name
@@ -371,7 +374,7 @@ class FilterResultsView(ListView):
             properties = self.kwargs.get('props')
             props_dict = distribute_properties_from_request(properties)
             lookups &= Q(properties__category_property__id__in=props_dict['ids'],
-                         properties__name__in=props_dict['names'],
+                         properties__translations__name__in=props_dict['names'],
                          properties__text_value__in=props_dict['text_values'],
                          properties__numeric_value__in=props_dict['numeric_values'])
 
@@ -387,7 +390,9 @@ class FilterResultsView(ListView):
         if 'category_slug' in self.kwargs:
             context['category'] = Category.objects.get(slug=self.kwargs.get('category_slug'))
 
-            context['category_properties'] = get_property_for_category(context['category'].name, self.queryset_filter)
+            context['category_properties'] = get_property_for_category(context['category'].name, 
+                                                                       prods_queryset=self.queryset_filter,
+                                                                       language_code=self.request.LANGUAGE_CODE)
 
             if 'filter_price' in self.kwargs:
                 min_price = Decimal(self.kwargs['filter_price'][0])

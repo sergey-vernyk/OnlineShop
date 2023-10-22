@@ -1,8 +1,18 @@
 from django.contrib import admin
-
-from goods.models import Product, Category, Manufacturer, Comment, Property, Favorite, PropertyCategory
 from django.utils.html import mark_safe
+from django.utils.translation import gettext_lazy as _
 from django_summernote.admin import SummernoteModelAdmin
+from parler.admin import TranslatableAdmin
+
+from goods.models import (
+    Product,
+    Category,
+    Manufacturer,
+    Comment,
+    Property,
+    Favorite,
+    PropertyCategory
+)
 
 
 class CommentInline(admin.StackedInline):
@@ -21,15 +31,16 @@ class CommentInline(admin.StackedInline):
 
 
 @admin.register(Property)
-class PropertyAdmin(SummernoteModelAdmin):
+class PropertyAdmin(TranslatableAdmin, SummernoteModelAdmin):
     """
-    Product property
+    Product property.
     """
+    fields = ['name', 'text_value', 'numeric_value', 'units', 'category_property', 'product', 'detail_description']
     list_display = ['name', 'text_value', 'numeric_value', 'units', 'category_property', 'product']
-    ordering = ['category_property', 'product', 'name']
-    search_fields = ['product__name', 'category_property__name']
+    ordering = ['category_property', 'product']
+    search_fields = ['product__name', 'category_property__name', 'translations__name']
     list_per_page = 15
-    list_filter = ['product', 'category_property', 'name']
+    list_filter = ['product', 'category_property']
     summernote_fields = ('detail_description',)
 
 
@@ -77,7 +88,7 @@ class ProductSummernoteAdmin(SummernoteModelAdmin):
     exclude = ('star',)
     summernote_fields = ('description',)
 
-    @admin.display(description='Image')
+    @admin.display(description=_('Image'))
     def get_image_tag(self, obj):
         """
         Displaying product image

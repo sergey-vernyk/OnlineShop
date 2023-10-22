@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'storages',
     'django_filters',
     'drf_yasg',
+    'parler',
 
     'goods.apps.GoodsConfig',
     'orders.apps.OrdersConfig',
@@ -119,7 +120,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en'
 
 LANGUAGES = (
     ('en', _('English')),
@@ -131,6 +132,18 @@ LANGUAGES = (
 LOCALE_PATHS = (
     os.path.join(BASE_DIR, './locale/'),
 )
+
+PARLER_LANGUAGES = {
+    SITE_ID: (
+        {'code': 'en'},
+        {'code': 'uk'},
+        {'code': 'ru'},
+    ),
+    'default': {
+        'fallbacks': ['en'],  # translation language by default
+        'hide_untranslated': False,  # settings for display no translated content
+    }
+}
 
 TIME_ZONE = 'Europe/Kyiv'
 

@@ -20,29 +20,29 @@ class RatingSetForm(forms.ModelForm):
 
 class CommentProductForm(forms.ModelForm, forms.Form):
     """
-    Form for leaving comments for a product
+    Form for leaving comments for a product.
     """
     captcha = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': 'comment-field-captcha'}))
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # override error message of custom field
-        self.fields['captcha'].error_messages['required'] = 'This field must not be empty'
+        self.fields['captcha'].error_messages['required'] = _('This field must not be empty')
 
     class Meta:
         model = Comment
         fields = ('user_name', 'user_email', 'body', 'captcha')
         widgets = {
-            'user_name': forms.TextInput(attrs={'class': 'comment-field', 'placeholder': 'Your name'}),
+            'user_name': forms.TextInput(attrs={'class': 'comment-field', 'placeholder': _('Your name')}),
             'user_email': forms.EmailInput(attrs={'class': 'comment-field', 'placeholder': 'example@example.com'}),
             'body': forms.Textarea(attrs={'class': 'comment-field-area',
                                           'rows': 3,
                                           'cols': 23,
-                                          'placeholder': 'Type your review...'}),
+                                          'placeholder': _('Type your review...')}),
         }
 
         # set the same error message for each field
-        error_messages = {field: {'required': 'This field must not be empty'} for field in fields}
+        error_messages = {field: {'required': _('This field must not be empty')} for field in fields}
 
     def clean_captcha(self):
         """
