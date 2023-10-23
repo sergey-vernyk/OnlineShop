@@ -6,6 +6,7 @@ from django.http.response import JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import FormMixin
@@ -185,7 +186,7 @@ class ProductDetailView(DetailView, FormMixin):
                                                                     'profiles_likes',
                                                                     'profiles_unlikes').order_by('-created')
         # getting all Property objects, that belongs to the current product
-        context['properties'] = self.object.properties.prefetch_related('category_property').filter(
+        context['properties'] = self.object.properties.prefetch_related('category_property', 'translations').filter(
             translations__language_code=language)
         # fill the name and email in the send comment form, if user is authenticated
         if self.request.user.is_authenticated:
@@ -375,7 +376,7 @@ class FilterResultsView(ListView):
             props_dict = distribute_properties_from_request(properties)
             lookups &= Q(properties__category_property__id__in=props_dict['ids'],
                          properties__translations__name__in=props_dict['names'],
-                         properties__text_value__in=props_dict['text_values'],
+                         properties__translations__text_value__in=props_dict['text_values'],
                          properties__numeric_value__in=props_dict['numeric_values'])
 
         # getting in the queryset only the unique results
@@ -439,7 +440,7 @@ def promotion_list(request, category_slug: str = None):
                                                                        'sorting_by_price': sorting_by_price,
                                                                        'is_paginated': page_obj.has_other_pages(),
                                                                        'is_sorting': False,
-                                                                       'place': 'promotion'})
+                                                                       'place': _('promotion')})
 
 
 def new_list(request, category_slug: str = None):
@@ -466,7 +467,7 @@ def new_list(request, category_slug: str = None):
                                                                        'sorting_by_price': sorting_by_price,
                                                                        'is_paginated': page_obj.has_other_pages(),
                                                                        'is_sorting': False,
-                                                                       'place': 'new'})
+                                                                       'place': _('new')})
 
 
 def popular_list(request, category_slug: str = None):
@@ -503,7 +504,7 @@ def popular_list(request, category_slug: str = None):
                                                                        'sorting_by_price': sorting_by_price,
                                                                        'is_paginated': page_obj.has_other_pages(),
                                                                        'is_sorting': False,
-                                                                       'place': 'popular'})
+                                                                       'place': _('popular')})
 
 
 def product_ordering(request, place: str, category_slug: str = 'all', page: int = 1):

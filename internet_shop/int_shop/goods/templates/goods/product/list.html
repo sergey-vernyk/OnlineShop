@@ -30,11 +30,15 @@
                     {% empty %}
                         {% if place == 'mainlist' %}
                             <div class="d-flex justify-content-center">
-                                <h4>There are no results for your query <b>"{{ request.GET.query }}"</b></h4>
+                                <h4>
+                                    {% blocktranslate with query=request.GET.query %}
+                                        There are no results for your query <b>"{{ query }}"</b>...
+                                    {% endblocktranslate %}
+                                </h4>
                             </div>
                         {% elif place == 'filter_list'%}
                             <div class="d-flex justify-content-center">
-                                <h4>There are no results by passed filter parameters</h4>
+                                <h4>{% translate 'There are no results by passed filter parameters...' %}</h4>
                             </div>
                         {% endif %}
                     {% endfor %}

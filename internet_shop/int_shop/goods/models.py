@@ -201,13 +201,14 @@ class Comment(models.Model):
         verbose_name_plural = _('Comments')
 
 
-class PropertyCategory(models.Model):
+class PropertyCategory(TranslatableModel):
     """
     Property category model.
     For example for display, memory, battery ect.
     """
-
-    name = models.CharField(max_length=100, verbose_name=_('Name'))
+    translations = TranslatedFields(
+        name=models.CharField(max_length=100, verbose_name=_('Name'), default='')
+    )
     product_categories = models.ManyToManyField(Category, verbose_name=_('Products Categories'))
 
     def __str__(self):
@@ -272,14 +273,14 @@ class Property(TranslatableModel):
     ], key=lambda x: x[0]))
 
     translations = TranslatedFields(
-        name=models.CharField(max_length=50, choices=property_names, default='', verbose_name=_('Property name'))
+        name=models.CharField(max_length=50, choices=property_names, default='', verbose_name=_('Property name')),
+        text_value=models.CharField(max_length=255, blank=True, verbose_name=_('Text value')),
+        units=models.CharField(max_length=10, blank=True, verbose_name=_('Units')),
+        detail_description=models.TextField(max_length=600, blank=True, verbose_name=_('Detail description')),
     )
 
-    text_value = models.CharField(max_length=255, blank=True, verbose_name=_('Text value'))
     numeric_value = models.DecimalField(max_digits=6, decimal_places=2, blank=True, default='0.00',
                                         verbose_name=_('Numeric value'))
-    units = models.CharField(max_length=10, blank=True, verbose_name=_('Units'))
-    detail_description = models.TextField(max_length=600, blank=True, verbose_name=_('Detail description'))
     category_property = models.ForeignKey(PropertyCategory,
                                           related_name='category_properties',
                                           on_delete=models.CASCADE,

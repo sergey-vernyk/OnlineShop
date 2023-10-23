@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import mark_safe
 from django.utils.translation import gettext_lazy as _
 from django_summernote.admin import SummernoteModelAdmin
-from parler.admin import TranslatableAdmin
+from parler.admin import TranslatableAdmin, TranslatableInlineModelAdmin
 
 from goods.models import (
     Product,
@@ -17,10 +17,10 @@ from goods.models import (
 
 class CommentInline(admin.StackedInline):
     """
-    Comments under each product in detail product info
+    Comments under each product in detail product info.
     """
     model = Comment
-    extra = 2
+    extra = 0
     readonly_fields = ['user_name', 'user_email', 'created', 'updated']
     fieldsets = (
         ('Comment', {
@@ -45,18 +45,18 @@ class PropertyAdmin(TranslatableAdmin, SummernoteModelAdmin):
 
 
 @admin.register(PropertyCategory)
-class PropertyCategoryAdmin(admin.ModelAdmin):
+class PropertyCategoryAdmin(TranslatableAdmin, admin.ModelAdmin):
     """
-    Product category
+    Product category.
     """
-    list_display = ['name']
+    list_display = ['id', 'name']
     filter_horizontal = ('product_categories',)
     list_filter = ['product_categories']
 
 
-class PropertyInline(admin.StackedInline):
+class PropertyInline(TranslatableInlineModelAdmin, admin.StackedInline):
     """
-    Product properties under each product in detail product info
+    Product properties under each product in detail product info.
     """
     model = Property
     extra = 0
