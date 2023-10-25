@@ -332,9 +332,9 @@ input[type="text"], input[type="email"], textarea {
 .empty-customer-content {
     font-size: 1.2rem;
     display: block;
-    position: absolute;
-    top: 50%;
-    left: 21%;
+    text-align: center;
+    position: relative;
+    top: 5rem;
 }
 
 /*Favorite goods*/
@@ -828,6 +828,8 @@ input[type="text"], input[type="email"], textarea {
 .block-set-pass .invalid-link {
     font-family: 'Merriweather', serif;
     text-indent: 20px;
+    text-align: justify;
+    text-justify: inter-word;
 }
 
 .change-pass-btn {

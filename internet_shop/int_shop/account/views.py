@@ -49,7 +49,7 @@ class LoginUserView(LoginView):
         if form.cleaned_data.get('remember'):
             self.request.session.set_expiry(0)
         else:
-            self.request.session.set_expiry(1200)  # otherwise log out in 20 minutes
+            self.request.session.set_expiry(3600)  # otherwise log out in 1 hour
         self.request.session.modified = True
         return super().form_valid(form)
 

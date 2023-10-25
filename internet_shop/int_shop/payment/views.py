@@ -129,6 +129,10 @@ def payment_success(request):
 
     amount_total = (Decimal(session.amount_total or session.amount_subtotal) / Decimal('100')).quantize(Decimal('0.01'))
 
+    # remove from session ids which does not needed anymore
+    del request.session['order_id']
+    del request.session['stripe_checkout_session_id']
+
     return render(request, 'payment/success.html', {'amount_total': amount_total,
                                                     'order_id': session.client_reference_id})
 

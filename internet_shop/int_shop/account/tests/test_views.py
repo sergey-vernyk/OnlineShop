@@ -393,7 +393,7 @@ class TestAccountViews(TestCase):
 
         login_data.update(remember=False)  # "toggle" checkbox "Remember me?"
         response = self.client.post(reverse('login'), data=login_data)
-        self.assertEqual(response.wsgi_request.session.get_expiry_age(), 1200)  # session lifetime is 20 minutes
+        self.assertEqual(response.wsgi_request.session.get_expiry_age(), 3600)  # session lifetime is 1 hour
         self.assertRedirects(response, reverse('goods:product_list'))
 
     def test_display_massage_after_send_email_for_password_reset(self):

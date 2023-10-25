@@ -3,7 +3,7 @@
 
 <div class="personal-info">
   <h3>Watched products</h3>
-  <div class="d-flex" style="flex-wrap: wrap;">
+  <div class="d-flex flex-wrap">
     {% for product in watched_products %}
       <div class="product-card-watched">
         <div class="image-product-watched">
@@ -18,7 +18,7 @@
         {% if product.promotional %}
           <div class="promo-prod-pic-watched">
             Promo
-        </div>
+          </div>
         {% endif %}
         <div class="prod-name-watched">
           <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
@@ -50,10 +50,11 @@
           {% endif %}
         </div>
       </div>
-    {% empty %}
-      <div class="empty-customer-content">
-          <h4>You haven't watched products yet</h4>
-      </div>
     {% endfor %}
   </div>
+  {% if not watched_products %} 
+    <div class="empty-customer-content">
+      <h4 class="d-inline">You haven't watched products yet</h4>
+    </div>
+  {% endif %}
 </div>
