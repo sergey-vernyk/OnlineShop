@@ -1,0 +1,622 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-10-24 20:55+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != "
+"11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % "
+"100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || "
+"(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
+
+#: goods/admin.py:91 goods/models.py:55
+msgid "Image"
+msgstr "Зображення"
+
+#: goods/forms.py:30 goods/forms.py:45
+msgid "This field must not be empty"
+msgstr "Поле має бути заповнене"
+
+#: goods/forms.py:36
+msgid "Your name"
+msgstr "Ваше ім'я"
+
+#: goods/forms.py:41
+msgid "Type your review..."
+msgstr "Напишіть свій відгук..."
+
+#: goods/forms.py:77
+msgid "Price: Default"
+msgstr "Ціна: За замовчуванням"
+
+#: goods/forms.py:78
+msgid "Price: Low To High"
+msgstr "Ціна: Від мін. до макс."
+
+#: goods/forms.py:79
+msgid "Price: High To Low"
+msgstr "Ціна: Від макс. до мін."
+
+#: goods/forms.py:87
+msgid "What find?"
+msgstr "Що знайти?"
+
+#: goods/models.py:46 goods/models.py:133 goods/models.py:155
+#: goods/models.py:175 goods/models.py:210
+msgid "Name"
+msgstr "Ім'я"
+
+#: goods/models.py:47 goods/models.py:134 goods/models.py:156
+msgid "Slug"
+msgstr "Слаг"
+
+#: goods/models.py:52 goods/models.py:163 goods/models.py:248
+msgid "Manufacturer"
+msgstr "Виробник"
+
+#: goods/models.py:53 goods/templates/filters_menu.html:13
+msgid "Price"
+msgstr "Ціна"
+
+#: goods/models.py:54 goods/models.py:157
+msgid "Description"
+msgstr "Детальний опис"
+
+#: goods/models.py:56
+msgid "Available"
+msgstr "Доступність"
+
+#: goods/models.py:57
+msgid "Promotional"
+msgstr "Акційний товар"
+
+#: goods/models.py:61
+msgid "Promotional price"
+msgstr "Акційна ціна"
+
+#: goods/models.py:62 goods/models.py:119 goods/models.py:193
+msgid "Created date"
+msgstr "Дата створення"
+
+#: goods/models.py:63 goods/models.py:194
+msgid "Updated date"
+msgstr "Дата оновлення"
+
+#: goods/models.py:67 goods/models.py:146
+msgid "Category"
+msgstr "Категорія"
+
+#: goods/models.py:72
+msgid "Rating"
+msgstr "Рейтинг"
+
+#: goods/models.py:105 goods/models.py:114 goods/models.py:174
+#: goods/models.py:293
+msgid "Product"
+msgstr "Товар"
+
+#: goods/models.py:106
+msgid "Products"
+msgstr "Товари"
+
+#: goods/models.py:118 goods/models.py:181
+msgid "Profile"
+msgstr "Профіль"
+
+#: goods/models.py:125 goods/templates/goods/product/detail.html:63
+msgid "Favorite"
+msgstr "Обране"
+
+#: goods/models.py:126
+msgid "Favorites"
+msgstr "Обрані"
+
+#: goods/models.py:147 goods/templates/base.html:36
+msgid "Categories"
+msgstr "Категорії"
+
+#: goods/models.py:164
+msgid "Manufacturers"
+msgstr "Виробники"
+
+#: goods/models.py:176
+msgid "Email"
+msgstr "Ел. пошта"
+
+#: goods/models.py:182 goods/models.py:200
+msgid "Comment"
+msgstr "Коментар"
+
+#: goods/models.py:187
+msgid "Profile's likes"
+msgstr "Лайки профіля"
+
+#: goods/models.py:192
+msgid "Profile's dislikes"
+msgstr "Дізлайки профіля"
+
+#: goods/models.py:201 goods/templates/goods/product/detail.html:21
+#: goods/templates/goods/product/detail.html:150
+msgid "Comments"
+msgstr "Коментарі"
+
+#: goods/models.py:212
+msgid "Products Categories"
+msgstr "Категорії товарів"
+
+#: goods/models.py:218
+msgid "Property Category"
+msgstr "Категорія властивості"
+
+#: goods/models.py:219
+msgid "Property Categories"
+msgstr "Категорії властивості"
+
+#: goods/models.py:228
+msgid "Colors"
+msgstr "Кольори"
+
+#: goods/models.py:228 goods/property_filters.py:13
+#: goods/property_filters.py:24 goods/property_filters.py:46
+msgid "Diagonal"
+msgstr "Діагональ"
+
+#: goods/models.py:228
+msgid "Pixel Density"
+msgstr "Щільність пікселів"
+
+#: goods/models.py:229 goods/property_filters.py:13
+#: goods/property_filters.py:24 goods/property_filters.py:29
+#: goods/property_filters.py:46
+msgid "Type"
+msgstr "Тип"
+
+#: goods/models.py:229 goods/property_filters.py:13
+#: goods/property_filters.py:24 goods/property_filters.py:26
+#: goods/property_filters.py:40 goods/property_filters.py:41
+#: goods/property_filters.py:46 goods/property_filters.py:47
+msgid "Resolution"
+msgstr "Роздільна здатність"
+
+#: goods/models.py:229
+msgid "Brightness"
+msgstr "Яскравість"
+
+#: goods/models.py:230
+msgid "Sweep frequency"
+msgstr "Частота оновлення"
+
+#: goods/models.py:232
+msgid "#Cores"
+msgstr "Кількість ядер"
+
+#: goods/models.py:232
+msgid "Frequency"
+msgstr "Частота"
+
+#: goods/models.py:232 goods/property_filters.py:25
+#: goods/property_filters.py:33
+msgid "Model"
+msgstr "Модель"
+
+#: goods/models.py:233
+msgid "Threads"
+msgstr "Потоки"
+
+#: goods/models.py:235 goods/property_filters.py:15
+msgid "Front"
+msgstr "Передня"
+
+#: goods/models.py:236 goods/property_filters.py:15
+msgid "Main"
+msgstr "Головна"
+
+#: goods/models.py:238
+msgid "Positioning"
+msgstr "Позиціонування"
+
+#: goods/models.py:238
+msgid "Radio"
+msgstr "Радіо"
+
+#: goods/models.py:239
+msgid "Speed"
+msgstr "Швидкість"
+
+#: goods/models.py:240
+msgid "Audio Port"
+msgstr "Аудіо порт"
+
+#: goods/models.py:242 goods/property_filters.py:17
+msgid "Capacity"
+msgstr "Ємність"
+
+#: goods/models.py:242 goods/property_filters.py:38
+msgid "Charging"
+msgstr "Заряджання"
+
+#: goods/models.py:242
+msgid "Quick Charge"
+msgstr "Швидка зарядка"
+
+#: goods/models.py:243
+msgid "#Cells"
+msgstr "Кількість комірок"
+
+#: goods/models.py:243 goods/property_filters.py:38
+msgid "Work Time"
+msgstr "Час роботи"
+
+#: goods/models.py:243 goods/property_filters.py:49
+msgid "Charging Port"
+msgstr "Порт зарядки"
+
+#: goods/models.py:245 goods/property_filters.py:32
+#: goods/property_filters.py:51
+msgid "Color"
+msgstr "Колір"
+
+#: goods/models.py:245
+msgid "Dimensions"
+msgstr "Розміри"
+
+#: goods/models.py:245 goods/property_filters.py:32
+#: goods/property_filters.py:51
+msgid "Material"
+msgstr "Матеріал"
+
+#: goods/models.py:246
+msgid "Weight"
+msgstr "Вага"
+
+#: goods/models.py:246
+msgid "Opening Angle"
+msgstr "Кут відкриття"
+
+#: goods/models.py:248 goods/property_filters.py:39
+msgid "Power"
+msgstr "Потужність"
+
+#: goods/models.py:248
+msgid "Frequency Range"
+msgstr "Діапзон частот"
+
+#: goods/models.py:249
+msgid "Interfaces"
+msgstr "Інтерфейси"
+
+#: goods/models.py:249 goods/property_filters.py:39
+msgid "Inputs"
+msgstr "Входи"
+
+#: goods/models.py:249
+msgid "Supply Types"
+msgstr "Типи живлення"
+
+#: goods/models.py:250
+msgid "Connections"
+msgstr "З'єднання"
+
+#: goods/models.py:250 goods/property_filters.py:39
+msgid "Channels"
+msgstr "Канали"
+
+#: goods/models.py:252 goods/property_filters.py:18
+#: goods/property_filters.py:20 goods/property_filters.py:29
+#: goods/property_filters.py:31 goods/property_filters.py:33
+#: goods/property_filters.py:50
+msgid "Volume"
+msgstr "Об'єм"
+
+#: goods/models.py:253
+msgid "#Slots"
+msgstr "Кількість слотів"
+
+#: goods/models.py:255
+msgid "Firmware"
+msgstr "Прошивка"
+
+#: goods/models.py:257 goods/property_filters.py:33
+#: goods/property_filters.py:42
+msgid "Form Factor"
+msgstr "Форм фактор"
+
+#: goods/models.py:259 goods/property_filters.py:41
+msgid "Image sensor"
+msgstr "Сенсор зображення"
+
+#: goods/models.py:261
+msgid "Card slot"
+msgstr "Слот карти пам'яті"
+
+#: goods/models.py:263
+msgid "Sensors"
+msgstr "Сенсори"
+
+#: goods/models.py:264
+msgid "Keyboard Lightening"
+msgstr "Підсвітка клавіатури"
+
+#: goods/models.py:265
+msgid "Additional Features"
+msgstr "Додаткові можливості"
+
+#: goods/models.py:267 goods/property_filters.py:19
+#: goods/property_filters.py:30
+msgid "OS"
+msgstr "Операційна система"
+
+#: goods/models.py:268
+msgid "User interface"
+msgstr "Інтерфейс користувача"
+
+#: goods/models.py:269
+msgid "Version"
+msgstr "Версія"
+
+#: goods/models.py:271
+msgid "Packaging"
+msgstr "Комплект"
+
+#: goods/models.py:276
+msgid "Property name"
+msgstr "Назва властивості"
+
+#: goods/models.py:277
+msgid "Text value"
+msgstr "Текстове значення"
+
+#: goods/models.py:278
+msgid "Units"
+msgstr "Одиниці виміру"
+
+#: goods/models.py:279
+msgid "Detail description"
+msgstr "Детальний опис"
+
+#: goods/models.py:283
+msgid "Numeric value"
+msgstr "Числове значення"
+
+#: goods/models.py:288
+msgid "Category property"
+msgstr "Категорія властивості"
+
+#: goods/models.py:296
+msgid "Property"
+msgstr "Властивість"
+
+#: goods/models.py:297 goods/templates/filters_menu.html:46
+msgid "Properties"
+msgstr "Властивості"
+
+#: goods/property_filters.py:14 goods/property_filters.py:25
+msgid "Cores"
+msgstr "Кількість ядер"
+
+#: goods/property_filters.py:28 goods/property_filters.py:49
+msgid "Work time"
+msgstr "Час роботи"
+
+#: goods/templates/base.html:41 goods/templates/products_navs.html:10
+msgid "All"
+msgstr "Всі"
+
+#: goods/templates/base.html:49 goods/templates/base.html:194
+#: goods/templates/goods/product/navs_categories_list.html:20
+msgid "Mobile phones"
+msgstr "Мобільні телефони"
+
+#: goods/templates/base.html:54 goods/templates/base.html:199
+#: goods/templates/goods/product/navs_categories_list.html:22
+msgid "Laptops"
+msgstr "Ноутбуки"
+
+#: goods/templates/base.html:59 goods/templates/base.html:204
+#: goods/templates/goods/product/navs_categories_list.html:24
+msgid "Smart Gadgets"
+msgstr "Смарт гаджети"
+
+#: goods/templates/base.html:64 goods/templates/base.html:209
+#: goods/templates/goods/product/navs_categories_list.html:26
+msgid "Audio Video"
+msgstr "Аудіо відео"
+
+#: goods/templates/base.html:72
+msgid "Delivery"
+msgstr "Доставка"
+
+#: goods/templates/base.html:75
+msgid "Contacts"
+msgstr "Контакти"
+
+#: goods/templates/base.html:84
+msgid "Search"
+msgstr "Пошук"
+
+#: goods/templates/base.html:98
+msgid "Sign in"
+msgstr "Увійти"
+
+#: goods/templates/base.html:101
+msgid "Register"
+msgstr "Реєстрація"
+
+#: goods/templates/base.html:137
+msgid "We are in messengers"
+msgstr "Ми в месенджерах"
+
+#: goods/templates/base.html:163
+msgid "Phones"
+msgstr "Телефони"
+
+#: goods/templates/base.html:186
+msgid "Shop categories"
+msgstr "Категорії товарів"
+
+#: goods/templates/base.html:218
+msgid "Emails"
+msgstr "Електронна пошта"
+
+#: goods/templates/base.html:232
+msgid "©2023 Online Shop. All rights reserved. Used only for development."
+msgstr ""
+"©2023 Online Shop. Всі права захищені. Використовується тільки для розробки."
+
+#: goods/templates/filters_menu.html:8
+msgid "Filters"
+msgstr "Фільтри"
+
+#: goods/templates/filters_menu.html:32
+msgid "Brand"
+msgstr "Бренд"
+
+#: goods/templates/filters_menu.html:55
+msgid "Apply"
+msgstr "Застосувати"
+
+#: goods/templates/filters_menu.html:59
+msgid "Reset"
+msgstr "Скинути"
+
+#: goods/templates/goods/product/card.html:20
+#: goods/templates/goods/product/detail.html:105
+msgid "Promo"
+msgstr "Акція"
+
+#: goods/templates/goods/product/detail.html:18
+#: goods/templates/goods/product/detail.html:123
+msgid "Specifications"
+msgstr "Характеристики"
+
+#: goods/templates/goods/product/detail.html:24
+#: goods/templates/goods/product/detail.html:256
+msgid "Additional information"
+msgstr "Додаткова інформація"
+
+#: goods/templates/goods/product/detail.html:156
+#, python-format
+msgid ""
+"\n"
+"                            Comments ( %(total_comments)s )\n"
+"                        "
+msgstr ""
+"\n"
+"Коментарі ( %(total_comments)s )"
+
+#: goods/templates/goods/product/detail.html:194
+msgid "Show all comments"
+msgstr "Показати всі коментарі"
+
+#: goods/templates/goods/product/detail.html:197
+#, python-format
+msgid ""
+"\n"
+"                                        Hide %(total)s comment\n"
+"                                    "
+msgid_plural ""
+"\n"
+"                                        Hide %(total)s comments\n"
+"                                    "
+msgstr[0] ""
+"\n"
+"Приховати %(total)s коментар"
+msgstr[1] ""
+"\n"
+"Приховати %(total)s коментарі"
+msgstr[2] ""
+"\n"
+"Приховати %(total)s коментарі"
+msgstr[3] ""
+"\n"
+"Приховати %(total)s коментарі"
+msgstr[4] ""
+"\n"
+"Приховати %(total)s коментарів"
+msgstr[5] ""
+"\n"
+"Приховати %(total)s коментарів"
+
+#: goods/templates/goods/product/detail.html:209
+msgid "New comment"
+msgstr "Новий коментар"
+
+#: goods/templates/goods/product/detail.html:233
+msgid "All letters in lower case. For update the captcha click on the image"
+msgstr ""
+"Всі літери в нижньому регістрі. Для оновлення капчі клікніть по зображенню"
+
+#: goods/templates/goods/product/detail.html:251
+msgid "Send comment"
+msgstr "Відправити коментар"
+
+#: goods/templates/goods/product/list.html:13
+msgid "Online Shop products"
+msgstr "Товари онлайн магазину"
+
+#: goods/templates/goods/product/list.html:34
+#, python-format
+msgid ""
+"\n"
+"                                        There are no results for your query "
+"<b>\"%(query)s\"</b>...\n"
+"                                    "
+msgstr ""
+"\n"
+"За переданим запитом <b>\"%(query)s\"</b> нічого не знайдено..."
+
+#: goods/templates/goods/product/list.html:41
+msgid "There are no results by passed filter parameters..."
+msgstr "За переданим запитом нічого не знайдено..."
+
+#: goods/templates/goods/product/navs_categories_list.html:18
+msgid "in category"
+msgstr "в категорії"
+
+#: goods/templates/goods/product/navs_categories_list.html:36
+msgid "Go to main"
+msgstr "На головну"
+
+#: goods/templates/goods/product/navs_categories_list.html:49
+msgid "There are no products in the section"
+msgstr "В даному розділі немає товарів"
+
+#: goods/templates/products_navs.html:17
+msgid "Filter"
+msgstr "Фільтр"
+
+#: goods/templates/products_navs.html:25
+msgid "Popular"
+msgstr "Популярні"
+
+#: goods/templates/products_navs.html:32
+msgid "New"
+msgstr "Нові"
+
+#: goods/templates/products_navs.html:39
+msgid "Promotion"
+msgstr "Акційні"
+
+#: goods/views.py:443
+msgid "promotion"
+msgstr "Акційні"
+
+#: goods/views.py:470
+msgid "new"
+msgstr "Нові"
+
+#: goods/views.py:507
+msgid "popular"
+msgstr "Популярні"

@@ -7,7 +7,7 @@ from django.contrib.auth.views import (
     LoginView,
     PasswordChangeView,
     PasswordResetView,
-    PasswordResetConfirmView
+    PasswordResetConfirmView,
 )
 from django.contrib.messages.views import messages
 from django.core.exceptions import ObjectDoesNotExist
@@ -17,6 +17,7 @@ from django.urls import reverse_lazy
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from django.utils.safestring import mark_safe
+from django.utils.translation import gettext_lazy as _, activate
 from django.views.generic import CreateView, DetailView
 
 from account.models import Profile
@@ -30,7 +31,7 @@ from .forms import (
     UserPasswordChangeForm,
     RegisterUserForm,
     ForgotPasswordForm,
-    SetNewPasswordForm
+    SetNewPasswordForm,
 )
 from .tasks import activate_account
 from .tokens import activation_account_token
@@ -41,6 +42,7 @@ class LoginUserView(LoginView):
     """
     Class for login user to the system
     """
+
     form_class = LoginForm
 
     def form_valid(self, form):
@@ -58,6 +60,7 @@ class UserPasswordChangeView(PasswordChangeView):
     """
     Changing user account password view
     """
+
     form_class = UserPasswordChangeForm
 
 
@@ -65,6 +68,7 @@ class UserRegisterView(CreateView):
     """
     Registration user in the system view
     """
+
     form_class = RegisterUserForm
     template_name = 'registration/user_register_form.html'
     success_url = reverse_lazy('login')
@@ -99,7 +103,15 @@ class UserRegisterView(CreateView):
             domain = request.site.domain
             is_secure = request.is_secure()
             # passing sending email task to celery
-            activate_account.delay({'domain': domain, 'is_secure': is_secure}, new_user.pk, new_user.email)
+            activate_account.delay(
+                {
+                    'domain': domain,
+                    'is_secure': is_secure,
+                    'language': request.LANGUAGE_CODE
+                },
+                new_user.pk,
+                new_user.email
+            )
             # creating profile with additional fields
             profile = Profile.objects.create(user=new_user,
                                              date_of_birth=date_of_birth,
@@ -108,19 +120,19 @@ class UserRegisterView(CreateView):
                                              about=about_info,
                                              gender=form.cleaned_data.get('gender'))
             Favorite.objects.create(profile=profile)  # creating favorite instance for profile
-            messages.success(request, 'Please, check your email! '
-                                      'You have to receive email with instruction for activate account')
+            messages.success(request, _('Please, check your email! '
+                                        'You have to receive email with instruction for activate account'))
             # delete captcha text, when user has complete registration
             redis.hdel(f'captcha:{form.cleaned_data.get("captcha")}', 'captcha_text')
             return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
+
+        return self.form_invalid(form)
 
 
 def activate_user_account(request, uidb64, token):
     """
     Activation registered user account after sending to user
-    email with activation link
+    email with activation link.
     """
     try:
         # decoding user id from uidb64
@@ -136,10 +148,10 @@ def activate_user_account(request, uidb64, token):
         profile = Profile.objects.get(user=user)
         profile.email_confirm = True
         profile.save(update_fields=['email_confirm'])
-        messages.success(request, 'Thank you for your email confirmation. Now you can login your account')
+        messages.success(request, _('Thank you for your email confirmation. Now you can login your account'))
         return redirect('login')
     else:
-        messages.error(request, 'Activation link is invalid!')
+        messages.error(request, _('Activation link is invalid!'))
         return redirect('goods:product_list')
 
 
@@ -148,6 +160,7 @@ class DetailUserView(DetailView):
     Detail information about user: his/her orders, personal info,
     favorite list etc.
     """
+
     model = Profile
     context_object_name = 'customer'
     template_name = 'account/user/detail.html'
@@ -206,6 +219,11 @@ class DetailUserView(DetailView):
 
 
 def save_social_user_to_profile(backend, user, response, *args, **kwargs):
+    """
+    Save a user who logs in through a social platform as a `profile` instance.
+    This function is used to store user information when they log in using their social media accounts.
+    The user's data will be saved as a `profile` instance in the system.
+    """
     if backend.name == 'facebook':
         # if profile wasn't be created
         if kwargs.get('is_new'):
@@ -266,20 +284,24 @@ def save_social_user_to_profile(backend, user, response, *args, **kwargs):
 
 class ForgotPasswordView(PasswordResetView):
     """
-    View for sending email needed for reset forgotten password from account
+    View for sending email needed for reset forgotten password from account.
     """
 
     form_class = ForgotPasswordForm
     template_name = 'registration/password_reset_form.html'
     success_url = reverse_lazy('password_reset')
     html_email_template_name = 'registration/password_reset_email_html.html'
-    message = ("We've emailed you instructions for setting your password. "
-               "If you don't receive an email, please make sure you've entered the address you registered with")
+    message = _("We've emailed you instructions for setting your password. "
+                "If you don't receive an email, please make sure you've entered the address you registered with")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
         context['captcha_image'] = create_captcha_image(self.request, width=135, font_size=30)
         return context
+
+    def dispatch(self, request, *args, **kwargs):
+        activate(request.LANGUAGE_CODE)  # activate current language for send email in current language
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         if form.is_valid():
@@ -295,4 +317,5 @@ class SetNewPasswordView(PasswordResetConfirmView):
     """
     View for set new password after reset
     """
+
     form_class = SetNewPasswordForm

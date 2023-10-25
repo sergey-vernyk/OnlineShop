@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Log-In | OnlineShop{% endblock %}
+{% block title %}{% translate 'Log-In' %} | OnlineShop{% endblock %}
 {% block styles %}
     <link href="https://fonts.googleapis.com/css2?family=Bitter:ital@1&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
@@ -26,7 +27,7 @@
             {% endfor %}
         {% endif %}
         <div class="login-form">
-            <h3 class="text-center pb-2 border-bottom" style="font-family: 'Merriweather', serif;">Log-in</h3>
+            <h3 class="text-center pb-2 border-bottom" style="font-family: 'Merriweather', serif;">{% translate 'Log-in' %}</h3>
             <div class="row">
                 <div class="simple-auth">
                     <form action="{% url 'login' %}" method="post">
@@ -38,7 +39,7 @@
                                         {% if field.field.required %}<span class="required-field">*</span>{% endif %}
                                 </label>
                                 {{ field }}
-                                {% if field.label == 'Password' %}
+                                {% if field.field.widget.input_type == 'password' %}
                                     <span class="material-symbols-outlined">visibility_off</span>
                                 {% endif %}
                                 <ul class="errorlist">
@@ -52,13 +53,13 @@
                         {% endfor %}
                         <div class="login-buttons">
                             <div class="addit-links">
-                                <a class="forgot-pass-link" href="{% url 'password_reset' %}">Forgot password?</a>
-                                <a class="reg-link" href="{% url 'register_user' %}">Not registered?</a>
+                                <a class="forgot-pass-link" href="{% url 'password_reset' %}">{% translate 'Forgot password?' %}</a>
+                                <a class="reg-link" href="{% url 'register_user' %}">{% translate 'Not registered?' %}</a>
                             </div>
                             <input type="hidden" name="next" value="{{ next }}"/>
                             <button type="submit" class="log-button">
                                 <span class="material-symbols-outlined">login</span>
-                                Sign in
+                                {% translate 'Sign in' %}
                             </button>
                         </div>
                     </form>
@@ -66,7 +67,7 @@
                 <!--social login-->
                 <div class="social">
                     <h4 style="font-family: 'Oswald', sans-serif; font-weight: 700; margin-bottom: 1.2rem;">
-                        Social login
+                        {% translate 'Social login' %}
                     </h4>
                     <ul>
                         <li class="facebook">

@@ -1,5 +1,7 @@
+{% load i18n %}
+
 <div class="personal-info">
-  <h3>Comments</h3>
+  <h3>{% translate 'Comments' %}</h3>
   {% for comment in comments %}
     <span class="comment-id-profile">№ {{ comment.pk }}</span>
     <div class="d-block border rounded mb-3">
@@ -10,7 +12,7 @@
         </div>
         {% if comment.updated == comment.created %}
           <div class="d-inline">
-            Updated: <span class="date date-comment-profile">{{ comment.updated|date:"d.m.Y l" }}</span>
+            {% translate 'Updated:'% } <span class="date date-comment-profile">{{ comment.updated|date:"d.m.Y l" }}</span>
           </div>
         {% endif %}
         <div class="product-name-profile">
@@ -30,7 +32,7 @@
           {% endif %}
 
           <span id="likes-count-{{ comment.pk }}">({{ comment.profiles_likes.count }})</span>
-          <!-- если комментарию был установлен dislike текущим пользователем profile -->
+          <!-- if comment have got dislike by current profile -->
           {% if customer in comment.profiles_unlikes.all %}
             <span class="material-symbols-outlined filled" id="unlike-{{ comment.pk }}">thumb_down</span>
           {% else %}
@@ -43,7 +45,7 @@
     </div>
   {% empty %}
     <div class="empty-customer-content">
-          <h4>You are not left comments yet</h4>
+          <h4>{% translate 'You have not left comments yet' %}</h4>
     </div>
   {% endfor %}
 </div>

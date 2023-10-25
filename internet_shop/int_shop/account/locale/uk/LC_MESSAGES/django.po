@@ -1,0 +1,623 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-10-25 14:20+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != "
+"11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % "
+"100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || "
+"(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
+
+#: admin.py:67
+msgid "Likes"
+msgstr "Лайки"
+
+#: admin.py:74
+msgid "Unlikes"
+msgstr "Дізлайки"
+
+#: admin.py:95
+msgid "Username"
+msgstr "Ім'я Прізвище"
+
+#: admin.py:102 forms.py:130 models.py:29
+msgid "Photo"
+msgstr "Фото"
+
+#: forms.py:23
+msgid ""
+"Your password must contain at least 8 characters and can not be entirely "
+"numeric."
+msgstr ""
+"Пароль має містити щонайменше 8 символів і не складатись повністю із цифр"
+
+#: forms.py:24
+msgid "Enter the same password as before, for verification."
+msgstr "Введіть такий самий пароль як і попередній для перевірки"
+
+#: forms.py:32
+msgid "Username or Email"
+msgstr "Username чи Email"
+
+#: forms.py:34 forms.py:113
+msgid "Password"
+msgstr "Пароль"
+
+#: forms.py:36
+msgid "Remember?"
+msgstr "Запам'ятати?"
+
+#: forms.py:54
+msgid "User with this email doesn't active"
+msgstr "Користувас з цим email не активний"
+
+#: forms.py:57
+msgid "User with this email doesn't exists"
+msgstr "Користувача з цим email не існує"
+
+#: forms.py:61
+msgid "User with this username doesn't exist"
+msgstr "Користувача з цим username не існує"
+
+#: forms.py:64
+msgid "User with this username doesn't active"
+msgstr "Користувача з цим username не активний"
+
+#: forms.py:82
+msgid "Username or Email with the input password are mismatch"
+msgstr "Username чи Email з введеним паролем не співпадають"
+
+#: forms.py:92
+msgid "Old password"
+msgstr "Старий пароль"
+
+#: forms.py:95
+msgid "If you have forgotten old password, click \"Forgot password?\" below."
+msgstr "Якщо ви забули старий пароль, натисніть \"Забули пароль?\" нижче."
+
+#: forms.py:98
+msgid "New Password"
+msgstr "Новий пароль"
+
+#: forms.py:100
+msgid "New password confirmation"
+msgstr "Підтвердження нового пароля"
+
+#: forms.py:110
+msgid "Phone"
+msgstr "Номер телефону"
+
+#: forms.py:112
+msgid "+country code ..."
+msgstr "+код країни ..."
+
+#: forms.py:116
+msgid "Confirm password"
+msgstr "Підтвердити пароль"
+
+#: forms.py:120
+msgid "First name"
+msgstr "Ім'я"
+
+#: forms.py:122
+msgid "Last name"
+msgstr "Прізвище"
+
+#: forms.py:123
+msgid "Date of birth"
+msgstr "Дата нарождення"
+
+#: forms.py:125 models.py:28 templates/account/user/personal_info.html:33
+msgid "About"
+msgstr "Про мене"
+
+#: forms.py:128 models.py:27 templates/account/user/personal_info.html:11
+msgid "Gender"
+msgstr "Стать"
+
+#: forms.py:140
+msgid "Incorrect date"
+msgstr "Некорректна дата"
+
+#: forms.py:151
+msgid "Username is already exist"
+msgstr "Username вже існує"
+
+#: forms.py:163
+msgid "Email is already register"
+msgstr "Email вже зараєестрований"
+
+#: forms.py:173
+msgid "This field must not be empty"
+msgstr "Поле має бути заповнене"
+
+#: forms.py:180
+msgid "Invalid phone number"
+msgstr "не корректний номер телефону телефону"
+
+#: forms.py:217
+msgid "Current email does not registered or user not active"
+msgstr "Поточний email не зараєстрований або користувач не активний"
+
+#: forms.py:228
+msgid "New password"
+msgstr "Новий пароль"
+
+#: forms.py:233
+msgid "Confirm new password"
+msgstr "Підтвердити новий пароль"
+
+#: forms.py:238
+msgid "The two password fields did not match."
+msgstr "Два паролі не співпадають."
+
+#: models.py:21 templates/account/user/personal_info.html:14
+msgid "Male"
+msgstr "Чоловіча"
+
+#: models.py:22 templates/account/user/personal_info.html:16
+msgid "Female"
+msgstr "Жіноча"
+
+#: models.py:25
+msgid "User"
+msgstr "Користувач"
+
+#: models.py:26
+msgid "Birth date"
+msgstr "Дата народження"
+
+#: models.py:30 templates/account/user/personal_info.html:25
+msgid "Phone number"
+msgstr "Номер телефону"
+
+#: models.py:31
+msgid "Created"
+msgstr "Створено"
+
+#: models.py:32
+msgid "Email confirm"
+msgstr "Підтвердження ел. адреси"
+
+#: models.py:33 templates/account/user/coupons_info.html:4
+#: templates/account/user/detail.html:92
+msgid "Coupons"
+msgstr "Купони"
+
+#: models.py:44
+msgid "Profile"
+msgstr "Профіль"
+
+#: models.py:45
+msgid "Profiles"
+msgstr "Профілі"
+
+#: tasks.py:20
+msgid "Activate your account"
+msgstr "Активація акаунту"
+
+#: templates/account/emails/order_created_email.html:71
+msgid "Order has been confirmed"
+msgstr "Замовлення підтверджене"
+
+#: templates/account/emails/order_created_email.html:74
+msgid "Thanks for your order! Your order ID is"
+msgstr "Дякуємо за ваше замовлення! Вам номер замовлення"
+
+#: templates/account/emails/order_created_email.html:75
+#: templates/account/emails/order_paid_email.html:75
+msgid "Order amount is"
+msgstr "Сумма замовлення"
+
+#: templates/account/emails/order_created_email.html:76
+msgid "Our manager contact you within 10 minutes."
+msgstr "Наш менеджер зв'яжеться з вами протягом 10 хвилин."
+
+#: templates/account/emails/order_created_email.html:79
+msgid "You can see your orders follow the"
+msgstr "Ви можете подивитись свої замовлення за"
+
+#: templates/account/emails/order_created_email.html:79
+msgid "link."
+msgstr "посиланням."
+
+#: templates/account/emails/order_paid_email.html:71
+msgid "Order has been paid"
+msgstr "Замовлення було оплачене"
+
+#: templates/account/emails/order_paid_email.html:74
+msgid "Thanks for your payment! Your order ID is"
+msgstr "Дякуємо за оплату! Вам номер замовлення"
+
+#: templates/account/user/comments_info.html:4
+#: templates/account/user/detail.html:46 templates/account/user/detail.html:100
+msgid "Comments"
+msgstr "Коментарі"
+
+#: templates/account/user/comments_info.html:48
+msgid "You have not left comments yet"
+msgstr "Ви ще не залишали комментарів"
+
+#: templates/account/user/coupons_info.html:17
+#: templates/account/user/present_cards_info.html:17
+msgid "Category"
+msgstr "Категорія"
+
+#: templates/account/user/coupons_info.html:21
+#: templates/account/user/present_cards_info.html:21
+msgid "Valid from"
+msgstr "Дійсний з"
+
+#: templates/account/user/coupons_info.html:25
+#: templates/account/user/present_cards_info.html:25
+msgid "Valid to"
+msgstr "Дійсний до"
+
+#: templates/account/user/coupons_info.html:29
+#: templates/account/user/orders_info.html:172
+msgid "Discount"
+msgstr "Знижка"
+
+#: templates/account/user/coupons_info.html:34
+#: templates/account/user/detail.html:38 templates/account/user/detail.html:84
+#: templates/account/user/orders_info.html:5
+msgid "Orders"
+msgstr "Замовлення"
+
+#: templates/account/user/coupons_info.html:40
+msgid "Go to order"
+msgstr "Перейти до замовлення"
+
+#: templates/account/user/coupons_info.html:45
+msgid "Your coupons will be here after purchases"
+msgstr "Ваші купони відображатимуться тут після покупок"
+
+#: templates/account/user/detail.html:5
+msgid "My account"
+msgstr "Мій акаунт"
+
+#: templates/account/user/detail.html:42 templates/account/user/detail.html:88
+msgid "Favorites"
+msgstr "Обрані"
+
+#: templates/account/user/detail.html:80
+msgid "Personal info"
+msgstr "Особиста інформація"
+
+#: templates/account/user/detail.html:96
+#: templates/account/user/present_cards_info.html:4
+msgid "Present cards"
+msgstr "Подарункові картки"
+
+#: templates/account/user/detail.html:104
+#: templates/account/user/watched_info.html:6
+msgid "Watched products"
+msgstr "Переглянуті товари"
+
+#: templates/account/user/detail.html:109
+msgid "Logout"
+msgstr "Вийти"
+
+#: templates/account/user/favorites_info.html:6
+msgid "Favorite products"
+msgstr "Обрані товари"
+
+#: templates/account/user/favorites_info.html:49
+msgid "There are no favorite products yet"
+msgstr "Ви ще не додали товари до обраного"
+
+#: templates/account/user/orders_info.html:22
+msgid "Done"
+msgstr "Виконано"
+
+#: templates/account/user/orders_info.html:24
+msgid "Not done"
+msgstr "Не виконано"
+
+#: templates/account/user/orders_info.html:74
+msgid "Add review"
+msgstr "Додати відгук"
+
+#: templates/account/user/orders_info.html:88
+msgid "Delivery"
+msgstr "Доставка"
+
+#: templates/account/user/orders_info.html:91
+msgid "Delivery date"
+msgstr "Дата доставки"
+
+#: templates/account/user/orders_info.html:99
+msgid "Delivery method"
+msgstr "Метод доставки"
+
+#: templates/account/user/orders_info.html:109
+msgid "Post office"
+msgstr "Номер відділення"
+
+#: templates/account/user/orders_info.html:120
+msgid "Delivery address"
+msgstr "Адреса доставки"
+
+#: templates/account/user/orders_info.html:129
+msgid "Recipient"
+msgstr "Отримувач"
+
+#: templates/account/user/orders_info.html:138
+msgid "Payment"
+msgstr "Оплата"
+
+#: templates/account/user/orders_info.html:141
+msgid "Pay method"
+msgstr "Метод оплати"
+
+#: templates/account/user/orders_info.html:151
+msgid "Coupon"
+msgstr "Купон"
+
+#: templates/account/user/orders_info.html:161
+msgid "Present card"
+msgstr "Подарункова картка"
+
+#: templates/account/user/orders_info.html:181
+msgid "Total"
+msgstr "Всього"
+
+#: templates/account/user/orders_info.html:198
+msgid "There are no orders yet"
+msgstr "Ви ще не робили замовлень"
+
+#: templates/account/user/orders_info.html:202
+#, python-format
+msgid ""
+"\n"
+"            <div class=\"show-all-orders\">Show another %(orders_count)s "
+"order</div>\n"
+"            <div class=\"hide-another-orders\">Hide another %(orders_count)s "
+"order</div>\n"
+"        "
+msgid_plural ""
+"\n"
+"            <div class=\"show-all-orders\">Show another %(orders_count)s "
+"orders</div>\n"
+"            <div class=\"hide-another-orders\">Hide another %(orders_count)s "
+"orders</div>\n"
+"        "
+msgstr[0] ""
+"\n"
+"            <div class=\"show-all-orders\">Показати інше %(orders_count)s "
+"замовлення</div>            <div class=\"hide-another-orders\">Приховати "
+"інше %(orders_count)s замовлення</div>"
+msgstr[1] ""
+"\n"
+"            <div class=\"show-all-orders\">Показати інші %(orders_count)s "
+"замовлення</div>            <div class=\"hide-another-orders\">Приховати "
+"інші %(orders_count)s замовлення</div>"
+msgstr[2] ""
+"\n"
+"            <div class=\"show-all-orders\">Показати інші %(orders_count)s "
+"замовлень</div>            <div class=\"hide-another-orders\">Приховати інші "
+"%(orders_count)s замовлень</div>"
+
+#: templates/account/user/personal_info.html:4
+msgid "Personal information"
+msgstr "Особиста інформація"
+
+#: templates/account/user/personal_info.html:7
+msgid "Full Name"
+msgstr "Ім'я Прізвище"
+
+#: templates/account/user/personal_info.html:21
+msgid "Date of Birth"
+msgstr "Дата нарождення"
+
+#: templates/account/user/personal_info.html:29
+msgid "Email"
+msgstr "Електронна адреса"
+
+#: templates/account/user/present_cards_info.html:29
+msgid "Amount"
+msgstr "Сума знижки"
+
+#: templates/account/user/present_cards_info.html:34
+msgid "Order"
+msgstr "Замовлення"
+
+#: templates/account/user/present_cards_info.html:42
+msgid "Additional information"
+msgstr "Додаткова інформація"
+
+#: templates/account/user/present_cards_info.html:45
+msgid "From"
+msgstr "Від"
+
+#: templates/account/user/present_cards_info.html:49
+msgid "From E-mail"
+msgstr "Від ел. адреси"
+
+#: templates/account/user/present_cards_info.html:53
+msgid "Message"
+msgstr "Повідомлення"
+
+#: templates/account/user/present_cards_info.html:60
+msgid "Your present cards will be here after purchases"
+msgstr "Ваші подарункові картки відображатимуться тут після покупок"
+
+#: templates/account/user/watched_info.html:21
+msgid "Promo"
+msgstr "Акція"
+
+#: templates/account/user/watched_info.html:56
+msgid "You have not watched products yet"
+msgstr "Ви ще не переглядали товари"
+
+#: templates/registration/login.html:5
+msgid "Log-In"
+msgstr "Увійти"
+
+#: templates/registration/login.html:30
+msgid "Log-in"
+msgstr "Увійти"
+
+#: templates/registration/login.html:56
+#: templates/registration/password_change_form.html:31
+msgid "Forgot password?"
+msgstr "Забули пароль?"
+
+#: templates/registration/login.html:57
+msgid "Not registered?"
+msgstr "Не зараєстровані?"
+
+#: templates/registration/login.html:62
+msgid "Sign in"
+msgstr "Вхід"
+
+#: templates/registration/login.html:70
+msgid "Social login"
+msgstr "Вхід через соц. мережі"
+
+#: templates/registration/password_change_form.html:5
+#: templates/registration/password_change_form.html:12
+msgid "Password change"
+msgstr "Зміна паролю"
+
+#: templates/registration/password_change_form.html:32
+#: templates/registration/password_reset_confirm.html:34
+msgid "Change password"
+msgstr "Змінити пароль"
+
+#: templates/registration/password_reset_complete.html:5
+#: templates/registration/password_reset_complete.html:16
+msgid "Password set"
+msgstr "Пароль встановлено"
+
+#: templates/registration/password_reset_complete.html:18
+msgid "Your password has been set"
+msgstr "Ваш пароль було успішно встановлено"
+
+#: templates/registration/password_reset_complete.html:22
+msgid "Log in"
+msgstr "Увійти"
+
+#: templates/registration/password_reset_confirm.html:5
+#: templates/registration/password_reset_confirm.html:13
+msgid "Set new password"
+msgstr "Встановити новий пароль"
+
+#: templates/registration/password_reset_confirm.html:38
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used. Please request a new password reset."
+msgstr ""
+"Посилання для скидання пароля не дійсне, можливо тому що вже було "
+"використане. Будь ласка зробіть запит на нове скидання пароля."
+
+#: templates/registration/password_reset_email.html:3
+#: templates/registration/password_reset_email_html.html:71
+msgid "Someone asked for password reset for email"
+msgstr "Хтось зробив запит на скидання пароля для email"
+
+#: templates/registration/password_reset_email.html:4
+msgid "Follow the link below:"
+msgstr "Перейдіть за посиланням нижче:"
+
+#: templates/registration/password_reset_email.html:6
+#: templates/registration/password_reset_email_html.html:73
+msgid "Your username, in case you have forgotten:"
+msgstr "Ваш username у випадку, якщо ви забули:"
+
+#: templates/registration/password_reset_email_html.html:68
+#: templates/registration/password_reset_form.html:5
+#: templates/registration/password_reset_form.html:15
+msgid "Password reset"
+msgstr "Скидання пароля"
+
+#: templates/registration/password_reset_email_html.html:72
+msgid "Follow the"
+msgstr "Перейдіть за"
+
+#: templates/registration/password_reset_email_html.html:72
+#: templates/registration/send_activation_email.html:75
+msgid "link"
+msgstr "посиланням"
+
+#: templates/registration/password_reset_form.html:16
+msgid "Enter your e-mail address to obtain a new password"
+msgstr "Введіть ваш e-mail для отримання нового пароля"
+
+#: templates/registration/password_reset_form.html:29
+msgid "Enter captcha"
+msgstr "Введіть капчу"
+
+#: templates/registration/password_reset_form.html:36
+#: templates/registration/user_register_form.html:67
+msgid "All letters in lower case. For update the captcha click on the image"
+msgstr ""
+"Всі літери в нижньому регістрі. Для оновлення капчі клікніть по зображенню"
+
+#: templates/registration/password_reset_form.html:52
+msgid "Send e-mail"
+msgstr "Відправити e-mail"
+
+#: templates/registration/send_activation_email.html:67
+msgid "Email confirmation"
+msgstr "Підтвердження email"
+
+#: templates/registration/send_activation_email.html:70
+msgid "Respect"
+msgstr "Привіт"
+
+#: templates/registration/send_activation_email.html:72
+msgid "For confirm email"
+msgstr "Для підтвердження email"
+
+#: templates/registration/send_activation_email.html:74
+msgid "and activate account, follow the"
+msgstr "і активації акаунту, перейдіть за"
+
+#: templates/registration/user_register_form.html:5
+#: templates/registration/user_register_form.html:15
+msgid "Register user"
+msgstr "Реєстрація користувача"
+
+#: templates/registration/user_register_form.html:84
+msgid "Register"
+msgstr "Зараєструватися"
+
+#: views.py:120
+msgid ""
+"Please, check your email! You have to receive email with instruction for "
+"activate account"
+msgstr ""
+"Будь ласка, перевірте свій email. Ви повинні отримати листа з інструкцією "
+"для активації акаунту"
+
+#: views.py:148
+msgid "Thank you for your email confirmation. Now you can login your account"
+msgstr "Дякуємо за підтверждення email. Тепер ви можете увійти в свій акаунт"
+
+#: views.py:151
+msgid "Activation link is invalid!"
+msgstr "Посилання для активації не дійсне!"
+
+#: views.py:286
+msgid ""
+"We've emailed you instructions for setting your password. If you don't "
+"receive an email, please make sure you've entered the address you registered "
+"with"
+msgstr ""
+"Ми відправили вам інструкції для установки паролю. Якщо ви не отримали "
+"листа, будь ласка переконайтесь, що ви ввели правильную email адресу, з якою "
+"ви реєструвались"

@@ -1,34 +1,36 @@
+{% load i18n %}
+
 <div class="personal-info">
-    <h3>Personal information</h3>
+    <h3>{% translate 'Personal information' %}</h3>
     <div class="info-block">
         <div class="info-row">
-            <span class="info-name">Full Name</span>
+            <span class="info-name">{% translate 'Full Name' %}</span>
             <span class="info-value">{{ request.user.get_full_name }}</span>
         </div>
         <div class="info-row">
-            <span class="info-name">Gender</span>
+            <span class="info-name">{% translate 'Gender' %}</span>
             {% with gender=customer.gender %}
                 {% if gender == 'M' %}
-                    <span class="info-value">Male</span>
+                    <span class="info-value">{% translate 'Male' %}</span>
                 {% else %}
-                    <span class="info-value">Female</span>
+                    <span class="info-value">{% translate 'Female' %}</span>
                 {% endif %}
             {% endwith %}
         </div>
         <div class="info-row">
-            <span class="info-name">Date of Birth</span>
+            <span class="info-name">{% translate 'Date of Birth' %}</span>
             <span class="info-value">{{ customer.date_of_birth|date:"d F Y"|default:'---' }}</span>
         </div>
         <div class="info-row">
-            <span class="info-name">Phone number</span>
+            <span class="info-name">{% translate 'Phone number' %}</span>
             <span class="info-value">{{ customer.phone_number|default:'---' }}</span>
         </div>
         <div class="info-row">
-            <span class="info-name">Email</span>
+            <span class="info-name">{% translate 'Email' %}</span>
             <span class="info-value">{{ request.user.email }}</span>
         </div>
         <div class="info-row">
-            <span class="info-name">About</span>
+            <span class="info-name">{% translate 'About' %}</span>
             <span class="info-value">{{ customer.about|default:'---' }}</span>
         </div>
     </div>

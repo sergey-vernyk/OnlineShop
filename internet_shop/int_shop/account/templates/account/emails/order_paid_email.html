@@ -1,3 +1,5 @@
+{% load i18n %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -66,11 +68,11 @@
         <div class="block-order-paid">
             <div>
                 <img src="https://drive.google.com/uc?export=download&id=1o3PXelqzR8RjNiW5tffmQ1ZAOcG5yjCD" alt="site-logo" border="0" height="80" width="80">
-                <h2>Order has been paid</h2>
+                <h2>{% translate 'Order has been paid' %}</h2>
             </div>
             <p>
-                Thanks for your payment! Your order ID is <span class="order-id">{{ order_id }}</span>.
-                Order amount is <span class="order-amount">${{ order_amount }}</span>.
+                {% translate 'Thanks for your payment! Your order ID is' %} <span class="order-id">{{ order_id }}</span>.
+                {% translate 'Order amount is' %} <span class="order-amount">${{ order_amount }}</span>.
             </p>
         </div>
         <a class="main-page-link" href="{{ protocol }}://{{ domain }}{% url 'goods:product_list' %}">OnlineShop</a>

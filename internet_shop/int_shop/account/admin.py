@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils.html import mark_safe
+from django.utils.translation import gettext_lazy as _
 
 from account.models import Profile
 from goods.models import Favorite, Comment
@@ -9,7 +10,7 @@ from present_cards.models import PresentCard
 
 class PresentCardInline(admin.StackedInline):
     """
-    Displaying profile's present cards inline
+    Displaying profile's present cards inline.
     """
     model = PresentCard
     extra = 0
@@ -26,7 +27,7 @@ class PresentCardInline(admin.StackedInline):
 
 class OrdersInline(admin.StackedInline):
     """
-    Displaying profile's orders inline
+    Displaying profile's orders inline.
     """
     model = Order
     extra = 0
@@ -36,10 +37,10 @@ class OrdersInline(admin.StackedInline):
 
 class FavoriteInline(admin.StackedInline):
     """
-    Displaying favorite products in user's profile
+    Displaying favorite products in user's profile.
     """
     model = Favorite
-    filter_horizontal = ('product',)  # поиск по добавленным товарам пользователя
+    filter_horizontal = ('product',)
     fieldsets = (
         ('Favorite', {
             'classes': ('collapse',),
@@ -50,7 +51,7 @@ class FavoriteInline(admin.StackedInline):
 
 class CommentInline(admin.StackedInline):
     """
-    Displaying product's comments in user profile
+    Displaying product's comments in user profile.
     """
     model = Comment
     extra = 1
@@ -63,17 +64,17 @@ class CommentInline(admin.StackedInline):
         }),
     )
 
-    @admin.display(description='Likes')
+    @admin.display(description=_('Likes'))
     def get_amount_profile_likes(self, obj):
         """
-        Returns likes count under comment obj
+        Returns likes count under comment obj.
         """
         return obj.profiles_likes.count()
 
-    @admin.display(description='Unlikes')
+    @admin.display(description=_('Unlikes'))
     def get_amount_profile_unlikes(self, obj):
         """
-        Returns dislikes count under comment obj
+        Returns dislikes count under comment obj.
         """
         return obj.profiles_unlikes.count()
 
@@ -81,7 +82,7 @@ class CommentInline(admin.StackedInline):
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
     """
-    User profile
+    User profile.
     """
     list_display = ['user', 'gender', 'email_confirm']
     fields = ('profile_full_name', 'user', 'date_of_birth',
@@ -91,17 +92,17 @@ class ProfileAdmin(admin.ModelAdmin):
     readonly_fields = ['profile_photo_tag', 'created', 'profile_full_name']
     filter_horizontal = ('coupons',)
 
-    @admin.display(description='Username')  # отображение названия поля в шапке админ сайта модели
+    @admin.display(description=_('Username'))
     def profile_full_name(self, obj):
         """
         Adding first name and last name from built-in user model to Profile model
         """
         return f'{obj.user.first_name} {obj.user.last_name}'
 
-    @admin.display(description='Photo')
+    @admin.display(description=_('Photo'))
     def profile_photo_tag(self, obj):
         """
-        Profile's photo
+        Profile's photo.
         """
         if obj.photo:
             return mark_safe(f'<img src="{obj.photo.url}" width="100" height="100"/>')

@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Register user | OnlineShop{% endblock %}
+{% block title %}{% translate 'Register user' %} | OnlineShop{% endblock %}
 {% block styles %}
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300&display=swap" rel="stylesheet">
@@ -11,7 +12,7 @@
 {% block content %}
 <div class="container d-flex justify-content-center">
     <div class="register-form">
-        <h3 class="text-center pb-2 border-bottom" style="font-family: 'Merriweather', serif;">Register user</h3>
+        <h3 class="text-center pb-2 border-bottom" style="font-family: 'Merriweather', serif;">{% translate 'Register user' %}</h3>
         <form id="reg-form" action="{% url 'register_user' %}" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {% for field in form %}
@@ -25,7 +26,7 @@
                             <div class="reg-photo">
                                 {{ field }}
                             </div>
-                        {% elif field.label == 'Gender' %}
+                        {% elif field.label == 'Gender' or field.label == 'Стать' %}
                             <label class="reg-label"
                                    for="{{ field.id_for_label }}">{{ field.label }}
                                     {% if field.field.required %}<span class="required-field">*</span>{% endif %}
@@ -44,7 +45,7 @@
                                     {% if field.field.required %}<span class="required-field">*</span>{% endif %}
                             </label>
                             {{ field }}
-                            {% if field.label == 'Password' or field.label == 'Confirm password'  %}
+                            {% if field.field.widget.input_type == 'password'  %}
                                 <span class="material-symbols-outlined">visibility_off</span>
                             {% endif %}
                         {% endif %}
@@ -63,7 +64,7 @@
                 <div class="captcha-image">
                     <img data-url="{% url 'update_captcha' %}"
                          src="data:image/png;base64,{{ captcha_image }}" alt="captcha">
-                    <p class="help help-captcha">All letters in lower case. For update the captcha click on the image</p>
+                    <p class="help help-captcha">{% translate 'All letters in lower case. For update the captcha click on the image' %}</p>
                 </div>
                 {% if form.captcha.field.required %}
                     <span class="required-field captcha-required">*</span>
@@ -80,7 +81,7 @@
         </form>
         <button form="reg-form" type="submit" class="reg-button">
             <span class="material-symbols-outlined">how_to_reg</span>
-            Register
+            {% translate 'Register' %}
         </button>
     </div>
 </div>

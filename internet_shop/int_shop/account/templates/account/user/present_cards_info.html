@@ -1,5 +1,7 @@
+{% load i18n %}
+
 <div class="personal-info">
-  <h3>Present cards</h3>
+  <h3>{% translate 'Present cards' %}</h3>
   <div class="d-block">
     {% for card in present_cards %}
       <div class="d-block border rounded p-3 mb-2">
@@ -12,24 +14,24 @@
           {% endif %}
         </div>
         <div class="card-category">
-          <span class="attr-coupons">Category</span>
+          <span class="attr-coupons">{% translate 'Category' %}</span>
           <span class="value-coupons">{{ card.category }}</span>
         </div>
         <div class="card-validation">
-          <span class="attr-coupons">Valid from</span>
+          <span class="attr-coupons">{% translate 'Valid from' %}</span>
           <span class="value-coupons">{{ card.valid_from|date:"d.m.Y H:i" }}</span>
         </div>
         <div class="card-validation">
-          <span class="attr-coupons">Valid to</span>
+          <span class="attr-coupons">{% translate 'Valid to' %}</span>
           <span class="value-coupons">{{ card.valid_to|date:"d.m.Y H:i" }}</span>
         </div>
         <div class="card-discount">
-          <span class="attr-coupons">Amount</span>
+          <span class="attr-coupons">{% translate 'Amount' %}</span>
           <span class="value-coupons discount-value">${{ card.amount }}</span>
         </div>
         <div class="mt-3">
           {% with card_order=card.order %}
-            <span class="attr-coupons">Order</span>
+            <span class="attr-coupons">{% translate 'Order' %}</span>
             <span class="value-coupons">
               <a class="text-decoration-none fw-bold" href="{% url 'customer_detail' request.user.username 'orders' %}?highlight=order-{{ card_order.pk }}">
                 № {{ card_order.pk }} - {{ card_order.created|date:"d.m.Y" }}</a>
@@ -37,25 +39,25 @@
           {% endwith %}
         </div>
         <hr>
-        <div class=" d-block text-center fs-5 mb-3">Additional information</div>
+        <div class=" d-block text-center fs-5 mb-3">{% translate 'Additional information' %}</div>
         <div class="d-block">
           <div class="addit-info-card">
-            <span class="attr-card-addit">From</span>
+            <span class="attr-card-addit">{% translate 'From' %}</span>
             <span class="value-card-addit">{{ card.from_name }}</span>
           </div>
           <div class="addit-info-card">
-            <span class="attr-card-addit">From E-mail</span>
+            <span class="attr-card-addit">{% translate 'From E-mail' %}</span>
             <span class="value-card-addit">{{ card.from_email }}</span>
           </div>
           <div class="addit-info-card">
-            <span class="attr-card-addit">Message</span>
+            <span class="attr-card-addit">{% translate 'Message' %}</span>
             <div class="value-card-addit card-message">{{ card.message }}</div>
           </div>
         </div>
       </div>
     {% empty %}
       <div class="empty-customer-content">
-          <h4 class="d-inline">Your present cards will be here after purchases</h4>
+          <h4 class="d-inline">{% translate 'Your present cards will be here after purchases' %}</h4>
       </div>
     {% endfor %}
   </div>

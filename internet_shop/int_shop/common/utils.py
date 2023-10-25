@@ -8,6 +8,7 @@ from captcha.image import ImageCaptcha
 from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.http.response import JsonResponse
+from django.utils.translation import gettext_lazy as _
 from phonenumbers import carrier
 
 from common.moduls_init import redis
@@ -44,6 +45,7 @@ class ValidDiscountsListFilter(admin.SimpleListFilter):
         if self.value() == 'invalid':
             invalid_ids = (x.id for x in queryset if not x.is_valid)
             return queryset.filter(id__in=invalid_ids)
+        return queryset
 
 
 def check_phone_number(phone_number: str) -> Union[str, bool]:
@@ -59,8 +61,7 @@ def check_phone_number(phone_number: str) -> Union[str, bool]:
             'lifecell'
     ):
         return phone_number_output
-    else:
-        return False
+    return False
 
 
 def create_captcha_image(request,
@@ -114,7 +115,7 @@ def create_random_text_for_captcha(symbols_num: int) -> str:
 
 def validate_captcha_text(cleaned_data: dict) -> str:
     """
-    Validating captcha text, which user is entering on pages with captcha
+    Validating captcha text, which user is entering on pages with captcha.
     """
 
     captcha = cleaned_data.get('captcha').upper()  # convert all symbols to upper case as well
@@ -123,6 +124,6 @@ def validate_captcha_text(cleaned_data: dict) -> str:
     if redis_captcha:
         decode_captcha = redis_captcha.decode('utf-8').upper()
     else:
-        raise ValidationError('Captcha is not correct', code='wrong_captcha')
+        raise ValidationError(_('Captcha is not correct'), code='wrong_captcha')
 
     return decode_captcha

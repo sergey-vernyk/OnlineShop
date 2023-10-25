@@ -131,6 +131,8 @@ LANGUAGES = (
 # path where Django looks for translations files
 LOCALE_PATHS = (
     os.path.join(BASE_DIR, './locale/'),
+    os.path.join(BASE_DIR, './goods/locale/'),
+    os.path.join(BASE_DIR, './account/locale/'),
 )
 
 PARLER_LANGUAGES = {
