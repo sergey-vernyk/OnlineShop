@@ -14,7 +14,7 @@ from .models import Coupon
 @require_POST
 def apply_coupon(request):
     """
-    Applying coupon on cart page and added it to profile
+    Apply coupon and add it to profile.
     """
     coupon_form = CouponApplyForm(request.POST)
     if coupon_form.is_valid():
@@ -25,10 +25,10 @@ def apply_coupon(request):
 
         return JsonResponse({'success': True,
                              'coupon_discount': coupon.discount / Decimal(100)})
-    else:
-        request.session['coupon_id'] = None
-        return JsonResponse({'success': False,
-                             'form_errors': coupon_form.errors})
+
+    request.session['coupon_id'] = None
+    return JsonResponse({'success': False,
+                         'form_errors': coupon_form.errors})
 
 
 @auth_profile_required
@@ -36,7 +36,7 @@ def apply_coupon(request):
 @require_POST
 def cancel_coupon(request):
     """
-    Canceling applying coupon and delete it from session and profile
+    Cancel applied coupon and delete it from session and profile
     """
     coupon = Coupon.objects.get(id=request.session['coupon_id'])
     Profile.objects.get(user=request.user).coupons.remove(coupon)

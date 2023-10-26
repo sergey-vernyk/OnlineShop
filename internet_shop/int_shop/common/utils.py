@@ -30,8 +30,8 @@ class ValidDiscountsListFilter(admin.SimpleListFilter):
         the option that will appear in the right sidebar.
         """
         return [
-            ('valid', 'Valid'),
-            ('invalid', 'Invalid'),
+            ('valid', _('Valid')),
+            ('invalid', _('Invalid')),
         ]
 
     def queryset(self, request, queryset):

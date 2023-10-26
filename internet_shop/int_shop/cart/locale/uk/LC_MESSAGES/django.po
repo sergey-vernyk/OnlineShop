@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-26 12:40+0300\n"
+"POT-Creation-Date: 2023-10-26 14:14+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,23 +21,24 @@ msgstr ""
 "100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || "
 "(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
-#: templates/cart/detail.html:5
+#: cart/templates/cart/detail.html:5
 msgid "Cart"
 msgstr "Кошик"
 
-#: templates/cart/detail.html:16
+#: cart/templates/cart/detail.html:16
 msgid "Shopping cart"
 msgstr "Кошик"
 
-#: templates/cart/detail.html:24
+#: cart/templates/cart/detail.html:24
 msgid "Continue shopping"
 msgstr "Продовжити покупки"
 
-#: templates/cart/detail.html:82
+#: cart/templates/cart/detail.html:82
 msgid "Totals"
 msgstr "Всього"
 
-#: templates/cart/detail.html:88
+#: cart/templates/cart/detail.html:86
+#, python-format
 msgid ""
 "\n"
 "                                <span>%(total)s </span> pcs. for amount:\n"
@@ -46,39 +47,39 @@ msgstr ""
 "\n"
 "<span>%(total)s </span> шт. на суму:"
 
-#: templates/cart/detail.html:93
+#: cart/templates/cart/detail.html:91
 msgid "Free"
 msgstr "Безкоштовно"
 
-#: templates/cart/detail.html:100
+#: cart/templates/cart/detail.html:98
 msgid "Discounts"
 msgstr "Знижки"
 
-#: templates/cart/detail.html:104
+#: cart/templates/cart/detail.html:102
 msgid "Have a coupon?"
 msgstr "Є купон?"
 
-#: templates/cart/detail.html:116 templates/cart/detail.html:144
+#: cart/templates/cart/detail.html:114 cart/templates/cart/detail.html:142
 msgid "Cancel"
-msgstr ""
+msgstr "Відмінити"
 
-#: templates/cart/detail.html:118 templates/cart/detail.html:146
+#: cart/templates/cart/detail.html:116 cart/templates/cart/detail.html:144
 msgid "Apply"
-msgstr ""
+msgstr "Застосувати"
 
 # msgstr "Застосувати"
-#: templates/cart/detail.html:132
+#: cart/templates/cart/detail.html:130
 msgid "Have a present card?"
 msgstr "Є подарункова картка?"
 
-#: templates/cart/detail.html:160
+#: cart/templates/cart/detail.html:158
 msgid "Amount discounts:"
 msgstr "Загальна знижка:"
 
-#: templates/cart/detail.html:164
+#: cart/templates/cart/detail.html:162
 msgid "Without discounts:"
 msgstr "Без знижок:"
 
-#: templates/cart/detail.html:170
+#: cart/templates/cart/detail.html:168
 msgid "Checkout"
 msgstr "Оформити замовлення"

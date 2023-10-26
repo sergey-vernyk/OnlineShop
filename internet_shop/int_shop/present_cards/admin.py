@@ -1,18 +1,21 @@
 from django.contrib import admin
+from django.utils.translation import gettext_lazy as _
+from parler.admin import TranslatableAdmin
+
 from common.utils import ValidDiscountsListFilter
 from present_cards.models import PresentCard, Category
 
 
 class ValidCardListFilter(ValidDiscountsListFilter):
     """
-    Filter by validity present card
+    Filter by validity present card.
     """
 
 
 @admin.register(PresentCard)
 class PresentCardAdmin(admin.ModelAdmin):
     """
-    Info about present card in admin panel
+    Info about present card in admin panel.
     """
     fieldsets = (
         ('General info', {
@@ -29,15 +32,17 @@ class PresentCardAdmin(admin.ModelAdmin):
     list_display = ['id', 'code', 'amount', 'valid_from', 'valid_to', 'is_valid']
     list_filter = [ValidCardListFilter]
 
-    @admin.display(description='Valid status')
+    @admin.display(description=_('Valid status'))
     def is_valid(self, instance):
-        return 'Valid' if instance.is_valid else 'Invalid'
+        return _('Valid') if instance.is_valid else _('Invalid')
 
 
 @admin.register(Category)
-class PresentCardCategoryAdmin(admin.ModelAdmin):
+class PresentCardCategoryAdmin(TranslatableAdmin):
     """
-    Info about present card category in admin panel
+    Info about present card category.
     """
     list_display = ['name', 'slug']
-    prepopulated_fields = {'slug': ('name',)}
+
+    def get_prepopulated_fields(self, request, obj=None) -> dict[str, tuple[str]]:
+        return {'slug': ('name',)}
