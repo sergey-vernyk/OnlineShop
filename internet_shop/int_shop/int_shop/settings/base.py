@@ -133,6 +133,7 @@ LOCALE_PATHS = (
     os.path.join(BASE_DIR, './locale/'),
     os.path.join(BASE_DIR, './goods/locale/'),
     os.path.join(BASE_DIR, './account/locale/'),
+    os.path.join(BASE_DIR, './cart/locale/'),
 )
 
 PARLER_LANGUAGES = {

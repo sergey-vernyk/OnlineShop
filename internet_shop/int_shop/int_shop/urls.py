@@ -19,6 +19,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.views.generic import TemplateView
+from django.views.i18n import JavaScriptCatalog
 from drf_yasg import openapi
 from drf_yasg.generators import OpenAPISchemaGenerator
 from drf_yasg.views import get_schema_view
@@ -68,6 +69,7 @@ urlpatterns = i18n_patterns(
     path('delivery/', TemplateView.as_view(template_name='./delivery.html'), name='delivery_services'),
     path('contacts/', TemplateView.as_view(template_name='./contacts.html'), name='contacts'),
     path('ajax/update_captcha/', create_captcha_image, name='update_captcha'),
+    path('jsi18n/cart/', JavaScriptCatalog.as_view(packages=['cart']), name='javascript-catalog'),
     re_path(r'^api/(?P<version>(v1|v2))/goods/', include('goods.api.urls')),
     re_path(r'^api/(?P<version>(v1|v2))/account/', include('account.api.urls')),
     re_path(r'^api/(?P<version>(v1|v2))/cart/', include('cart.api.urls')),
