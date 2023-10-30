@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-24 20:55+0300\n"
+"POT-Creation-Date: 2023-10-27 18:30+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -133,7 +133,7 @@ msgstr "Виробники"
 
 #: goods/models.py:176
 msgid "Email"
-msgstr "Ел. пошта"
+msgstr "Email"
 
 #: goods/models.py:182 goods/models.py:200
 msgid "Comment"
@@ -402,13 +402,61 @@ msgstr "Властивість"
 msgid "Properties"
 msgstr "Властивості"
 
+#: goods/property_filters.py:13
+msgid "Display"
+msgstr "Дисплей"
+
+#: goods/property_filters.py:14
+msgid "CPU"
+msgstr "Процесор"
+
 #: goods/property_filters.py:14 goods/property_filters.py:25
 msgid "Cores"
 msgstr "Кількість ядер"
 
+#: goods/property_filters.py:15
+msgid "Camera"
+msgstr "Камера"
+
+#: goods/property_filters.py:16
+msgid "Communications"
+msgstr "З'єднання"
+
+#: goods/property_filters.py:17
+msgid "Battery"
+msgstr "Батарея"
+
+#: goods/property_filters.py:18
+msgid "Internal Memory"
+msgstr "Накопичувач"
+
+#: goods/property_filters.py:19
+msgid "Software"
+msgstr "Програмне забезпечення"
+
+#: goods/property_filters.py:20
+msgid "RAM Memory"
+msgstr "Оперативна пам'ять"
+
 #: goods/property_filters.py:28 goods/property_filters.py:49
 msgid "Work time"
 msgstr "Час роботи"
+
+#: goods/property_filters.py:32
+msgid "Body"
+msgstr "Корпус"
+
+#: goods/property_filters.py:33
+msgid "Video"
+msgstr "Відео"
+
+#: goods/property_filters.py:39
+msgid "Audio"
+msgstr "Аудіо"
+
+#: goods/property_filters.py:41
+msgid "Photo"
+msgstr "Фото"
 
 #: goods/templates/base.html:41 goods/templates/products_navs.html:10
 msgid "All"

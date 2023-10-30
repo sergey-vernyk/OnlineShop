@@ -82,4 +82,4 @@ msgstr "Без знижок:"
 
 #: cart/templates/cart/detail.html:168
 msgid "Checkout"
-msgstr "Оформити замовлення"
+msgstr "Оформлення замовлення"

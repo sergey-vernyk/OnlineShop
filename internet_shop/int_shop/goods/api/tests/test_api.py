@@ -597,10 +597,14 @@ class TestGoodsProductAPI(APITestCase):
         Checking create manufacturer only by staff users
         """
         property_data = {
-            'name': 'Diagonal',
-            'numeric_value': '15.6',
-            'units': '"',
+            'translations': {
+                'en': {
+                    'name': 'Diagonal',
+                    'units': '"',
+                },
+            },
             'category_property': self.category_property3.pk,
+            'numeric_value': '15.6',
             'product': self.product2.pk
         }
 
@@ -619,9 +623,9 @@ class TestGoodsProductAPI(APITestCase):
                                     data=property_data,
                                     format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        created_manufacturer = Property.objects.filter(name=property_data['name']).exists()
-        self.assertTrue(created_manufacturer)
-        for field, value in Property.objects.get(name=property_data['name']).__dict__.items():
+        created_property = Property.objects.all()[2]
+        self.assertTrue(created_property)
+        for field, value in created_property.__dict__.items():
             if field in property_data:
                 if field == 'numeric_value':
                     self.assertEqual(value, Decimal(property_data[field]))
@@ -653,10 +657,14 @@ class TestGoodsProductAPI(APITestCase):
         Checking update one or more fields of property with id only by staff users
         """
         property_data = {
-            'name': 'OS',
-            'text_value': 'iOS',
-            'category_property': self.property1.category_property.pk,
-            'product': self.product1.pk
+            'translations': {
+                'en': {
+                    'name': 'OS',
+                    'text_value': 'iOS',
+                    'category_property': self.property1.category_property.pk,
+                    'product': self.product1.pk
+                },
+            }
         }
 
         # make user as not staff

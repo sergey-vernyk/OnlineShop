@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-26 14:48+0300\n"
+"POT-Creation-Date: 2023-10-27 11:38+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,66 +21,66 @@ msgstr ""
 "100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || "
 "(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
-#: admin.py:23
+#: coupons/admin.py:23
 msgid "Valid status"
 msgstr "Статус дійсності"
 
-#: admin.py:25
+#: coupons/admin.py:25
 msgid "Valid"
 msgstr "Дійсний до"
 
-#: admin.py:25
+#: coupons/admin.py:25
 msgid "Invalid"
 msgstr "Недійсний"
 
-#: forms.py:13
+#: coupons/forms.py:13
 msgid "Enter code"
 msgstr "Введіть код"
 
-#: forms.py:13
+#: coupons/forms.py:13
 msgid "Coupon code"
 msgstr "Код купона"
 
-#: forms.py:26
+#: coupons/forms.py:26
 msgid "Invalid coupon code"
 msgstr "Недійсний код купона"
 
-#: models.py:13
+#: coupons/models.py:13
 msgid "Code"
 msgstr "Код"
 
-#: models.py:14
+#: coupons/models.py:14
 msgid "Valid from"
 msgstr "Дійсний з"
 
-#: models.py:15
+#: coupons/models.py:15
 msgid "Valid to"
 msgstr "Дійсний до"
 
-#: models.py:17
+#: coupons/models.py:17
 msgid "Discount"
 msgstr "Знижка"
 
-#: models.py:22 models.py:54
+#: coupons/models.py:22 coupons/models.py:54
 msgid "Category"
 msgstr "Категорія"
 
-#: models.py:37
+#: coupons/models.py:37
 msgid "Coupon"
 msgstr "Купон"
 
-#: models.py:38
+#: coupons/models.py:38
 msgid "Coupons"
 msgstr "Купони"
 
-#: models.py:46
+#: coupons/models.py:46
 msgid "Name"
 msgstr "Назва"
 
-#: models.py:47
+#: coupons/models.py:47
 msgid "Slug"
 msgstr "Слаг"
 
-#: models.py:55
+#: coupons/models.py:55
 msgid "Categories"
 msgstr "Категорії"

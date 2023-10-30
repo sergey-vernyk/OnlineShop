@@ -169,8 +169,14 @@
                 </a>
             </div>
         {% else %}
+        <!--select `empty cart` pic depends on current language-->
+            {% get_current_language as LANGUAGE_CODE %}
             <div class="empty-cart">
-                <img src="{% static 'img/your-cart-is-empty.png' %}" width="350" height="350">
+                {% if LANGUAGE_CODE == 'en' %}
+                    <img src="{% static 'img/your-cart-is-empty_en.png' %}" width="350" height="350">
+                {% elif LANGUAGE_CODE == 'uk' %}
+                    <img src="{% static 'img/your-cart-is-empty_uk.png' %}" width="350" height="350">
+                {% endif %}
             </div>
         {% endif %}
     </div>

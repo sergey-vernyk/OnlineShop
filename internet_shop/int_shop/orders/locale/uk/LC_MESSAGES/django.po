@@ -1,0 +1,294 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-10-29 17:43+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != "
+"11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % "
+"100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || "
+"(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
+
+#: admin.py:32
+msgid "Name"
+msgstr "Назва"
+
+#: admin.py:43
+msgid "Apply discount"
+msgstr "Застосована знижка"
+
+#: admin.py:52
+msgid "Total cost (discount)"
+msgstr "Загальна вартість (знижка)"
+
+#: forms.py:19 forms.py:78 forms.py:79
+msgid "Not choose"
+msgstr "Не вибрано"
+
+#: forms.py:31
+msgid "Invalid phone number"
+msgstr "Невірний номер телефону"
+
+#: forms.py:42
+msgid "+country code ..."
+msgstr "+код країни ..."
+
+#: forms.py:44
+msgid "City, Street, Building"
+msgstr "Місто, Вулиця, Будівля"
+
+#: forms.py:49
+msgid "Any comment..."
+msgstr "Будь-який коментар..."
+
+#: forms.py:54
+msgid "Enter a valid email address"
+msgstr "Введіть дійсний email"
+
+#: forms.py:55 forms.py:61 forms.py:81 forms.py:99
+msgid "This field must not be empty"
+msgstr "Поле має бути заповнене"
+
+#: forms.py:73
+msgid "dd-mm-yyyy"
+msgstr "дд-мм-рррр"
+
+#: forms.py:110
+msgid "Date must be grater or equal than today date"
+msgstr "Дата не може бути меншою за сьогоднішню"
+
+#: models.py:18
+msgid "Online"
+msgstr "Онлайн"
+
+#: models.py:19
+msgid "On delivery"
+msgstr "Під час доставки"
+
+#: models.py:20
+msgid "Installments"
+msgstr "Розстрочка"
+
+#: models.py:23 models.py:108
+msgid "First name"
+msgstr "Ім'я"
+
+#: models.py:24 models.py:109
+msgid "Last name"
+msgstr "Прізвище"
+
+#: models.py:25
+msgid "Email"
+msgstr "Email"
+
+#: models.py:26
+msgid "Address"
+msgstr "Адреса"
+
+#: models.py:27
+msgid "Phone"
+msgstr "Номер телефону"
+
+#: models.py:28
+msgid "Created"
+msgstr "Дата створення"
+
+#: models.py:29
+msgid "Updated"
+msgstr "Дата оновлення"
+
+#: models.py:30
+msgid "Comment"
+msgstr "Коментар"
+
+#: models.py:31
+msgid "Call confirm"
+msgstr "Дзвінок для підтвердження"
+
+#: models.py:32
+msgid "Pay method"
+msgstr "Метод оплати"
+
+#: models.py:33
+msgid "Paid"
+msgstr "Сплачено"
+
+#: models.py:34
+msgid "Done"
+msgstr "Виконано"
+
+#: models.py:40
+msgid "Present card"
+msgstr "Подарункова картка"
+
+#: models.py:46
+msgid "Coupon"
+msgstr "Купон"
+
+#: models.py:51 models.py:121
+msgid "Delivery"
+msgstr "Доставка"
+
+#: models.py:52
+msgid "Stripe id"
+msgstr "Ідентифікатор stripe"
+
+#: models.py:57
+msgid "User profile"
+msgstr "Профіль користувача"
+
+#: models.py:87 models.py:129
+msgid "Order"
+msgstr "Замовлення"
+
+#: models.py:88
+msgid "Orders"
+msgstr "Замовлення"
+
+#: models.py:97
+msgid "Self-delivery"
+msgstr "Самовивіз"
+
+#: models.py:98
+msgid "Post office"
+msgstr "Поштове відділення"
+
+#: models.py:99
+msgid "Apartment"
+msgstr "Квартира"
+
+#: models.py:103
+msgid "New Post"
+msgstr "Нова Пошта"
+
+#: models.py:104
+msgid "Ukrpost"
+msgstr "Укрпошта"
+
+#: models.py:105
+msgid "Meest Express"
+msgstr "Міст Експрес"
+
+#: models.py:110
+msgid "Service"
+msgstr "Служба"
+
+#: models.py:111
+msgid "Method"
+msgstr "Метод"
+
+#: models.py:113
+msgid "Office number"
+msgstr "Номер відділення"
+
+#: models.py:114
+msgid "Delivery date"
+msgstr "Дата доставки"
+
+#: models.py:122
+msgid "Deliveries"
+msgstr "Доставки"
+
+#: models.py:133
+msgid "Product"
+msgstr "Товар"
+
+#: models.py:134
+msgid "Price"
+msgstr "Ціна"
+
+#: models.py:135
+msgid "Quantity"
+msgstr "Кількість"
+
+#: models.py:139
+msgid "Order Item"
+msgstr "Одиниця замовлення"
+
+#: models.py:140
+msgid "Order Items"
+msgstr "Одиниці замовлення"
+
+#: templates/orders/order_create.html:5 templates/orders/order_create.html:13
+msgid "Checkout"
+msgstr "Оформлення замовлення"
+
+#: templates/orders/order_create.html:18
+msgid "General information"
+msgstr "Основна інформація"
+
+#: templates/orders/order_create.html:49
+msgid "Delivery information"
+msgstr "Інформація про доставку"
+
+#: templates/orders/order_create.html:70
+msgid "Back"
+msgstr "Назад"
+
+#: templates/orders/order_create.html:75
+msgid "Place order"
+msgstr "Зробити замовлення"
+
+#: templates/orders/order_create.html:82
+msgid "Your purchases"
+msgstr "Ваші покупки"
+
+#: templates/orders/order_create.html:110
+msgid "Amount:"
+msgstr "Всього:"
+
+#: templates/orders/order_create.html:116
+msgid "Discount:"
+msgstr "Знижка:"
+
+#: templates/orders/order_create.html:120
+msgid "Amount with discounts:"
+msgstr "Всього без знижок:"
+
+#: templates/orders/order_created.html:5
+msgid "Order accepted"
+msgstr "Замовлення прийнято"
+
+#: templates/orders/order_created.html:17
+msgid "To main page"
+msgstr "На головну"
+
+#: templates/orders/order_created.html:19
+msgid "Order has been accepted successfully!"
+msgstr "Замовлення було успішно прийнято!"
+
+#: templates/orders/order_created.html:20
+msgid "Your order"
+msgstr "Ваше замовлення"
+
+#: templates/orders/order_created.html:21
+msgid "All information about your orders you can see in your"
+msgstr "Вся інформація про ваші замовлення ви можете знайти у вашому"
+
+#: templates/orders/order_created.html:24
+msgid "Profile"
+msgstr "Профілі"
+
+#: templates/orders/order_created.html:30
+msgid ""
+"Since you have chosen online payment, please click the button to make a "
+"payment"
+msgstr ""
+"Так як ви вибрали спосіб оплати онлайн, будь ласка натисніть на кнопку для "
+"оплати"
+
+#: templates/orders/order_created.html:34
+msgid "Make a payment"
+msgstr "Здійснити оплату"

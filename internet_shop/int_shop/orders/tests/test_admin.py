@@ -6,6 +6,7 @@ from random import randint
 from django.conf import settings
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
+from django.shortcuts import reverse
 from django.test import TestCase
 from django.utils import timezone
 
@@ -46,7 +47,7 @@ class TestOrdersAdmin(TestCase):
 
     def test_get_discount_for_coupon(self):
         """
-        Checking whether transition link to coupon info is correct in the order
+        Checking whether transition link to coupon info is correct in the order.
         """
         order = Order.objects.create(first_name='Name',
                                      last_name='Surname',
@@ -56,12 +57,13 @@ class TestOrdersAdmin(TestCase):
                                      profile=self.profile,
                                      coupon=self.coupon)
 
-        self.assertEqual(self.instance_order.get_discount(order),
-                         f'<a href="/admin/coupons/coupon/{self.coupon.pk}/change/">Coupon</a>')
+        self.assertEqual(
+            self.instance_order.get_discount(order),
+            f'<a href="{reverse("admin:coupons_coupon_change", args=(self.coupon.pk,))}">Coupon</a>')
 
     def test_get_discount_for_present_card(self):
         """
-        Checking whether transition link to present card info is correct in the order
+        Checking whether transition link to present card info is correct in the order.
         """
         order = Order.objects.create(first_name='Name',
                                      last_name='Surname',
@@ -71,8 +73,9 @@ class TestOrdersAdmin(TestCase):
                                      profile=self.profile,
                                      present_card=self.card)
 
-        self.assertEqual(self.instance_order.get_discount(order),
-                         f'<a href="/admin/present_cards/presentcard/{self.card.pk}/change/">Present Card</a>')
+        self.assertEqual(
+            self.instance_order.get_discount(order),
+            f'<a href="{reverse("admin:present_cards_presentcard_change", args=(self.card.pk,))}">Present Card</a>')
 
     def test_get_total_order_cost(self):
         """

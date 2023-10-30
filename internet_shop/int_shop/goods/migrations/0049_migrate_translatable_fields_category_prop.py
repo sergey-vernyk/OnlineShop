@@ -7,7 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 def forwards_func(apps, schema_editor):
     MyModel = apps.get_model('goods', 'PropertyCategoryTranslation')
-    MyModelTranslation = apps.get_model('goods', 'PropertyCategoryTranslationTranslation')
+    MyModelTranslation = apps.get_model('goods', 'PropertyCategoryTranslation')
 
     for object in MyModel.objects.all():
         MyModelTranslation.objects.create(

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-26 16:14+0300\n"
+"POT-Creation-Date: 2023-10-27 11:38+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,86 +21,86 @@ msgstr ""
 "100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || "
 "(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
-#: admin.py:35
+#: present_cards/admin.py:35
 msgid "Valid status"
 msgstr "Статус дійсності"
 
-#: admin.py:37
+#: present_cards/admin.py:37
 msgid "Valid"
 msgstr "Дійсний"
 
-#: admin.py:37
+#: present_cards/admin.py:37
 msgid "Invalid"
 msgstr "Недійсний"
 
-#: forms.py:13
+#: present_cards/forms.py:15
 msgid "Enter code"
 msgstr "Введіть код"
 
-#: forms.py:13
+#: present_cards/forms.py:15
 msgid "Present Card code"
 msgstr "Код подарункової картки"
 
-#: forms.py:26
+#: present_cards/forms.py:28
 msgid "Invalid card code"
 msgstr "Недійсний код картки"
 
-#: forms.py:29
+#: present_cards/forms.py:33
 msgid "The code was already used"
 msgstr "Цей код вже був використаний"
 
-#: models.py:13
+#: present_cards/models.py:13
 msgid "Code"
 msgstr "Код"
 
-#: models.py:14
+#: present_cards/models.py:14
 msgid "Valid from"
 msgstr "Дійсний з"
 
-#: models.py:15
+#: present_cards/models.py:15
 msgid "Valid to"
 msgstr "Дійсний до"
 
-#: models.py:16
+#: present_cards/models.py:16
 msgid "From name"
 msgstr "Від імені"
 
-#: models.py:17
+#: present_cards/models.py:17
 msgid "From email"
 msgstr "Від email"
 
-#: models.py:18
+#: present_cards/models.py:18
 msgid "To name"
 msgstr "На ім'я"
 
-#: models.py:19
+#: present_cards/models.py:19
 msgid "To email"
 msgstr "На email"
 
-#: models.py:23 models.py:63
+#: present_cards/models.py:23 present_cards/models.py:63
 msgid "Category"
 msgstr "Категорія"
 
-#: models.py:24
+#: present_cards/models.py:24
 msgid "Message"
 msgstr "Повідомлення"
 
-#: models.py:25
+#: present_cards/models.py:25
 msgid "Amount"
 msgstr "Сума знижки"
 
-#: models.py:31
+#: present_cards/models.py:31
 msgid "Profile"
 msgstr "Профіль"
 
-#: models.py:46
+#: present_cards/models.py:46
 msgid "Present card"
 msgstr "Подарункова картка"
 
-#: models.py:47
+#: present_cards/models.py:47
 msgid "Present cards"
 msgstr "Подарункові картки"
 
-#: models.py:64
+#: present_cards/models.py:64
 msgid "Categories"
 msgstr "Категорії"

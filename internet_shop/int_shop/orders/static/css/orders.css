@@ -123,7 +123,6 @@ input[type="text"], input[type="email"], textarea, select, option {
     background-color: #3040d5;
     border: 1px solid grey;
     border-radius: 5px;
-    width: 150px;
 }
 
 .place-order-btn:hover { background-color: #606de0; }

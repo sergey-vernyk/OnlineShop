@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Delivery | OnlineShop{% endblock %}
+{% block title %}{% translate 'Delivery' %} | OnlineShop{% endblock %}
 
 {% block styles %}
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
@@ -11,33 +12,35 @@
 {% endblock %}
 
 {% block content %}
-<h2 class="header-deliveries">Delivery Services</h2>
+<h2 class="header-deliveries">{% translate 'Delivery Services' %}</h2>
     <div class="container">
         <div class="services-list">
             <div class="delivery-service">
                 <div class="logos">
                     <img src="{% static 'img/Nova_Poshta_logo.svg' %}" width="110" height="40" alt="Nova Post Logo">
                     <a href="https://novapost.com/">
-                        <h3 class="title-service">Nova Post</h3>
+                        <h3 class="title-service">{% translate 'Nova Post' %}</h3>
                     </a>
                 </div>
                 <div class="brief-service-info">
-                    Nova Post is a trusted and reliable delivery service that ensures your packages reach you safely and
-                    on time. With it efficient logistics network and dedicated team, they strive to provide the best delivery
-                    experience for their customers.
+                    {% blocktranslate %}
+                        Nova Post is a trusted and reliable delivery service that ensures your packages reach you safely and
+                        on time. With it efficient logistics network and dedicated team, they strive to provide the best delivery
+                        experience for their customers.
+                    {% endblocktranslate %}
                 </div>
                 <ul>
                     <li>
-                        <span class="delivery-type">Standard Delivery:</span>Estimated delivery within 5-7 business days -
+                        <span class="delivery-type">{% translate 'Standard Delivery:</span>Estimated delivery within 5-7 business days' %} -
                         <span class="delivery-cost">$5.00</span>
                     </li>
                     <li>
-                        <span class="delivery-type">Express Delivery:</span> Guaranteed delivery within 2-3 business days -
+                        <span class="delivery-type">{% translate 'Express Delivery:</span> Guaranteed delivery within 2-3 business days' %} -
                         <span class="delivery-cost">$10.00</span>
                     </li>
                     <li>
-                        <span class="delivery-type">Same-Day Delivery:</span> Get your package delivered on the same day
-                        (available in select areas) - <span class="delivery-cost">$15.00</span>
+                        <span class="delivery-type">{% translate 'Same-Day Delivery:</span> Get your package delivered on the same day' %}
+                        {% translate '(available in select areas)' %} - <span class="delivery-cost">$15.00</span>
                     </li>
                 </ul>
             </div>
@@ -45,26 +48,28 @@
                 <div class="logos">
                     <img src="{% static 'img/Meest_Corporation_logo.svg' %}" width="110" height="40" alt="Meest Express Logo">
                     <a href="https://ua.meest.com/">
-                        <h3 class="title-service">Meest Express</h3>
+                        <h3 class="title-service">{% translate 'Meest Express' %}</h3>
                     </a>
                 </div>
                 <div class="brief-service-info">
-                    Meest Express is a global delivery service known for its fast and efficient shipping solutions.
-                    They offer a range of delivery options to suit your needs, including express and economy shipping.
-                    Their reliable network ensures your packages are delivered securely and on time.
+                    {% blocktranslate %}
+                        Meest Express is a global delivery service known for its fast and efficient shipping solutions.
+                        They offer a range of delivery options to suit your needs, including express and economy shipping.
+                        Their reliable network ensures your packages are delivered securely and on time.
+                    {% endblocktranslate %}
                 </div>
                 <ul>
                     <li>
-                        <span class="delivery-type">Standard Delivery</span>:
-                        Estimated delivery within 7-10 business days - <span class="delivery-cost">$8.00</span>
+                        <span class="delivery-type">{% translate 'Standard Delivery' %}</span>:
+                        {% translate 'Estimated delivery within 7-10 business days' %} - <span class="delivery-cost">$8.00</span>
                     </li>
                     <li>
-                        <span class="delivery-type">Express Delivery:</span>
-                        Guaranteed delivery within 3-5 business days - <span class="delivery-cost">$15.00</span>
+                        <span class="delivery-type">{% translate 'Express Delivery:' %}</span>
+                        {% translate 'Guaranteed delivery within 3-5 business days' %} - <span class="delivery-cost">$15.00</span>
                     </li>
                     <li>
-                        <span class="delivery-type">International Delivery:
-                        </span> Shipping rates vary based on the destination
+                        <span class="delivery-type">{% translate 'International Delivery:' %}
+                        </span> {% translate 'Shipping rates vary based on the destination' %}
                     </li>
                 </ul>
             </div>
@@ -72,26 +77,28 @@
                 <div class="logos">
                     <img src="{% static 'img/Ukrposhta-ua-icon.svg' %}" width="40" height="40" alt="Ukrpost Logo">
                     <a href="https://www.ukrposhta.ua/en">
-                        <h3 class="title-service">Ukrpost</h3>
+                        <h3 class="title-service">{% translate 'Ukrpost' %}</h3>
                     </a>
                 </div>
                 <div class="brief-service-info">
-                    Ukrpost is the national postal service of Ukraine. They provide a wide range of postal and delivery
-                    services, including domestic and international shipping, parcel tracking, and additional insurance
-                    options. Their dedicated team is committed to delivering your packages with care and efficiency.
+                    {% blocktranslate %}
+                        Ukrpost is the national postal service of Ukraine. They provide a wide range of postal and delivery
+                        services, including domestic and international shipping, parcel tracking, and additional insurance
+                        options. Their dedicated team is committed to delivering your packages with care and efficiency.
+                    {% endblocktranslate %}
                 </div>
                 <ul>
                     <li>
-                        <span class="delivery-type">Standard Delivery:</span>
-                        Estimated delivery within 3-5 business days - <span class="delivery-cost">$6.00</span>
+                        <span class="delivery-type">{% translate 'Standard Delivery:' %}</span>
+                        {% translate 'Estimated delivery within 3-5 business days' %} - <span class="delivery-cost">$6.00</span>
                     </li>
                     <li>
-                        <span class="delivery-type">Registered Mail:</span>
-                        Additional tracking and security features - <span class="delivery-cost">$10.00</span>
+                        <span class="delivery-type">{% translate 'Registered Mail:' %}</span>
+                        {% translate 'Additional tracking and security features' %} - <span class="delivery-cost">$10.00</span>
                     </li>
                     <li>
-                        <span class="delivery-type">International Delivery:</span>
-                        Shipping rates vary based on the destination
+                        <span class="delivery-type">{% translate 'International Delivery:' %}</span>
+                        {% translate 'Shipping rates vary based on the destination' %}
                     </li>
                 </ul>
             </div>

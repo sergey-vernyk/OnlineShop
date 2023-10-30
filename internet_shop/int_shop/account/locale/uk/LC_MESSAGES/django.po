@@ -148,7 +148,7 @@ msgstr "Поле має бути заповнене"
 
 #: account/forms.py:180
 msgid "Invalid phone number"
-msgstr "не корректний номер телефону телефону"
+msgstr "Не корректний номер телефону"
 
 #: account/forms.py:217
 msgid "Current email does not registered or user not active"
@@ -350,7 +350,7 @@ msgstr "Метод доставки"
 
 #: account/templates/account/user/orders_info.html:109
 msgid "Post office"
-msgstr "Номер відділення"
+msgstr "Поштове відділення"
 
 #: account/templates/account/user/orders_info.html:120
 msgid "Delivery address"

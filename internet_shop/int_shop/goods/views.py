@@ -391,7 +391,7 @@ class FilterResultsView(ListView):
         if 'category_slug' in self.kwargs:
             context['category'] = Category.objects.get(slug=self.kwargs.get('category_slug'))
 
-            context['category_properties'] = get_property_for_category(context['category'].name, 
+            context['category_properties'] = get_property_for_category(context['category'].name,
                                                                        prods_queryset=self.queryset_filter,
                                                                        language_code=self.request.LANGUAGE_CODE)
 
@@ -509,9 +509,9 @@ def popular_list(request, category_slug: str = None):
 
 def product_ordering(request, place: str, category_slug: str = 'all', page: int = 1):
     """
-    Sorting products by price
+    Sorting products by price.
     """
-    # names of templates, that will be rendering for each category (popular, new, promotion, main products list)
+    # names of templates, that will be render for each category (popular, new, promotion, main products list)
     templates = {
         'mainlist': 'list.html',
         'popular': 'navs_categories_list.html',
@@ -538,7 +538,7 @@ def product_ordering(request, place: str, category_slug: str = 'all', page: int 
     if request.method == 'GET':
         sort = request.GET.get('sort')
         # if sort is needed
-        if sort == 'p_asc' or sort == 'p_desc':
+        if sort in ('p_asc', 'p_desc'):
             if category_slug != 'all':  # if category has been received
                 category = Category.objects.get(slug=category_slug)
                 lookups = Q(category=category,
@@ -586,7 +586,7 @@ def product_ordering(request, place: str, category_slug: str = 'all', page: int 
     manufacturers_prod_qnty = next(manufacturers_info)  # products quantity for each manufacturer
 
     if category_slug != 'all':
-        category_properties = get_property_for_category(category.name)
+        category_properties = get_property_for_category(category.name, language_code=request.LANGUAGE_CODE)
 
     return render(request, f'goods/product/{templates[place]}', {'products': page_products,
                                                                  'category': category,

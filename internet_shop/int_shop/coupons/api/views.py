@@ -61,7 +61,7 @@ class CouponViewSet(viewsets.ModelViewSet):
     def apply_or_cancel_coupon(self, request, act: str, code: str, version: str = 'v1'):
         """
         Action provides an opportunity to apply coupon to cart or to cancel applied coupon.
-        To apply coupon need to send `apply` or `cancel` to cancel it, and send coupon `code` itself
+        To apply coupon need to send `apply` or `cancel` to cancel it, and send coupon `code` itself.
         """
         try:
             coupon = Coupon.objects.get(code=code.strip())
@@ -85,8 +85,7 @@ class CouponViewSet(viewsets.ModelViewSet):
             return Response({'success': f"Coupon with code '{coupon.code}' has been successfully"
                                         f' {act + "ed" if act == "cancel" else act[:-1] + "ied"}'},
                             status=status.HTTP_200_OK)
-        else:
-            return Response({'detail': 'Cart is empty'}, status=status.HTTP_200_OK)
+        return Response({'detail': 'Cart is empty'}, status=status.HTTP_200_OK)
 
     def filter_queryset(self, queryset, **kwargs):
         """
@@ -130,8 +129,17 @@ class CouponCategoryViewSet(viewsets.ModelViewSet):
     remove_fields_list_for_get_request = ['coupons']
     http_method_names = ['get', 'head', 'post', 'put', 'delete']
 
+    def get_queryset(self):
+        """
+        Returns category instances depends on current language.
+        """
+        language = self.request.LANGUAGE_CODE
+        queryset = Category.objects.prefetch_related('coupons').filter(
+            translations__language_code=language)
+        return queryset
+
     def list(self, request, *args, **kwargs):
-        page = self.paginate_queryset(self.queryset)
+        page = self.paginate_queryset(self.get_queryset())
         if page:
             serializer = self.get_serializer(instance=page, many=True)
             serializer.child.remove_fields(self.remove_fields_list_for_get_request)

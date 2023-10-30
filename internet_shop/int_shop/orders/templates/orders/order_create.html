@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Checkout | OnlineShop{% endblock %}
+{% block title %}{% translate 'Checkout' %}| OnlineShop{% endblock %}
 {% block styles %}
     <link rel="stylesheet" href="{% static 'css/orders.css' %}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
@@ -9,12 +10,12 @@
 {% endblock %}
 {% block content %}
 <div class="container-xl p-3">
-    <h1 class="my-3 d-block">Checkout</h1>
+    <h1 class="my-3 d-block">{% translate 'Checkout' %}</h1>
     <div class="row flex-nowrap align-items-start">
         <div class="block-order-info">
             <form method="post" style="padding: 10px;">
                 <!--General order data-->
-                <h4 class="my-3 text-center">General information</h4>
+                <h4 class="my-3 text-center">{% translate 'General information' %}</h4>
                 <hr>
                 {% csrf_token %}
                 {% for field in form %}
@@ -45,7 +46,7 @@
                 {% endfor %}
                 <hr>
                 <!--Info about order delivery-->
-                <h4 class="my-3 text-center">Delivery information</h4>
+                <h4 class="my-3 text-center">{% translate 'Delivery information' %}</h4>
                 <hr>
                 {% for field in delivery_form %}
                     <div class="order-form-fields">
@@ -61,65 +62,65 @@
                         </ul>
                     </div>
                 {% endfor %}
-                <!--Buttons "Back" and "Place order-->
+                <!--Buttons `Back` and `Place order`-->
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="order-back-btn">
                         <a href="{% url 'cart:cart_detail' %}" role="button">
                             <span class="material-symbols-outlined">undo</span>
-                            Back
+                            {% translate 'Back' %}
                         </a>
                     </div>
                     <button type="submit" class="place-order-btn">
                         <span class="material-symbols-outlined">check</span>
-                        Place order
+                        {% translate 'Place order' %}
                     </button>
                 </div>
             </form>
         </div>
         <!--Info about order items-->
         <div class="block-purchases-info">
-            <h4 class="text-center fs-4 my-3">Your purchases</h4>
+            <h4 class="text-center fs-4 my-3">{% translate 'Your purchases' %}</h4>
             <hr>
-                {% for item in cart %}
-                    <div class="row justify-content-between align-items-center m-2 p-2" style="border-bottom: solid 2px #C1C8C5;">
-                        {% with product=item.product %}
-                            <div class="order-prod-image">
-                                {% if product.image %}
-                                    <a href="{{ product.get_absolute_url }}" target="_blank">
-                                        <img src="{{ product.image.url }}" alt="product-image" height="80" width="80">
-                                    </a>
-                                {% else %}
-                                    <a href="{{ product.image.url }}" target="_blank">
-                                        <img src="{% static 'img/no_image_crop' %}" alt="product-image">
-                                    </a>
-                                {% endif %}
-                            </div>
-                            <div class="order-prod-name">
+            {% for item in cart %}
+                <div class="row justify-content-between align-items-center m-2 p-2" style="border-bottom: solid 2px #C1C8C5;">
+                    {% with product=item.product %}
+                        <div class="order-prod-image">
+                            {% if product.image %}
                                 <a href="{{ product.get_absolute_url }}" target="_blank">
-                                    {{ product.name }}
+                                    <img src="{{ product.image.url }}" alt="product-image" height="80" width="80">
                                 </a>
-                            </div>
-                        {% endwith %}
-                        <div class="order-prod-qnty">{{ item.quantity }}x</div>
-                        <div class="order-prod-total-price">${{ item.total_price }}</div>
-                    </div>
-                {% endfor %}
-                <!--Amount cost without discounts-->
-                <div class="order-total-amount">
-                    <span>Amount:</span>
-                    <span>${{ cart.get_total_price }}</span>
+                            {% else %}
+                                <a href="{{ product.image.url }}" target="_blank">
+                                    <img src="{% static 'img/no_image_crop' %}" alt="product-image">
+                                </a>
+                            {% endif %}
+                        </div>
+                        <div class="order-prod-name">
+                            <a href="{{ product.get_absolute_url }}" target="_blank">
+                                {{ product.name }}
+                            </a>
+                        </div>
+                    {% endwith %}
+                    <div class="order-prod-qnty">{{ item.quantity }}x</div>
+                    <div class="order-prod-total-price">${{ item.total_price }}</div>
                 </div>
-                <!--If are discounts-->
-                {% if cart.coupon_id or cart.present_card_id %}
-                    <div class="order-total-discount">
-                        <span>Discount:</span>
-                        <span>-${{ cart.get_total_discount }}</span>
-                    </div>
-                    <div class="order-total-with-discount">
-                        <span>Amount with discounts:</span>
-                        <span>${{ cart.get_total_price_with_discounts }}</span>
-                    </div>
-                {% endif %}
+            {% endfor %}
+            <!--Amount cost without discounts-->
+            <div class="order-total-amount">
+                <span>{% translate 'Amount:' %}</span>
+                <span>${{ cart.get_total_price }}</span>
+            </div>
+            <!--If are discounts-->
+            {% if cart.coupon_id or cart.present_card_id %}
+                <div class="order-total-discount">
+                    <span>{% translate 'Discount:' %}</span>
+                    <span>-${{ cart.get_total_discount }}</span>
+                </div>
+                <div class="order-total-with-discount">
+                    <span>{% translate 'Amount with discounts:' %}</span>
+                    <span>${{ cart.get_total_price_with_discounts }}</span>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
