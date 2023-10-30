@@ -137,6 +137,7 @@ LOCALE_PATHS = (
     os.path.join(BASE_DIR, './coupon/locale/'),
     os.path.join(BASE_DIR, './present_cards/locale/'),
     os.path.join(BASE_DIR, './orders/locale/'),
+    os.path.join(BASE_DIR, './payment/locale/'),
 )
 
 PARLER_LANGUAGES = {

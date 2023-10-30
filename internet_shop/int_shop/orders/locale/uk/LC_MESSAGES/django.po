@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-29 17:43+0200\n"
+"POT-Creation-Date: 2023-10-30 16:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -221,6 +221,10 @@ msgstr "Одиниця замовлення"
 msgid "Order Items"
 msgstr "Одиниці замовлення"
 
+#: tasks.py:20
+msgid "Order confirmed"
+msgstr "Замовлення прийнято"
+
 #: templates/orders/order_create.html:5 templates/orders/order_create.html:13
 msgid "Checkout"
 msgstr "Оформлення замовлення"
@@ -275,7 +279,7 @@ msgstr "Ваше замовлення"
 
 #: templates/orders/order_created.html:21
 msgid "All information about your orders you can see in your"
-msgstr "Вся інформація про ваші замовлення ви можете знайти у вашому"
+msgstr "Всю інформація про ваші замовлення ви можете знайти у вашому"
 
 #: templates/orders/order_created.html:24
 msgid "Profile"

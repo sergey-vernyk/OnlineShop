@@ -49,23 +49,25 @@ class OrderCreateView(LoginRequiredMixin, FormView):
             order.delivery = delivery
             order.profile = profile
             order.save()
-            self.create_order_items_from_cart(order)  # creating the order items in DB
+            self.create_order_items_from_cart(order)  # creating the order's items in DB
             self.request.session['order_id'] = order.pk
 
             domain = request.site.domain
             is_secure = request.is_secure()
             # send message about complete the order to user's email
-            order_created.delay(data={'domain': domain, 'is_secure': is_secure},
+            order_created.delay(data={'domain': domain,
+                                      'is_secure': is_secure,
+                                      'language': request.LANGUAGE_CODE},
                                 order_id=order.pk,
                                 profile_username=self.request.user.username)
             return HttpResponseRedirect(self.success_url)
-        else:  # returns forms with errors
-            return self.render_to_response(context={'form': order_form,
-                                                    'delivery_form': delivery_form})
+        # returns forms with errors
+        return self.render_to_response(context={'form': order_form,
+                                                'delivery_form': delivery_form})
 
-    def create_order_items_from_cart(self, order: Order):
+    def create_order_items_from_cart(self, order: Order) -> None:
         """
-        Creating order items in DB from cart items, linked with current order
+        Creating order's items in DB from cart items, linked with current order.
         """
         cart = Cart(self.request)
         for item in cart:
