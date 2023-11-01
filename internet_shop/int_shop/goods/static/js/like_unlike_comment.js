@@ -28,10 +28,9 @@ $(document).ready(function() {
                         if(previousStatus == 'unset') {
                             $(currentButton).css(cssFillThumb);
                             $(`#unlike-${commentId}`).css(cssUnfillThumb); //reset opposite action
-                        } else if(previousStatus == 'set') {
+                        } else if(previousStatus == 'set')
                             $(currentButton).css(cssUnfillThumb);
-                        }
-        
+
                         break;
                     case 'unlike':
                         if(previousStatus == 'set') {
@@ -53,16 +52,20 @@ $(document).ready(function() {
                 //if user is not authenticated - show up window with an information
                 if(errorThrown === 'Unauthorized') {
                     var login_url = jqXHR.responseJSON['login_page_url']
-                    const content = `<div id="dialog">Please <a href="${login_url}">login</a> to be able to rate comments!</div>`
+                    // translate windows's strings for other languges
+                    const formats = django.gettext(
+                        '<div id="dialog">Please <a href="%s">login</a> to be able to rate comments!</div>', login_url
+                    )
+                    const content = django.interpolate(formats, [login_url])
 
                     var commentRatePanel = $(`#comment-pk-${commentId}`).children().first();
 
                     $(content).dialog({
-                        height: 57,
-                        width: 300,
+                        height: 75,
+                        width: 250,
                         resizable: false,
                         draggable: false,
-                        title: 'Unauthorized',
+                        title: django.gettext('Unauthorized'),
                         show: { effect: "fadeIn", duration: 500 },
                         hide: { effect: "fadeOut", duration: 500 },
                         classes: {
@@ -70,7 +73,7 @@ $(document).ready(function() {
                             'ui-dialog-title': 'dialog-rate-comment-title',
                             'ui-dialog-content': 'dialog-rate-comment-content',
                         },
-                        position: {my: "right center", at: "right-22% center", of: commentRatePanel}
+                        position: {my: "right center", at: "right-24% center", of: commentRatePanel}
                       });
                 }
             },

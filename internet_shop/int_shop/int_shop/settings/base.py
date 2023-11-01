@@ -125,7 +125,6 @@ LANGUAGE_CODE = 'en'
 LANGUAGES = (
     ('en', _('English')),
     ('uk', _('Ukrainian')),
-    ('ru', _('Russian')),
 )
 
 # path where Django looks for translations files
@@ -144,7 +143,6 @@ PARLER_LANGUAGES = {
     SITE_ID: (
         {'code': 'en'},
         {'code': 'uk'},
-        {'code': 'ru'},
     ),
     'default': {
         'fallbacks': ['en'],  # translation language by default

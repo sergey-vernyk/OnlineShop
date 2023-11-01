@@ -91,7 +91,7 @@ body {
     font-family:'Comic Sans MS';
     font-size:18px;
     line-height:1.3em;
-    background: rgba(51,84,175,1);
+    background: rgb(71, 107, 207);
     min-width: 85%;
 }
 
@@ -275,7 +275,7 @@ body {
     list-style: none;
     padding-left: 0;
     width: 193px;
-    background-color: rgba(51,84,175,1);
+    background-color: rgb(71, 107, 207);
     border-radius: 8px;
     margin-bottom: inherit;
     z-index: 10;
@@ -442,7 +442,7 @@ body {
 }
 
 .footer {
-    background-color: rgba(51,84,175,1);
+    background-color: rgb(71, 107, 207);
     color: white;
     font-family: 'Montserrat', sans-serif;
 }   
@@ -758,3 +758,17 @@ body {
 }
 
 .social-contacts img { margin-right: 5px; }
+
+/* change language */
+.change-language-form {
+    display: flex;
+    align-items: center;
+}
+
+.change-language-form img {
+    border: 1px solid rgb(38, 38, 38);
+    margin: 0 3px;
+    cursor: pointer;
+}
+
+.language-list { margin: 10px; }

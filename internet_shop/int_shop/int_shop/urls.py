@@ -54,8 +54,12 @@ swagger_schema_view = get_schema_view(
     validators=['ssv'],
     permission_classes=[AllowAny],
 )
+# view sets a user’s language preference and redirects to a given URL
+urlpatterns = [
+    path('i18n/', include('django.conf.urls.i18n')),
+]
 
-urlpatterns = i18n_patterns(
+urlpatterns += i18n_patterns(
     path('admin/', admin.site.urls),
     path('', include('goods.urls')),
     path('account/', include('account.urls')),
@@ -70,6 +74,7 @@ urlpatterns = i18n_patterns(
     path('contacts/', TemplateView.as_view(template_name='./contacts.html'), name='contacts'),
     path('ajax/update_captcha/', create_captcha_image, name='update_captcha'),
     path('jsi18n/cart/', JavaScriptCatalog.as_view(packages=['cart']), name='javascript-catalog'),
+    path('jsi18n/goods/', JavaScriptCatalog.as_view(packages=['goods']), name='javascript-catalog'),
     re_path(r'^api/(?P<version>(v1|v2))/goods/', include('goods.api.urls')),
     re_path(r'^api/(?P<version>(v1|v2))/account/', include('account.api.urls')),
     re_path(r'^api/(?P<version>(v1|v2))/cart/', include('cart.api.urls')),
