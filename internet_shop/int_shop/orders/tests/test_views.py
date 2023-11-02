@@ -235,6 +235,7 @@ class OrderCreateTest(TestCase):
         request = self.factory.post(reverse('orders:order_create'), data=data_order_form)
         request.session = self.client.session
         request.user = self.user
+        request.LANGUAGE_CODE = 'en'
         site = get_current_site(request)
         request.site = site
 
