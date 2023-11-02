@@ -37,7 +37,7 @@ def cart_add(request) -> JsonResponse:
                          'total_discount': cart.get_total_discount()})
 
 
-def cart_detail(request)-> JsonResponse:
+def cart_detail(request) -> JsonResponse:
     """
     Displaying cart with goods if any.
     """

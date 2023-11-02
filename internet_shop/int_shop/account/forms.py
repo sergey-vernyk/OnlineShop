@@ -119,11 +119,12 @@ class RegisterUserForm(UserCreationForm):
 
     first_name = forms.CharField(required=True, label=_('First name'),
                                  widget=forms.TextInput(attrs={'class': 'reg-field'}))
-    last_name = forms.CharField(required=False, label=_('Last name'), widget=forms.TextInput(attrs={'class': 'reg-field'}))
+    last_name = forms.CharField(required=False, label=_('Last name'),
+                                widget=forms.TextInput(attrs={'class': 'reg-field'}))
     date_of_birth = forms.DateField(required=False, label=_('Date of birth'), widget=forms.DateInput(
         attrs={'class': 'reg-field', 'placeholder': 'dd-mm-yyyy'}))
-    about = forms.CharField(label=_('About'), required=False, widget=forms.Textarea(attrs={'rows': 6, 'cols': 5,
-                                                                                        'class': 'reg-field'}))
+    about = forms.CharField(label=_('About'), required=False,
+                            widget=forms.Textarea(attrs={'rows': 6, 'cols': 5, 'class': 'reg-field'}))
 
     gender = forms.CharField(required=False, label=_('Gender'), widget=forms.RadioSelect(choices=Profile.GENDER))
 

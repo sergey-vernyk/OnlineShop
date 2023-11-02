@@ -34,4 +34,3 @@ class CategoryAdmin(TranslatableAdmin):
 
     def get_prepopulated_fields(self, request, obj=None) -> dict[str, tuple[str]]:
         return {'slug': ('name',)}
-    
