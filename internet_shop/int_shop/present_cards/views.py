@@ -13,7 +13,7 @@ from present_cards.models import PresentCard
 @require_POST
 def apply_present_card(request):
     """
-    Applying present card from cart page and adding it to profile
+    Apply present card and add it to profile.
     """
     card_form = PresentCardApplyForm(request.POST)
     if card_form.is_valid():
@@ -24,10 +24,9 @@ def apply_present_card(request):
 
         return JsonResponse({'success': True,
                              'card_amount': present_card.amount})
-    else:
-        request.session['present_card_id'] = None
-        return JsonResponse({'success': False,
-                             'form_errors': card_form.errors})
+    request.session['present_card_id'] = None
+    return JsonResponse({'success': False,
+                         'form_errors': card_form.errors})
 
 
 @auth_profile_required
@@ -35,7 +34,7 @@ def apply_present_card(request):
 @require_POST
 def cancel_present_card(request):
     """
-    Canceling applying present card to cart, deleting this card from session and from profile
+    Cancel applied present card, delete this card from session and from profile.
     """
     present_card = PresentCard.objects.get(pk=request.session.get('present_card_id'))
     present_card.profile.profile_cards.update(profile_id=None)

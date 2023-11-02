@@ -1,14 +1,15 @@
 from django.contrib import admin
+from django.shortcuts import reverse
+from django.utils.safestring import mark_safe
+from django.utils.translation import gettext_lazy as _
 
 from orders.models import Order, Delivery, OrderItem
-from django.utils.safestring import mark_safe
-from django.shortcuts import reverse
 
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     """
-    Admin panel for orders
+    Admin panel for orders.
     """
     fieldsets = (
         ('Buyer info', {
@@ -28,7 +29,7 @@ class OrderAdmin(admin.ModelAdmin):
         })
     )
 
-    @admin.display(description='Name')
+    @admin.display(description=_('Name'))
     def get_full_name(self, obj):
         return f'{obj.first_name} {obj.last_name}'
 
@@ -39,7 +40,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ['is_paid']
     list_display_links = ['get_discount', 'get_full_name']
 
-    @admin.display(description='Apply discount')
+    @admin.display(description=_('Apply discount'))
     def get_discount(self, obj):
         if obj.coupon:
             coupon_url = reverse('admin:coupons_coupon_change', args=(obj.coupon.pk,))
@@ -48,7 +49,7 @@ class OrderAdmin(admin.ModelAdmin):
             card_url = reverse('admin:present_cards_presentcard_change', args=(obj.present_card.pk,))
             return mark_safe(f'<a href="{card_url}">Present Card</a>')
 
-    @admin.display(description='Total cost (discount)')
+    @admin.display(description=_('Total cost (discount)'))
     def get_total_order_cost(self, obj):
         values = obj.get_total_values()
         if values['total_cost_with_discounts']:

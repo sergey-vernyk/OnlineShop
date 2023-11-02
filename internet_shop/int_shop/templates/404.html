@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Page Not Found (404) | OnlineShop{% endblock %}
+{% block title %}{% translate 'Page Not Found' %} (404) | OnlineShop{% endblock %}
 
 {% block styles %}
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300&display=swap" rel="stylesheet">
@@ -12,11 +13,11 @@
         <div class="page404-content">
             <img src="{% static 'img/404_not_found.png' %}" alt="">
             <div class="err-message">
-                Page Not Found
+               {% translate 'Page Not Found' %}
             </div>
             <div class="additional-err-text">
-                The page you are looking for doesn't exist or another error occurred.
-                Go to the <a href="{% url 'goods:product_list' %}">Home Page</a>.
+                {% translate 'The page you are looking for does not exist or another error occurred.' %}
+                {% translate 'Go to the' %} <a href="{% url 'goods:product_list' %}">{% translate 'Home Page' %}</a>.
             </div>
         </div>
     </div>

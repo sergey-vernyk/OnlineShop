@@ -39,9 +39,14 @@ $(document).ready(function() {
 		}
 	})
 
-	//function calculates a new price value, depending on its increase or decrease
-	function calcNewPriceValue(newValue, direction) {
-		var newConvertedValue = Math.round(Number(newValue)) * 100 //rounding the price to an integer
+	/**
+	 * 
+	 * @param {string} curValue current value, which will be do up or down
+	 * @param {string} direction either `up` or `down`
+	 * @returns {string} new converted value
+	 */
+	function calcNewPriceValue(curValue, direction) {
+		var newConvertedValue = Math.round(Number(curValue)) * 100 //rounding the price to an integer
 		if (direction === 'up') {
 			return ((newConvertedValue + 1000) / 100).toFixed(2);
 		} else if (direction === 'down') {

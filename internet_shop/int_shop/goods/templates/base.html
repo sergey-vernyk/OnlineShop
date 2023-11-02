@@ -1,3 +1,4 @@
+{% load i18n %}
 {% load static %}
 <!DOCTYPE html>
 <html>
@@ -32,46 +33,46 @@
             <div class="header-block-links-1">
                 <ul class="dropdwn">
                     <li id="main-nav-item">
-                        Categories<span class="material-symbols-outlined">arrow_drop_down</span>
+                        {% translate 'Categories' %} <span class="material-symbols-outlined">arrow_drop_down</span>
                     </li>
                     <li class="dropdwn-item">
                         <a href="{% url 'goods:product_list' %}">
                             <span class="material-symbols-outlined">dataset</span>
-                            All
+                            {% translate 'All' %}
                         </a>
                     </li>
                     {% for c in categories %}
-                    <li class="dropdwn-item">
-                        {% if c.name == 'Mobile phones' %}
-                        <a href="{{ c.get_absolute_url }}">
-                            <span class="material-symbols-outlined">smartphone</span>
-                            {{ c.name }}
-                        </a>
-                        {% elif c.name == 'Laptops' %}
-                        <a href="{{ c.get_absolute_url }}">
-                            <span class="material-symbols-outlined">laptop_windows</span>
-                            {{ c.name }}
-                        </a>
-                        {% elif c.name == 'Smart Gadgets' %}
-                        <a href="{{ c.get_absolute_url }}">
-                            <span class="material-symbols-outlined">devices_other</span>
-                            {{ c.name }}
-                        </a>
-                        {% elif c.name == 'Audio Video' %}
-                        <a href="{{ c.get_absolute_url }}">
-                            <span class="material-symbols-outlined">play_circle</span>
-                            {{ c.name }}
-                        </a>
-                        {% endif %}
-                    </li>
+                        <li class="dropdwn-item">
+                            {% if c.name == 'Mobile phones' %}
+                            <a href="{{ c.get_absolute_url }}">
+                                <span class="material-symbols-outlined">smartphone</span>
+                                {% translate 'Mobile phones' %}
+                            </a>
+                            {% elif c.name == 'Laptops' %}
+                            <a href="{{ c.get_absolute_url }}">
+                                <span class="material-symbols-outlined">laptop_windows</span>
+                                {% translate 'Laptops' %}
+                            </a>
+                            {% elif c.name == 'Smart Gadgets' %}
+                            <a href="{{ c.get_absolute_url }}">
+                                <span class="material-symbols-outlined">devices_other</span>
+                                {% translate 'Smart Gadgets' %}
+                            </a>
+                            {% elif c.name == 'Audio Video' %}
+                            <a href="{{ c.get_absolute_url }}">
+                                <span class="material-symbols-outlined">play_circle</span>
+                                {% translate 'Audio Video' %}
+                            </a>
+                            {% endif %}
+                        </li>
                     {% endfor %}
                 </ul>
                 <ul class="additional-menu-items">
                     <li>
-                        <a href="{% url 'delivery_services' %}">Delivery</a>
+                        <a href="{% url 'delivery_services' %}">{% translate 'Delivery' %}</a>
                     </li>
                     <li>
-                        <a href="{% url 'contacts' %}">Contacts</a>
+                        <a href="{% url 'contacts' %}">{% translate 'Contacts' %}</a>
                     </li>
                 </ul>
             </div>
@@ -80,7 +81,7 @@
                 {{ search_form.query }}
                 <button role="button" id="search-btn" type="submit">
                     <span class="material-symbols-outlined">search</span>
-                    Search
+                    {% translate 'Search' %}
                 </button>
             </form>
             <!--Panel with username and registration or authorization buttons-->
@@ -94,10 +95,10 @@
                     </div>
                     {% else %}
                     <div class="authorization" role="toolbar">
-                        <a id="login-button" role="button" href="{% url 'login' %}">Sign in</a>
+                        <a id="login-button" role="button" href="{% url 'login' %}">{% translate 'Sign in' %}</a>
                         <span style="color: white;">|</span>
                         <div class="register">
-                            <a id="register-button" href="{% url 'register_user' %}">Register</a>
+                            <a id="register-button" href="{% url 'register_user' %}">{% translate 'Register' %}</a>
                         </div>
                     </div>
                     {% endif %}
@@ -119,36 +120,56 @@
                             </a>
                         </div>
                         {% with discount_price=cart.get_total_price_with_discounts %}
-                        <div class="total-price">
-                            {% if cart %}
-                            {% if discount_price < 0 %}
-                            Free
-                            {% else %}
-                            ${{ cart.get_total_price_with_discounts }}
-                            {% endif %}
-                            {% endif %}
-                        </div>
+                            <div class="total-price">
+                                {% if cart %}
+                                    {% if discount_price < 0 %}
+                                        {% translate 'Free' %}
+                                    {% else %}
+                                        ${{ cart.get_total_price_with_discounts }}
+                                    {% endif %}
+                                {% endif %}
+                            </div>
                         {% endwith %}
                     </div>
                 </div>
                 <!--Social contacts-->
                 <div class="we-in-social">
-                    <p>We are in messengers</p>
+                    <p>{% translate 'We are in messengers' %}</p>
                     <ul>
                         <li>
-                            <a href="https://t.me/+38096134567">
+                            <a href="https://t.me/+380961345678">
                                 <img src="{% static 'img/Telegram_logo.svg' %}" width="30" height="30"></a>
                         </li>
                         <li>
-                            <a href="https://wa.me/+38096134567">
+                            <a href="https://wa.me/+380961345678">
                                 <img src="{% static 'img/whatsapp-icon.png' %}" width="30" height="30"></a>
                         </li>
                         <li>
-                            <a href="viber://contact?number %2B38096134567">
+                            <a href="viber://contact?number %2B380961345678">
                                 <img src="{% static 'img/Viber_logo.svg' %}" width="30" height="30"></a>
                         </li>
                     </ul>
                 </div>
+                <!--change language form-->
+                <form action="{% url 'set_language' %}" class="change-language-form" method="post">
+                    {% csrf_token %}
+                    <input name="next" type="hidden" value="{{ redirect_to }}">
+                    {% get_current_language as LANGUAGE_CODE %}
+                    <input type="hidden" name="cur-lang", value="{{ LANGUAGE_CODE }}">
+                    {% get_available_languages as LANGUAGES %}
+                    {% get_language_info_list for LANGUAGES as languages %}
+                    
+                    <div class="language-list">
+                        {% for language in languages %}
+                            {% if language.code == 'uk' %}
+                                <img id="lang-{{ language.code }}" src="{% static 'img/ua_flag.png' %}" width="30" height="24">
+                            {% elif language.code == 'en' %}
+                                <img id="lang-{{ language.code }}" src="{% static 'img/united_kingdom_flag.png' %}" width="30" height="24">
+                            {% endif %}
+                        {% endfor %}
+                        <input type="hidden" name="language", value="">
+                    </div>
+                </form>
             </div>
         </div>
     </nav>
@@ -159,7 +180,7 @@
     <footer class="footer">
         <section class="footer-info">
             <div class="contacts">
-                <h5 class="footer-headers">Phones</h5>
+                <h5 class="footer-headers">{% translate 'Phones' %}</h5>
                 <ul class="phone-numbers">
                     <li>
                         <div>
@@ -182,7 +203,7 @@
                 </ul>
             </div>
             <div class="shop-prods-categories">
-                <h5 class="footer-headers">Shop categories</h5>
+                <h5 class="footer-headers">{% translate 'Shop categories' %}</h5>
                 <ul>
                     <!--Categories-->
                     {% for c in categories %}
@@ -190,22 +211,22 @@
                             {% if c.name == 'Mobile phones' %}
                                 <a href="{{ c.get_absolute_url }}">
                                     <span class="material-symbols-outlined">smartphone</span>
-                                    {{ c.name }}
+                                    {% translate 'Mobile phones' %}
                                 </a>
                             {% elif c.name == 'Laptops' %}
                                 <a href="{{ c.get_absolute_url }}">
                                     <span class="material-symbols-outlined">laptop_windows</span>
-                                    {{ c.name }}
+                                    {% translate 'Laptops' %}
                                 </a>
                             {% elif c.name == 'Smart Gadgets' %}
                                 <a href="{{ c.get_absolute_url }}">
                                     <span class="material-symbols-outlined">devices_other</span>
-                                    {{ c.name }}
+                                    {% translate 'Smart Gadgets' %}
                                 </a>
                             {% elif c.name == 'Audio Video' %}
                                 <a href="{{ c.get_absolute_url }}">
                                     <span class="material-symbols-outlined">play_circle</span>
-                                    {{ c.name }}
+                                    {% translate 'Audio Video' %}
                                 </a>
                             {% endif %}
                         </li>
@@ -214,7 +235,7 @@
             </div>
             <div class="other-info">
                 <div class="email">
-                    <h5 class="footer-headers">Emails</h5>
+                    <h5 class="footer-headers">{% translate 'Emails' %}</h5>
                     <ul>
                         <li>
                             <div>info@onlineshop.com</div>
@@ -228,7 +249,7 @@
                     </ul>
                 </div>
                 <div class="copyright">
-                    ©2023 Online Shop. All rights reserved. Used only for development.
+                    {% translate '©2023 Online Shop. All rights reserved. Used only for development.' %}
                 </div>
             </div>
         </section>
@@ -236,5 +257,6 @@
     <script src="{% static 'js/add_to_cart.js' %}"></script>
     <script src="{% static 'js/main_dropdown.js' %}"></script>
     <script src="{% static 'js/change_cart_pointer_events.js' %}"></script>
+    <script src="{% static 'js/change_language.js' %}"></script>
 </body>
 </html>

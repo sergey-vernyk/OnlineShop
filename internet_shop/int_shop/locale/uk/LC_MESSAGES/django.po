@@ -1,0 +1,284 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-10-27 19:24+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != "
+"11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % "
+"100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || "
+"(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
+
+#: common/utils.py:33
+msgid "Valid"
+msgstr "Дійсний"
+
+#: common/utils.py:34
+msgid "Invalid"
+msgstr "Недійсний"
+
+#: common/utils.py:127
+msgid "Captcha is not correct"
+msgstr "Капча не правильна"
+
+#: int_shop/settings/base.py:126
+msgid "English"
+msgstr "Англійська"
+
+#: int_shop/settings/base.py:127
+msgid "Ukrainian"
+msgstr "Українська"
+
+#: int_shop/settings/base.py:128
+msgid "Russian"
+msgstr "Російська"
+
+#: templates/404.html:5 templates/404.html:16
+msgid "Page Not Found"
+msgstr "Сторінку не знайдено"
+
+#: templates/404.html:19
+msgid "The page you are looking for does not exist or another error occurred."
+msgstr "Сторінка, яку ви шукаете не існує або виникла інша помилка."
+
+#: templates/404.html:20
+msgid "Go to the"
+msgstr "Перейти на"
+
+#: templates/404.html:20
+msgid "Home Page"
+msgstr "Головна сторінка"
+
+#: templates/500.html:7
+msgid "Server Error"
+msgstr "Помилка сервера"
+
+#: templates/500.html:59
+msgid "Internal Server Error"
+msgstr "Внутрішня помилка сервера"
+
+#: templates/500.html:63
+msgid ""
+"Sorry, something went wrong our end. We are currently trying to fix the "
+"problem."
+msgstr ""
+"Вибачте, щось трапилось з нашого боку. Зараз ми намагаємось виправити цю "
+"проблему."
+
+#: templates/500.html:64
+msgid "In the meantime you can:"
+msgstr "Тим часом ви можете:"
+
+#: templates/500.html:69
+msgid "Refresh this page"
+msgstr "Оновити сторінку"
+
+#: templates/500.html:73
+msgid "Wait a few minutes"
+msgstr "Зачекати декілька хвилин"
+
+#: templates/admin/goods/product/change_form.html:18
+msgid "Home"
+msgstr "Домівка"
+
+#: templates/admin/goods/product/change_form.html:21
+#, python-format
+msgid "Add %(name)s"
+msgstr "Додати %(name)s"
+
+#: templates/admin/goods/product/change_form.html:43
+msgid "Please correct the error below."
+msgstr "Будь ласка виправте помилку нижче"
+
+#: templates/admin/goods/product/change_form.html:43
+msgid "Please correct the errors below."
+msgstr "Будь ласка виправте помилку нижче"
+
+#: templates/contacts.html:5
+msgid "Contacts"
+msgstr "Контакти"
+
+#: templates/contacts.html:15
+msgid "Contact information"
+msgstr "Контакта інформація"
+
+#: templates/contacts.html:18
+msgid "Emails"
+msgstr "Електронні адреси"
+
+#: templates/contacts.html:20
+msgid "Info:"
+msgstr "Інфо:"
+
+#: templates/contacts.html:23
+msgid "Sales:"
+msgstr "Продажі:"
+
+#: templates/contacts.html:26
+msgid "Cooperation:"
+msgstr "Співробітництво:"
+
+#: templates/contacts.html:30
+msgid "Phone Numbers"
+msgstr "Номери телефонів"
+
+#: templates/contacts.html:32
+msgid "Customer Support:"
+msgstr "Підтримка клієнтів:"
+
+#: templates/contacts.html:35
+msgid "Sales Inquiries:"
+msgstr "Запити щодо продажу:"
+
+#: templates/contacts.html:38
+msgid "About Cooperation:"
+msgstr "Про співробітництво:"
+
+#: templates/contacts.html:44
+msgid "Also you can ask your questions us in our social accounts"
+msgstr ""
+"Також ви можете поставити ваші питання в акаунтах наших соцільних мереж"
+
+#: templates/delivery.html:5
+msgid "Delivery"
+msgstr "Доставка"
+
+#: templates/delivery.html:15
+msgid "Delivery Services"
+msgstr "Служби доставки"
+
+#: templates/delivery.html:22
+msgid "Nova Post"
+msgstr "Нова Пошта"
+
+#: templates/delivery.html:26
+msgid ""
+"\n"
+"                        Nova Post is a trusted and reliable delivery service "
+"that ensures your packages reach you safely and\n"
+"                        on time. With it efficient logistics network and "
+"dedicated team, they strive to provide the best delivery\n"
+"                        experience for their customers.\n"
+"                    "
+msgstr ""
+"\n"
+"                       Nova Post — це перевірена та надійна служба доставки, "
+"яка гарантує, що ваші посилки дістануться до вас "
+"безпечно                       та вчасно. Завдяки ефективній логістичній "
+"мережі та відданій команді, вони прагнуть забезпечити найкращий досвід "
+"доставки                       для своїх клієнтів."
+
+#: templates/delivery.html:34
+msgid "Standard Delivery:</span>Estimated delivery within 5-7 business days"
+msgstr ""
+"Станадартна доставка:</span>Розрахункова доставка протягом 5-7 робочих днів"
+
+#: templates/delivery.html:38
+msgid "Express Delivery:</span> Guaranteed delivery within 2-3 business days"
+msgstr ""
+"Експрес-доставка:</span> Гарантована доставка протягом 2-3 робочих днів"
+
+#: templates/delivery.html:42
+msgid "Same-Day Delivery:</span> Get your package delivered on the same day"
+msgstr "Доставка в той же день:</span> Отримайте свою посилку в той же день"
+
+#: templates/delivery.html:43
+msgid "(available in select areas)"
+msgstr "(доступно в окремих регіонах)"
+
+#: templates/delivery.html:51
+msgid "Meest Express"
+msgstr "Міст Експрес"
+
+#: templates/delivery.html:55
+msgid ""
+"\n"
+"                        Meest Express is a global delivery service known for "
+"its fast and efficient shipping solutions.\n"
+"                        They offer a range of delivery options to suit your "
+"needs, including express and economy shipping.\n"
+"                        Their reliable network ensures your packages are "
+"delivered securely and on time.\n"
+"                    "
+msgstr ""
+"\n"
+"                         Meest Express — це глобальна служба доставки, яка "
+"відома своїми швидкими й ефективними рішеннями для "
+"доставки.                         Вони пропонують різноманітні варіанти "
+"доставки відповідно до ваших потреб, зокрема експрес-доставку та економ-"
+"доставку.                         Їхня надійна мережа гарантує, що ваші "
+"посилки будуть доставлені безпечно та вчасно."
+
+#: templates/delivery.html:63
+msgid "Standard Delivery"
+msgstr "Стандартна доставка:"
+
+#: templates/delivery.html:64
+msgid "Estimated delivery within 7-10 business days"
+msgstr "Орієнтовна доставка протягом 7-10 робочих днів"
+
+#: templates/delivery.html:67
+msgid "Express Delivery:"
+msgstr "Експрес доставка:"
+
+#: templates/delivery.html:68
+msgid "Guaranteed delivery within 3-5 business days"
+msgstr "Гарантована доставка протягом 3-5 робочих днів"
+
+#: templates/delivery.html:71 templates/delivery.html:100
+msgid "International Delivery:"
+msgstr "Міжнародна доставка:"
+
+#: templates/delivery.html:72 templates/delivery.html:101
+msgid "Shipping rates vary based on the destination"
+msgstr "Гарантована доставка протягом 3-5 робочих днів"
+
+#: templates/delivery.html:80
+msgid "Ukrpost"
+msgstr "Укрпошта"
+
+#: templates/delivery.html:84
+msgid ""
+"\n"
+"                        Ukrpost is the national postal service of Ukraine. "
+"They provide a wide range of postal and delivery\n"
+"                        services, including domestic and international "
+"shipping, parcel tracking, and additional insurance\n"
+"                        options. Their dedicated team is committed to "
+"delivering your packages with care and efficiency.\n"
+"                    "
+msgstr ""
+"\n"
+"                        Укрпошта — національна поштова служба України. Вони "
+"пропонують широкий спектр поштових послуг і доставки                        "
+"послуги, включаючи внутрішні та міжнародні доставки відстеження посилок і "
+"додаткові варіанти                       страхування. Їхня віддана команда "
+"дбайливо та ефективно доставлятиме ваші посилки."
+
+#: templates/delivery.html:92
+msgid "Standard Delivery:"
+msgstr "Стандартна доставка:"
+
+#: templates/delivery.html:93
+msgid "Estimated delivery within 3-5 business days"
+msgstr "Орієнтовна доставка протягом 3-5 робочих днів"
+
+#: templates/delivery.html:96
+msgid "Registered Mail:"
+msgstr "Доставка замовленим листом:"
+
+#: templates/delivery.html:97
+msgid "Additional tracking and security features"
+msgstr "Додаткові функції відстеження та безпеки"

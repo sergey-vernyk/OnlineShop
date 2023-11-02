@@ -128,6 +128,7 @@ class TestProductListView(TestCase):
         self.instance.setup(self.request,
                             **{'category_slug': f'category-{self.random_number}', 'filter_price': ('120.20', '350.00')})
         self.request.user = self.user
+        self.request.LANGUAGE_CODE = 'en'
 
         context = self.instance.get_context_data()
         # whether the key exists in context
@@ -362,6 +363,7 @@ class TestProductDetailView(TestCase):
         self.request = self.factory.get(reverse('goods:product_detail',
                                                 args=(self.product1.pk, self.product1.slug)))
         self.request.user = self.user
+        self.request.LANGUAGE_CODE = 'en'
         self.profile.comments_liked.add(self.comment)  # add to profile comment, which it rated as like
 
         self.instance.setup(self.request)
@@ -581,7 +583,7 @@ class TestProductDetailView(TestCase):
 
         self.instance.setup(self.request, **{'product_pk': self.product1.pk, 'product_slug': self.product1.slug})
         url = self.instance.get_success_url()
-        self.assertURLEqual(f'/goods/{self.product1.pk}/{self.product1.slug}/', url)
+        self.assertURLEqual(reverse('goods:product_detail', args=(self.product1.pk, self.product1.slug)), url)
 
     def tearDown(self):
         # deleting product directory from media root
@@ -677,7 +679,7 @@ class TestFilterResultsView(TestCase):
 
     def test_filtering_products_process_by_passed_parameters(self):
         """
-        Checking keys and values in context dict, queryset content, handling the GET method
+        Checking keys and values in context dict, queryset content, handling the GET method.
         """
         # search product1 and product2
         # make request with min price, max price, manufacturers and properties as data
@@ -721,8 +723,12 @@ class TestFilterResultsView(TestCase):
                 self.assertEqual(value, self.category_2)
             elif key == 'category_properties':
                 self.assertEqual(value, {'Internal Memory': [
-                    {'name': 'Volume', 'text_value': '', 'numeric_value': Decimal('256.00'), 'units': 'Gb',
-                     'category_property': 'Internal Memory', 'category_property_pk': self.property_category3.pk,
+                    {'translations__name': 'Volume',
+                     'translations__text_value': '',
+                     'numeric_value': Decimal('256.00'),
+                     'translations__units': 'Gb',
+                     'category_property': 'Internal Memory',
+                     'category_property_pk': self.property_category3.pk,
                      'item_count': 2}]})
             elif key == 'filter_manufacturers':
                 self.assertIsInstance(value, FilterByManufacturerForm)
@@ -770,12 +776,20 @@ class TestFilterResultsView(TestCase):
                 self.assertEqual(value, self.category_1)
             elif key == 'category_properties':
                 self.assertEqual(value, {'Display': [
-                    {'name': 'Diagonal', 'text_value': '', 'numeric_value': Decimal('15.60'), 'units': '"',
-                     'category_property': 'Display', 'category_property_pk': self.property_category1.pk,
+                    {'translations__name': 'Diagonal',
+                     'translations__text_value': '',
+                     'numeric_value': Decimal('15.60'),
+                     'translations__units': '"',
+                     'category_property': 'Display',
+                     'category_property_pk': self.property_category1.pk,
                      'item_count': 1}],
                     'Software': [
-                        {'name': 'OS', 'text_value': 'Linux', 'numeric_value': Decimal('0.00'), 'units': '',
-                         'category_property': 'Software', 'category_property_pk': self.property_category2.pk,
+                        {'translations__name': 'OS',
+                         'translations__text_value': 'Linux',
+                         'numeric_value': Decimal('0.00'),
+                         'translations__units': '',
+                         'category_property': 'Software',
+                         'category_property_pk': self.property_category2.pk,
                          'item_count': 1}]})
             elif key == 'filter_manufacturers':
                 self.assertIsInstance(value, FilterByManufacturerForm)
@@ -810,12 +824,20 @@ class TestFilterResultsView(TestCase):
                 self.assertEqual(value, self.category_1)
             elif key == 'category_properties':
                 self.assertEqual(value, {'Display': [
-                    {'name': 'Diagonal', 'text_value': '', 'numeric_value': Decimal('15.60'), 'units': '"',
-                     'category_property': 'Display', 'category_property_pk': self.property_category1.pk,
+                    {'translations__name': 'Diagonal',
+                     'translations__text_value': '',
+                     'numeric_value': Decimal('15.60'),
+                     'translations__units': '"',
+                     'category_property': 'Display',
+                     'category_property_pk': self.property_category1.pk,
                      'item_count': 1}],
                     'Software': [
-                        {'name': 'OS', 'text_value': 'Linux', 'numeric_value': Decimal('0.00'), 'units': '',
-                         'category_property': 'Software', 'category_property_pk': self.property_category2.pk,
+                        {'translations__name': 'OS',
+                         'translations__text_value': 'Linux',
+                         'numeric_value': Decimal('0.00'),
+                         'translations__units': '',
+                         'category_property': 'Software',
+                         'category_property_pk': self.property_category2.pk,
                          'item_count': 1}]})
             elif key == 'filter_manufacturers':
                 self.assertIsInstance(value, FilterByManufacturerForm)
@@ -962,12 +984,13 @@ class TestOtherGoodsViews(TestCase):
 
     def test_add_product_to_favorite_for_unauthenticated_user(self):
         """
-        Checking add product into profile's favorite, if the profile isn't authenticated
+        Checking add product into profile's favorite, if the profile isn't authenticated.
         """
         # add product to favorite
         response = self.client.post(reverse('goods:add_or_remove_product_favorite'),
                                     data={'product_id': self.product1.pk, 'action': 'add'},
-                                    **{'HTTP_X-REQUESTED-WITH': 'XMLHttpRequest', 'HTTP_REFERER': 'http://testserver/'})
+                                    **{'HTTP_X-REQUESTED-WITH': 'XMLHttpRequest',
+                                       'HTTP_REFERER': 'http://testserver/en/'})
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)  # must be unauthorized status
 
@@ -1931,8 +1954,8 @@ class TestOtherGoodsViews(TestCase):
         self.assertQuerysetEqual(context['products'],
                                  # result depends on "per_page" value
                                  [p for n, p in enumerate(paginator.object_list, 1) if n <= paginator.per_page])
-        # must be product1(300.25), product2(400.45)
-        self.assertQuerysetEqual(paginator.object_list, [self.product1, self.product2])
+        # the order of products can be whichever
+        self.assertQuerysetEqual(paginator.object_list, [self.product1, self.product2], ordered=False)
 
     def test_product_ordering_in_promotional_list_with_category(self):
         """

@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Payment success | OnlineShop{% endblock %}
+{% block title %}{% translate 'Payment success' %} | OnlineShop{% endblock %}
 {% block styles %}
     <link href="{% static 'css/payment.css' %}" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
@@ -13,10 +14,12 @@
         <div class="success-payment">
             <a class="payment-go-home" href="{% url 'goods:product_list' %}">
                 <span class="material-symbols-outlined">home</span>
-                To main page
+                {% translate 'To main page' %}
             </a>
-            <h3 class="header-success-payment">Payment was successfully completed!</h3>
-            <p>Your order <b>№ {{ order_id }}</b> was paid on amount <span class="amount-payment">${{ amount_total }}</span></p>
+            {% blocktranslate %}
+                <h3 class="header-success-payment">Payment was successfully completed!</h3>
+                <p>Your order <b>№ {{ order_id }}</b> was paid on amount <span class="amount-payment">${{ amount_total }}</span></p>
+            {% endblocktranslate %}
         </div>
     </div>
 {% endblock %}

@@ -7,20 +7,20 @@
         <div class="mb-2">
             {% for p in properties %}
                 {% ifchanged %}
-                    <div class="prop-name">{{ p.name }}</div>
+                    <div class="prop-name">{{ p.translations__name }}</div>
                 {% endifchanged %}
                 <div class="form-check-filter">
                     <!--Using custom simple tag, which receive GET dictionary from the request and receive checkbox values-->
                     <!--And checks, what checkboxes were selected, to mark these checkboxes as selected-->
-                    {% check_request request.GET p.category_property_pk p.name p.text_value p.numeric_value|cut_fraction as checked_flag %}
+                    {% check_request request.GET p.category_property_pk p.translations__name p.translations__text_value p.numeric_value|cut_fraction as checked_flag %}
                     <input class="check-field-filter" id="prop-input-{{ forloop.counter }}" {% if checked_flag %}checked{% endif %}
-                     type="checkbox" name="props" value="{{ p.category_property_pk }},{{ p.name }},{{ p.text_value }},{{ p.numeric_value|cut_fraction }}">
+                     type="checkbox" name="props" value="{{ p.category_property_pk }},{{ p.translations__name }},{{ p.translations__text_value }},{{ p.numeric_value|cut_fraction }}">
                     <div class="d-flex">
                         <label class="form-label-filter" for="prop-input-{{ forloop.counter }}">
-                            {% if p.text_value %} {{ p.text_value }} {% else %} {{ p.numeric_value|cut_fraction }} {% endif %}
+                            {% if p.translations__text_value %} {{ p.translations__text_value }} {% else %} {{ p.numeric_value|cut_fraction }} {% endif %}
                         </label>
                     </div>
-                    <div class="d-inline ms-1">{{ p.units }}</div>
+                    <div class="d-inline ms-1">{{ p.translations__units }}</div>
                     <div class="count-items-filter">({{ p.item_count }})</div>
                 </div>
             {% endfor %}

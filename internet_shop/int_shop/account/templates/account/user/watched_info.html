@@ -1,8 +1,9 @@
 {% load static %}
 {% load cut_fraction_part %}
+{% load i18n %}
 
 <div class="personal-info">
-  <h3>Watched products</h3>
+  <h3>{% translate 'Watched products' %}</h3>
   <div class="d-flex flex-wrap">
     {% for product in watched_products %}
       <div class="product-card-watched">
@@ -17,8 +18,8 @@
         </div>
         {% if product.promotional %}
           <div class="promo-prod-pic-watched">
-            Promo
-          </div>
+            {% translate 'Promo' %}
+        </div>
         {% endif %}
         <div class="prod-name-watched">
           <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
@@ -54,7 +55,7 @@
   </div>
   {% if not watched_products %} 
     <div class="empty-customer-content">
-      <h4 class="d-inline">You haven't watched products yet</h4>
+      <h4 class="d-inline">{% translate 'You have not watched products yet' %}</h4>
     </div>
   {% endif %}
 </div>

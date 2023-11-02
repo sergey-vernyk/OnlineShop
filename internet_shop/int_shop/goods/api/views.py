@@ -193,7 +193,24 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'head', 'post', 'put', 'delete']
 
 
-@method_decorator(name='list', decorator=swagger_auto_schema(operation_summary='Get all properties'))
+@method_decorator(name='list', decorator=swagger_auto_schema(operation_summary='Get all properties',
+                                                             manual_parameters=[
+                                                                 Parameter(name='translations__text_value',
+                                                                           type='string',
+                                                                           required=False,
+                                                                           in_='query',
+                                                                           description='Text value'),
+                                                                 Parameter(name='numeric_value',
+                                                                           type='string',
+                                                                           required=False,
+                                                                           in_='query',
+                                                                           description='Numeric value'),
+                                                                 Parameter(name='category_property__translations__name',
+                                                                           type='string',
+                                                                           required=False,
+                                                                           in_='query',
+                                                                           description='Name of category property')
+                                                             ]))
 @method_decorator(name='retrieve', decorator=swagger_auto_schema(operation_summary='Get property with {id}'))
 @method_decorator(name='create', decorator=swagger_auto_schema(operation_summary='Create property'))
 @method_decorator(name='partial_update', decorator=swagger_auto_schema(
@@ -213,7 +230,8 @@ class PropertyViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ProductPropertySerializer
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['product__name']
-    filterset_fields = ['text_value', 'numeric_value', 'name', 'category_property__name']
+    filterset_fields = ['translations__text_value', 'numeric_value',
+                        'translations__name', 'category_property__translations__name']
     permission_classes = [IsAdminUser]
     http_method_names = ['get', 'head', 'post', 'patch', 'delete']
 

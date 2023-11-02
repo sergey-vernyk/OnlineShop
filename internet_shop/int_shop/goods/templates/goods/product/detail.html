@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load cut_fraction_part %}
+{% load i18n %}
 
 {% block title %} {{ product.name }} | OnlineShop{% endblock %}
 {% block styles %}
@@ -14,13 +15,13 @@
     <div class="container-fluid" style="padding: 15px 0 !important;">
         <ul class="nav nav-tabs">
             <li class="nav-item" style="border-right: 0 !important;">
-                <a class="nav-link" href="#specification">Specification</a>
+                <a class="nav-link" href="#specification">{% translate 'Specifications' %}</a>
             </li>
             <li class="nav-item" style="border-right: 0 !important;">
-                <a class="nav-link" href="#comments">Comments</a>
+                <a class="nav-link" href="#comments">{% translate 'Comments' %}</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#full-information">Additional information</a>
+                <a class="nav-link" href="#full-information">{% translate 'Additional information' %}</a>
             </li>
         </ul>
         <div class="top-info-row">
@@ -59,7 +60,7 @@
                                 {% endif %}
                                 <a id="add-rem-fav" role="button"
                                    data-url="{% url 'goods:add_or_remove_product_favorite' %}"
-                                   data-pk="{{ product.id }}" >Favorite
+                                   data-pk="{{ product.id }}">{% translate 'Favorite' %}
                                 </a>
                                 <input type="hidden" name="action" value="add">
                             {% endwith %}
@@ -75,7 +76,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-cart3"
                                  viewBox="0 0 16 16">
                                 <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1
-                                            .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5
+                                .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5
                                             0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479
                                             9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0
                                             0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1
@@ -101,7 +102,7 @@
                     </div>
                     {% if product.promotional %}
                         <div class="promo-prod-pic-detail">
-                            <h4>Promo</h4>
+                            <h4>{% translate 'Promo' %}</h4>
                         </div>
                     {% endif %}
                     <!--Product price-->
@@ -119,7 +120,7 @@
             </div>
         </div>
         <!--Product properties-->
-        <h4 id="specification" class="headers-detail">Specifications</h4>
+        <h4 id="specification" class="headers-detail">{% translate 'Specifications' %}</h4>
         <div id="prod-props" class="container">
             {% for property in properties %}
                 <div class="props-block">
@@ -146,12 +147,16 @@
             {% endfor %}
         </div>
         <!--Comments-->
-        <h4 id="comments" class="headers-detail">Comments</h4>
+        <h4 id="comments" class="headers-detail">{% translate 'Comments' %}</h4>
         <div class="container-fluid">
             <div class="block-comments-row">
                 <div class="comments-column">
                     {% with comments.count as total_comments %}
-                        <h5 class="count">Comments ( {{ total_comments }} )</h5>
+                    <h5 class="count">
+                        {% blocktranslate with total_comments=total_comments %}
+                            Comments ( {{ total_comments }} )
+                        {% endblocktranslate %}
+                    </h5>
                         {% for comment in comments %}
                             <div id="comment-pk-{{ comment.pk }}" class{% if forloop.counter == 1 and total_comments >= 1 %}="comment-body expand-comm"{% else %}="comment-body collapse-comm"{% endif %}>
                                 <div class="d-flex justify-content-between align-items-center">
@@ -186,10 +191,14 @@
                                 </div>
                             </div>
                             {% if forloop.counter == 1 and total_comments > 1 %}
-                                <div class="show-comments">Show all comments</div>
+                                <div class="show-comments">{% translate 'Show all comments' %}</div>
                             {% elif forloop.counter == total_comments %}
                                 <div class="hide-comments">
-                                    Hide {{ total_comments|add:-1 }} comments
+                                    {% blocktranslate count total=total_comments|add:-1 %}
+                                        Hide {{ total }} comment
+                                    {% plural %}
+                                        Hide {{ total }} comments
+                                    {% endblocktranslate %}
                                 </div>
                             {% endif %}
                         {% endfor %}
@@ -197,7 +206,7 @@
                 </div>
                 <!--Post new comment-->
                 <div class="post-comment">
-                    <h4>New comment</h4>
+                    <h4>{% translate 'New comment' %}</h4>
                     <form id="form-comment" method="post">
                         {% csrf_token %}
                         {% for field in comment_form %}
@@ -221,7 +230,7 @@
                                      src="data:image/png;base64,{{ captcha_image }}"
                                      data-width="135" data-height="60" data-font-size="30"
                                      alt="captcha">
-                                <p class="help help-captcha">All letters in lower case. For update the captcha click on the image</p>
+                                <p class="help help-captcha">{% translate 'All letters in lower case. For update the captcha click on the image' %}</p>
                             </div>
                             {% if comment_form.captcha.field.required %}
                                 <span class="required-field captcha-required">*</span>
@@ -239,12 +248,12 @@
                     <div>
                         <button type="submit" form="form-comment" class="send-comment-btn">
                             <span class="material-symbols-outlined">send</span>
-                            Send comment
+                            {% translate 'Send comment' %}
                         </button>
                     </div>
                 </div>
             </div>
-            <h4 id="full-information" class="headers-detail">Additional information</h4>
+            <h4 id="full-information" class="headers-detail">{% translate 'Additional information' %}</h4>
             {{ product.description|safe }}
             <script src="{% static 'js/set_product_rating.js' %}"></script>
             <script src="{% static 'js/add_to_cart.js' %}"></script>
@@ -252,6 +261,7 @@
             <script src="{% static 'js/like_unlike_comment.js' %}" type="module"></script>
             <script src="{% static 'js/collapse_expand_comments.js' %}"></script>
             <script src="{% static 'js/update_captcha.js' %}" type="module"></script>
+            <script src="{% url 'javascript-catalog' %}"></script>
         </div>
     </div>
 {% endblock %}

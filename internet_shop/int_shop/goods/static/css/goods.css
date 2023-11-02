@@ -222,11 +222,12 @@ input[type="text"], input[type="email"], textarea {
 }
 
 .filter-apply-btn, .filter-reset-btn {
-    display: inline-flex;
-    align-items: center;
+    display: flex;
     padding: 0.5rem 0.8rem;
     border: 1px solid;
     border-radius: 8px;
+    margin: 5px 0;
+    justify-content: center;
 }
 
 .filter-apply-btn .material-symbols-outlined, .filter-reset-btn .material-symbols-outlined {
@@ -244,8 +245,7 @@ input[type="text"], input[type="email"], textarea {
 }
 
 .filter-buttons {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
     margin: 0.5rem;
 }
 
@@ -487,7 +487,7 @@ input[type="text"], input[type="email"], textarea {
 }
 
 .dialog-rate-comment-titlebar {
-    width: calc(300px - 0.5em);
+    width: calc(250px - 0.5em);
     height: 30px;
     padding: 5px !important;
     background: gainsboro;
@@ -497,8 +497,7 @@ input[type="text"], input[type="email"], textarea {
 .dialog-rate-comment-content {
     font-size: 0.8rem;
     padding: 1px !important;
-    display: block;
-    text-align: center;
+    display: inline-table;
     line-height: initial;
 }
 

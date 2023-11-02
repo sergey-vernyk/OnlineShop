@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Cart | OnlineShop{% endblock %}
+{% block title %}{% translate 'Cart' %} | OnlineShop{% endblock %}
 {% block styles %}
     <link rel="stylesheet" href="{% static 'css/cart.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300&display=swap" rel="stylesheet">
@@ -12,7 +13,7 @@
 <div class="container p-3">
     <!--top string of the cart-->
     <div class="cart-top">
-        <h2 class="mb-1 d-block">Shopping cart</h2>
+        <h2 class="mb-1 d-block">{% translate 'Shopping cart' %}</h2>
         <div class="d-block align-self-center">
             <a class="back-link" href="{% url 'goods:product_list' %}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
@@ -20,7 +21,7 @@
                     <path fill-rule="evenodd" d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0
                  1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5z"/>
                 </svg>
-                Continue shopping
+                {% translate 'Continue shopping' %}
             </a>
         </div>
     </div>
@@ -78,26 +79,27 @@
         {% endif %}
         {% if cart %}
             <div class="block-totals">
-                <h3>Totals</h3>
+                <h3>{% translate 'Totals' %}</h3>
                 <div class="amount-items">
-                    {% with cart_total=cart|length discount_price=cart.get_total_price_with_discounts %}
+                    {% with discount_price=cart.get_total_price_with_discounts %}
                         <div>
-                            <span>{{ cart_total }}</span>
-                            <span>product{{cart_total|pluralize }}</span> for amount:
+                            {% blocktranslate with total=cart|length %}
+                                <span>{{ total }} </span> pcs. for amount:
+                            {% endblocktranslate %}
                         </div>
                         {% if discount_price < 0 %}
-                            <span>Free</span>
+                            <span>{% translate 'Free' %}</span>
                         {% else %}
                             <span>${{ discount_price }}</span>
                         {% endif %}
                     {% endwith %}
                 </div>
                 <div class="block-summary">
-                    <h5 class="fw-bold mb-3">Discounts</h5>
+                    <h5 class="fw-bold mb-3">{% translate 'Discounts' %}</h5>
                     <!--Form for coupon code-->
                     <div class="coupon-discount-block">
                         <div class="coupon-check">
-                            <label for="have-coupon">Have a coupon?</label>
+                            <label for="have-coupon">{% translate 'Have a coupon?' %}</label>
                             <input style="cursor: pointer" type="checkbox" name="have-coupon" id="have-coupon">
                         </div>
                         <form id="coupon-form" style="display: none;"
@@ -109,13 +111,14 @@
                             {% endfor %}
                             <button class="coupon-btn" type="submit">
                                 {% if cart.coupon_id %}
-                                    Cancel
+                                    {% translate 'Cancel' %}
                                 {% else %}
-                                    Apply
+                                    {% translate 'Apply' %}
                                 {% endif %}
                             </button>
+                            <input type="hidden" name="action" value='Apply'>
                             {% if cart.coupon_id %}
-                            <span class="material-symbols-outlined">check_circle</span>
+                                <span class="material-symbols-outlined">check_circle</span>
                             {% endif %}
                         </form>
                         <!--errors for coupon form-->
@@ -124,7 +127,7 @@
                     <!--Form for present card form (will fill in JavaScript)-->
                     <div class="card-discount-block">
                         <div class="card-check">
-                            <label for="have-card">Have a present card?</label>
+                            <label for="have-card">{% translate 'Have a present card?' %}</label>
                             <input style="cursor: pointer" type="checkbox" name="have-card" id="have-card">
                         </div>
                         <form id="present-card-form" style="display: none;"
@@ -136,11 +139,12 @@
                             {% endfor %}
                             <button class="present-card-btn" type="submit">
                                 {% if cart.present_card_id %}
-                                    Cancel
+                                    {% translate 'Cancel' %}
                                 {% else %}
-                                    Apply
+                                    {% translate 'Apply' %}
                                 {% endif %}
                             </button>
+                            <input type="hidden" name="action" value='Apply'>
                             {% if cart.present_card_id %}
                                 <span class="material-symbols-outlined">check_circle</span>
                             {% endif %}
@@ -151,22 +155,28 @@
                 </div>
                 {% if cart.coupon_id or cart.present_card_id %}
                     <div class="discounts-total">
-                        <div class="discount-title">Amount discounts:</div>
+                        <div class="discount-title">{%translate 'Amount discounts:' %}</div>
                         <div class="discount-value">-${{ cart.get_total_discount }}</div>
                     </div>
                     <div class="without-discounts">
-                        <div class="without-title">Without discounts:</div>
+                        <div class="without-title">{% translate 'Without discounts:' %}</div>
                         <div class="without-value">${{ cart.get_total_price }}</div>
                     </div>
                 {% endif %}
                 <a id="checkout-btn" href="{% url 'orders:order_create' %}" role="button">
                     <span class="material-symbols-outlined">shopping_cart_checkout</span>
-                    Checkout
+                    {% translate 'Checkout' %}
                 </a>
             </div>
         {% else %}
+        <!--select `empty cart` pic depends on current language-->
+            {% get_current_language as LANGUAGE_CODE %}
             <div class="empty-cart">
-                <img src="{% static 'img/your-cart-is-empty.png' %}" width="350" height="350">
+                {% if LANGUAGE_CODE == 'en' %}
+                    <img src="{% static 'img/your-cart-is-empty_en.png' %}" width="350" height="350">
+                {% elif LANGUAGE_CODE == 'uk' %}
+                    <img src="{% static 'img/your-cart-is-empty_uk.png' %}" width="350" height="350">
+                {% endif %}
             </div>
         {% endif %}
     </div>
@@ -176,4 +186,5 @@
 <script src="{% static 'js/activate_deactivate_discounts_inputs.js' %}"></script>
 <script src="{% static 'js/remove_from_cart.js' %}" type="module"></script>
 <script src="{% static 'js/apply_cancel_card_or_coupon.js' %}"></script>
+<script src="{% url 'javascript-catalog' %}"></script>
 {% endblock %}

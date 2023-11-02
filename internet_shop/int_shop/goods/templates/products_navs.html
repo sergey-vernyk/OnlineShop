@@ -1,3 +1,5 @@
+{% load i18n %}
+
 <!--Tabs with links at the top of products list-->
 <ul class="nav nav-justified justify-content-center prod-navs"
     data-domain="{{ request.site.domain }}"
@@ -5,14 +7,14 @@
     <li class="nav-item">
         <a class="nav-link" style="border-left: 0 !important;" href="{% url 'goods:product_list' %}">
             <span class="material-symbols-outlined">dataset</span>
-            All
+            {% translate 'All' %}
         </a>
     </li>
     {% if category and place == 'mainlist' or place == 'filter_list' %}
         <li class="nav-item">
             <a class="nav-link" id="filters-prod">
                 <span class="material-symbols-outlined">filter_alt</span>
-                Filter
+                {% translate 'Filter' %}
             </a>
         </li>
     {% endif %}
@@ -20,21 +22,21 @@
         <a class="nav-link"
            href="{% if category %}{% url 'goods:popular_list_by_category' category.slug %}{% else %}{% url 'goods:popular_list' %}{% endif %}">
             <span class="material-symbols-outlined">local_fire_department</span>
-            Popular
+            {% translate 'Popular' %}
         </a>
     </li>
     <li class="nav-item">
         <a class="nav-link"
            href="{% if category %}{% url 'goods:new_list_by_category' category.slug %}{% else %}{% url 'goods:new_list' %}{% endif %}">
             <span class="material-symbols-outlined">acute</span>
-            New
+            {% translate 'New' %}
         </a>
     </li>
     <li class="nav-item">
         <a class="nav-link" style="border-right: 0 !important;"
            href="{% if category %}{% url 'goods:promotion_list_by_category' category.slug %}{% else %}{% url 'goods:promotion_list' %}{% endif %}">
             <span class="material-symbols-outlined">sell</span>
-            Promotion
+            {% translate 'Promotion' %}
         </a>
     </li>
 </ul>

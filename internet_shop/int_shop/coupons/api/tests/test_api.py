@@ -22,7 +22,7 @@ from ..views import CouponViewSet
 
 class TestCouponsAPI(APITestCase):
     """
-    Testing API for coupons application
+    Testing API for coupons application.
     """
 
     def setUp(self):
@@ -40,6 +40,10 @@ class TestCouponsAPI(APITestCase):
 
         category_coupon = CouponCategory.objects.create(name=f'coupon_category_{random_number + 2}',
                                                         slug=f'coupon-category-{random_number + 2}')
+        category_coupon.set_current_language('uk')
+        category_coupon.name = f'категорія_купона_{random_number + 2}'
+        category_coupon.slug = f'categoria_kypona_{random_number + 2}'
+        category_coupon.save()
 
         self.coupon = Coupon.objects.create(code=f'coupon_code_{random_number + 5}',
                                             valid_from=timezone.now(),
@@ -139,6 +143,10 @@ class TestCouponsAPI(APITestCase):
                                            kwargs={'pk': self.coupon.pk, 'version': 'v1'}),
                                    format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # set current language of coupon's category,
+        # since category was initialized in `uk` language
+        self.coupon.category.set_current_language('en')
+        self.coupon.category.save()
         serializer = CouponSerializer(instance=self.coupon)
         self.assertDictEqual(response.data, serializer.data)
 
@@ -285,6 +293,8 @@ class TestCouponsAPI(APITestCase):
         serializer = CouponCategorySerializer()
         view = response.renderer_context['view']
         serializer.remove_fields(view.remove_fields_list_for_get_request)
+        self.coupon.category.set_current_language('en')
+        self.coupon.category.save()
         serializer = CouponCategorySerializer(instance=self.coupon.category)
         serializer.remove_fields(view.remove_fields_list_for_get_request)
         actual_result = response.data['results'][0] if settings.REST_FRAMEWORK.get(
@@ -294,12 +304,20 @@ class TestCouponsAPI(APITestCase):
 
     def test_create_coupon_category_by_only_staff_users(self):
         """
-        Checking create coupon category, which can create only by staff users
+        Checking create coupon category, which can create only by staff users.
         """
 
         category_data = {
-            'name': 'new_coupon_category',
-            'slug': 'new-coupon-category',
+            'translations': {
+                'en': {
+                    'name': 'new_coupon_category',
+                    'slug': 'new-coupon-category',
+                },
+                'uk': {
+                    'name': 'нова-категорія',
+                    'slug': 'nova-categoria',
+                }
+            }
         }
 
         # user is not staff and authorized
@@ -317,10 +335,12 @@ class TestCouponsAPI(APITestCase):
                                     format='json')
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        created_category = CouponCategory.objects.filter(name=category_data['name']).exists()
+        # ability to get created object for some reason can make only by this way
+        # CouponCategory.objects.filter(translated__name='...') does not work
+        created_category = CouponCategory.objects.all()[1]
         self.assertTrue(created_category)
 
-        for field, value in CouponCategory.objects.get(name=category_data['name']).__dict__.items():
+        for field, value in created_category.__dict__.items():
             if field in category_data:
                 self.assertEqual(value, category_data[field])
 
@@ -342,16 +362,27 @@ class TestCouponsAPI(APITestCase):
                                            kwargs={'pk': self.coupon.category.pk, 'version': 'v1'}),
                                    format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.coupon.category.set_current_language('en')
+        self.coupon.category.save()
         serializer = CouponCategorySerializer(instance=self.coupon.category)
         self.assertDictEqual(response.data, serializer.data)
 
     def test_full_update_coupon_category_only_by_staff_users(self):
         """
-        Checking full update coupon category info only by staff users
+        Checking full update coupon category info only by staff users.
         """
         category_data = {
-            'name': 'Such a new name',
-            'slug': self.product.category.slug
+            'translations': {
+                'en': {
+                    'name': 'Such a new name',
+                    'slug': self.coupon.category.slug
+                },
+                'uk': {
+                    'name': "Нове ім'я",
+                    'slug': 'nove-imia'
+                }
+            }
+
         }
 
         # user is not staff and authorized

@@ -1,0 +1,77 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-10-30 18:04+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != "
+"11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % "
+"100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || "
+"(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
+
+#: tasks.py:20
+msgid "Order paid"
+msgstr "Замовлення оплачене"
+
+#: templates/payment/cancel.html:5
+msgid "Payment canceled"
+msgstr "Замовлення скасоване"
+
+#: templates/payment/cancel.html:17 templates/payment/success.html:17
+msgid "To main page"
+msgstr "На головну"
+
+#: templates/payment/cancel.html:19
+msgid "Payment was canceled!"
+msgstr "Оплата була скасована!"
+
+#: templates/payment/cancel.html:21
+#, python-format
+msgid ""
+"\n"
+"                    Your order <span>№ %(order_id)s</span>For details about "
+"reasons of canceling payment contact to\n"
+"                    <a class=\"cancel-payment-email-info\" href=\"mailto:"
+"info@onlineshop.com\"> info@onlineshop.com</a>\n"
+"                    or <a class=\"cancel-payment-tel-info\" href=\"tel:"
+"+380961234567\">+38 (096) 123-45-67</a>\n"
+"                "
+msgstr ""
+"\n"
+"                    Ваше замовлення <span>№ %(order_id)s</span>За деталями "
+"щодо щодо причин скасування оплати повідомте на                    <a "
+"class=\"cancel-payment-email-info\" href=\"mailto:info@onlineshop.com\"> "
+"info@onlineshop.com</a>                    чи <a class=\"cancel-payment-tel-"
+"info\" href=\"tel:+380961234567\">+38 (096) 123-45-67</a>"
+
+#: templates/payment/success.html:5
+msgid "Payment success"
+msgstr "Платіж успішно виконаний"
+
+#: templates/payment/success.html:19
+#, python-format
+msgid ""
+"\n"
+"                <h3 class=\"header-success-payment\">Payment was "
+"successfully completed!</h3>\n"
+"                <p>Your order <b>№ %(order_id)s</b> was paid on amount <span "
+"class=\"amount-payment\">$%(amount_total)s</span></p>\n"
+"            "
+msgstr ""
+"\n"
+"                <h3 class=\"header-success-payment\">Палатіж "
+"успішно завершений!</h3>"
+"                <p>Ваше замовлення <b>№ %(order_id)s</b> було оплачене на суму<span "
+"class=\"amount-payment\">$%(amount_total)s</span></p>"

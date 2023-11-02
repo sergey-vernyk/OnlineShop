@@ -6,6 +6,7 @@ from django.http.response import JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import FormMixin
@@ -58,7 +59,8 @@ class ProductListView(ListView):
             context['category'] = Category.objects.get(slug=self.kwargs.get('category_slug'))
             context['filter_manufacturers'] = FilterByManufacturerForm()
 
-            context['category_properties'] = get_property_for_category(context['category'].name)
+            context['category_properties'] = get_property_for_category(context['category'].name,
+                                                                       language_code=self.request.LANGUAGE_CODE)
 
             if 'filter_price' in self.kwargs:
                 min_price = Decimal(self.kwargs['filter_price'][0])
@@ -175,6 +177,7 @@ class ProductDetailView(DetailView, FormMixin):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        language = self.request.LANGUAGE_CODE
         context['captcha_image'] = create_captcha_image(self.request, width=135, font_size=30)
         context['comment_form'] = CommentProductForm()
         context['quantity_form'] = CartQuantityForm()
@@ -183,7 +186,8 @@ class ProductDetailView(DetailView, FormMixin):
                                                                     'profiles_likes',
                                                                     'profiles_unlikes').order_by('-created')
         # getting all Property objects, that belongs to the current product
-        context['properties'] = self.object.properties.select_related('category_property')
+        context['properties'] = self.object.properties.prefetch_related('category_property', 'translations').filter(
+            translations__language_code=language)
         # fill the name and email in the send comment form, if user is authenticated
         if self.request.user.is_authenticated:
             context['comment_form'].fields['user_name'].initial = self.request.user.first_name
@@ -371,8 +375,8 @@ class FilterResultsView(ListView):
             properties = self.kwargs.get('props')
             props_dict = distribute_properties_from_request(properties)
             lookups &= Q(properties__category_property__id__in=props_dict['ids'],
-                         properties__name__in=props_dict['names'],
-                         properties__text_value__in=props_dict['text_values'],
+                         properties__translations__name__in=props_dict['names'],
+                         properties__translations__text_value__in=props_dict['text_values'],
                          properties__numeric_value__in=props_dict['numeric_values'])
 
         # getting in the queryset only the unique results
@@ -387,7 +391,9 @@ class FilterResultsView(ListView):
         if 'category_slug' in self.kwargs:
             context['category'] = Category.objects.get(slug=self.kwargs.get('category_slug'))
 
-            context['category_properties'] = get_property_for_category(context['category'].name, self.queryset_filter)
+            context['category_properties'] = get_property_for_category(context['category'].name,
+                                                                       prods_queryset=self.queryset_filter,
+                                                                       language_code=self.request.LANGUAGE_CODE)
 
             if 'filter_price' in self.kwargs:
                 min_price = Decimal(self.kwargs['filter_price'][0])
@@ -434,7 +440,7 @@ def promotion_list(request, category_slug: str = None):
                                                                        'sorting_by_price': sorting_by_price,
                                                                        'is_paginated': page_obj.has_other_pages(),
                                                                        'is_sorting': False,
-                                                                       'place': 'promotion'})
+                                                                       'place': _('promotion')})
 
 
 def new_list(request, category_slug: str = None):
@@ -461,7 +467,7 @@ def new_list(request, category_slug: str = None):
                                                                        'sorting_by_price': sorting_by_price,
                                                                        'is_paginated': page_obj.has_other_pages(),
                                                                        'is_sorting': False,
-                                                                       'place': 'new'})
+                                                                       'place': _('new')})
 
 
 def popular_list(request, category_slug: str = None):
@@ -498,14 +504,14 @@ def popular_list(request, category_slug: str = None):
                                                                        'sorting_by_price': sorting_by_price,
                                                                        'is_paginated': page_obj.has_other_pages(),
                                                                        'is_sorting': False,
-                                                                       'place': 'popular'})
+                                                                       'place': _('popular')})
 
 
 def product_ordering(request, place: str, category_slug: str = 'all', page: int = 1):
     """
-    Sorting products by price
+    Sorting products by price.
     """
-    # names of templates, that will be rendering for each category (popular, new, promotion, main products list)
+    # names of templates, that will be render for each category (popular, new, promotion, main products list)
     templates = {
         'mainlist': 'list.html',
         'popular': 'navs_categories_list.html',
@@ -532,7 +538,7 @@ def product_ordering(request, place: str, category_slug: str = 'all', page: int 
     if request.method == 'GET':
         sort = request.GET.get('sort')
         # if sort is needed
-        if sort == 'p_asc' or sort == 'p_desc':
+        if sort in ('p_asc', 'p_desc'):
             if category_slug != 'all':  # if category has been received
                 category = Category.objects.get(slug=category_slug)
                 lookups = Q(category=category,
@@ -580,7 +586,7 @@ def product_ordering(request, place: str, category_slug: str = 'all', page: int 
     manufacturers_prod_qnty = next(manufacturers_info)  # products quantity for each manufacturer
 
     if category_slug != 'all':
-        category_properties = get_property_for_category(category.name)
+        category_properties = get_property_for_category(category.name, language_code=request.LANGUAGE_CODE)
 
     return render(request, f'goods/product/{templates[place]}', {'products': page_products,
                                                                  'category': category,

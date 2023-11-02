@@ -1,8 +1,9 @@
 {% load static %}
 {% load cut_fraction_part %}
+{% load i18n %}
 
 <div class="personal-info">
-  <h3>Favorite products</h3>
+  <h3>{% translate 'Favorite products' %}</h3>
   {% for product in favorites %}
     <div id="fav-prod-{{ product.id }}" class="favorite-card">
       <div class="prod-image-fav">
@@ -45,7 +46,7 @@
     </div>
   {% empty %}
     <div class="empty-customer-content">
-        <h4>There are no favorite products yet</h4>
+        <h4>{% translate 'There are no favorite products yet' %}</h4>
     </div>
   {% endfor %}
 </div>

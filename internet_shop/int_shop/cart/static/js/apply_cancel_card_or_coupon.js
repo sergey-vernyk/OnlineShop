@@ -34,7 +34,7 @@ $(document).ready(function() {
 		event.preventDefault();
 		var currentForm = $(this);
 		var submitBtn = $(this).find(':submit');
-		var action = submitBtn.text().trim(); //action is taken from the name of the button
+		var action = $(currentForm).find('input[name=action]').val(); //action is taken from the hidden field with name `action`
 		var url;
 		var boundErrorList = $(this).parent().find('.errorlist'); //errors list, linked with selected form
 
@@ -67,7 +67,7 @@ $(document).ready(function() {
 
 				//current cost of all products with all discounts
 				var currentAmountPrice;
-				if($('.amount-items > span:nth-child(2)').text() === 'Free') {
+				if($('.amount-items > span:nth-child(2)').text() === django.gettext('Free')) {
 					currentAmountPrice = initialCurrentAmountPrice;
 				} else {
 					currentAmountPrice = Number($('.amount-items > span:nth-child(2)').text().slice(1)).toFixed(2)
@@ -88,7 +88,8 @@ $(document).ready(function() {
 					$(boundErrorList).find('li').remove(); //deleting list item, that with error
                     //applying discounts
 					if (action === 'Apply') {
-						submitBtn.text('Cancel');
+						submitBtn.text(django.gettext('Cancel'));
+						$(currentForm).find('input[name=action]').val('Cancel')
 						//coupon has been applied
 						if ($(currentForm).attr('id') === 'coupon-form') {
 							var couponDiscount = response['coupon_discount'];
@@ -101,16 +102,16 @@ $(document).ready(function() {
 							var cardAmount = response['card_amount'];
 							finallyPriceWithCard = currentAmountPrice - Number(cardAmount);
 							initialCurrentAmountPrice = finallyPriceWithCard;
-							$('.amount-items > span:nth-child(2), .total-price').text(finallyPriceWithCard > 0 ? `$${finallyPriceWithCard.toFixed(2)}` : 'Free');
+							$('.amount-items > span:nth-child(2), .total-price').text(finallyPriceWithCard > 0 ? `$${finallyPriceWithCard.toFixed(2)}` : django.gettext('Free'));
 						}
 
 						//content appear, when one of discounts was applied
 						var contentSummary = `<div class="discounts-total">
-                                                  <div class="discount-title">Amount discounts:</div>
+                                                  <div class="discount-title">${django.gettext('Amount discounts:')}</div>
                                                   <div class="discount-value">-$${(currentAmountPrice - (finallyPriceWithCoupon || finallyPriceWithCard)).toFixed(2)}</div>
                                               </div>
                                               <div class="without-discounts">
-                                                  <div class="without-title">Without discounts:</div>
+                                                  <div class="without-title">${django.gettext('Without discounts:')}</div>
                                                   <div class="without-value">$${currentAmountPrice}</div>
                                               </div>`
 
@@ -145,7 +146,8 @@ $(document).ready(function() {
 						}
 
 					} else if (action === 'Cancel') {
-						submitBtn.text('Apply');
+						submitBtn.text(django.gettext('Apply'));
+						$(currentForm).find('input[name=action]').val('Apply')
 						var restDisc; //remaining sum of discount
 						//coupon was canceled
 						if ($(currentForm).attr('id') === 'coupon-form') {

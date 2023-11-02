@@ -1,5 +1,6 @@
 from rest_framework import serializers
-
+from parler_rest.fields import TranslatedFieldsField
+from parler_rest.serializers import TranslatableModelSerializer
 from present_cards.models import PresentCard, Category
 
 
@@ -25,15 +26,16 @@ class PresentCardSerializer(serializers.ModelSerializer):
             self.fields.pop(field_name)
 
 
-class PresentCardCategorySerializer(serializers.ModelSerializer):
+class PresentCardCategorySerializer(TranslatableModelSerializer):
     """
-    Serializer for coupon category
+    Serializer for coupon category.
     """
+    translations = TranslatedFieldsField(shared_model=Category)
     present_cards = serializers.StringRelatedField(read_only=True, many=True)
 
     class Meta:
         model = Category
-        fields = '__all__'
+        fields = ('name', 'slug', 'present_cards', 'translations')
 
     def remove_fields(self, fields: list):
         """

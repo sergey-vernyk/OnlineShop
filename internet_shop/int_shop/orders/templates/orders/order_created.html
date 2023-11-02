@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Order accepted | OnlineShop{% endblock %}
+{% block title %}{% translate 'Order accepted' %} | OnlineShop{% endblock %}
 {% block styles %}
     <link rel="stylesheet" href="{% static 'css/orders.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
@@ -13,24 +14,24 @@
         <div class="success-order">
             <a class="order-go-home" href="{% url 'goods:product_list' %}">
                 <span class="material-symbols-outlined">home</span>
-                To main page
+                {% translate 'To main page' %}
             </a>
-            <h3 class="header-success-order">Order has been accepted successfully!</h3>
-            <p class="info-success-order">Your order <b>№ {{ order_id }}</b>.
-                All information about your orders you can see in your
+            <h3 class="header-success-order">{% translate 'Order has been accepted successfully!' %}</h3>
+            <p class="info-success-order">{% translate 'Your order' %} <b>№ {{ order_id }}</b>.
+                {% translate 'All information about your orders you can see in your' %}
                 <a target="_blank" href="{% url 'customer_detail' request.user.username 'about' %}">
                     <span class="material-symbols-outlined">account_circle</span>
-                    Profile
+                    {% translate 'Profile' %}
                 </a>
             </p>
-            {% if method == 'Online' %}
+            {% if method == 'Online' or method == 'Онлайн' %}
             <form method="post" action="{% url 'payment:create_checkout_session' %}">
                 <div class="make-payment">
-                    <p>Since you have chosen online payment, please click the button to make a payment</p>
+                    <p>{% translate 'Since you have chosen online payment, please click the button to make a payment' %}</p>
                     <span class="material-symbols-outlined">east</span>
                     <button class="pay-btn" type="submit">
                         <span class="material-symbols-outlined">credit_card</span>
-                        Make a payment
+                        {% translate 'Make a payment' %}
                     </button>
                 </div>
             </form>

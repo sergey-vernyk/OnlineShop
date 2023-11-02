@@ -1,15 +1,16 @@
+{% load i18n %}
 {% load get_value_from_dict %}
 <!--Menu to select a filter on the left side of the product list page of a specific category-->
 
 <!--Filters-->
 <div class="filter-header">
     <span class="material-symbols-outlined">filter_alt</span>
-    Filters
+    {% translate 'Filters' %}
 </div>
 <form id="filters-form" method="get" action="{% url 'goods:filter_results_list' category.slug page_obj.number %}">
     <!--By price-->
     <div class="title-filters">
-        <div>Price</div>
+        <div>{% translate 'Price' %}</div>
         <span class="material-symbols-outlined">expand_less</span>
     </div>
     <div class="filter-items">
@@ -28,7 +29,7 @@
     </div>
     <!--By manufacturer-->
     <div class="title-filters">
-        <div>Brand</div>
+        <div>{% translate 'Brand' %}</div>
         <span class="material-symbols-outlined">expand_less</span>
     </div>
     <div class="filter-items">
@@ -42,7 +43,7 @@
     </div>
     <!--By properties-->
     <div class="title-filters">
-        <div>Properties</div>
+        <div>{% translate 'Properties' %}</div>
         <span class="material-symbols-outlined">expand_less</span>
     </div>
     <!--Menu with properties for selected product category-->
@@ -51,10 +52,10 @@
 <div class="filter-buttons">
     <button form="filters-form" class="filter-apply-btn" type="submit">
         <span class="material-symbols-outlined">filter_alt</span>
-        Apply
+        {% translate 'Apply' %}
     </button>
     <button form="filters-form" class="filter-reset-btn" type="reset">
         <span class="material-symbols-outlined">restart_alt</span>
-        Reset
+        {% translate 'Reset' %}
     </button>
 </div>

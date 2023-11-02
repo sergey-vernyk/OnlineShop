@@ -1,5 +1,7 @@
+{% load i18n %}
+
 <div class="personal-info">
-  <h3>Coupons</h3>
+  <h3>{% translate 'Coupons' %}</h3>
   <div class="d-block">
     {% for coupon in coupons %}
       <div class="d-block border rounded p-3 mb-2">
@@ -12,35 +14,35 @@
           {% endif %}
         </div>
         <div class="coupon-category">
-          <span class="attr-coupons">Category</span>
+          <span class="attr-coupons">{% translate 'Category' %}</span>
           <span class="value-coupons">{{ coupon.category }}</span>
         </div>
         <div class="coupon-validation">
-          <span class="attr-coupons">Valid from</span>
+          <span class="attr-coupons">{% translate 'Valid from' %}</span>
           <span class="value-coupons">{{ coupon.valid_from|date:"d.m.Y H:i" }}</span>
         </div>
         <div class="coupon-validation">
-          <span class="attr-coupons">Valid to</span>
+          <span class="attr-coupons">{% translate 'Valid to' %}</span>
           <span class="value-coupons">{{ coupon.valid_to|date:"d.m.Y H:i" }}</span>
         </div>
         <div class="coupon-discount">
-          <span class="attr-coupons">Discount</span>
+          <span class="attr-coupons">{% translate 'Discount' %}</span>
           <span class="value-coupons discount-value">{{ coupon.discount }}%</span>
         </div>
         <!--Форма с выбором заказов для текущего купона-->
         <form>
-          <label class="attr-coupons mt-3" for="coupon-{{ coupon.id }}">Orders</label>
+          <label class="attr-coupons mt-3" for="coupon-{{ coupon.id }}">{% translate 'Orders' %}</label>
           <select id="coupon-{{ coupon.id }}">
             {% for order in coupon.choices %}
               <option>№ {{ order.pk }} - {{ order.created|date:"d.m.Y" }}</option>
             {% endfor %}
           </select>
-          <button class="go-order" data-url="{% url 'customer_detail' request.user.username 'orders' %}">Go to order</button>
+          <button class="go-order" data-url="{% url 'customer_detail' request.user.username 'orders' %}">{% translate 'Go to order' %}</button>
         </form>
       </div>
     {% empty %}
       <div class="empty-customer-content">
-          <h4 class="d-inline">Your coupons will be here after purchases</h4>
+          <h4 class="d-inline">{% translate 'Your coupons will be here after purchases' %}</h4>
       </div>
     {% endfor %}
   </div>

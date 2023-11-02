@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Contacts | OnlineShop{% endblock %}
+{% block title %}{% translate 'Contacts' %} | OnlineShop{% endblock %}
 
 {% block styles %}
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
@@ -11,36 +12,36 @@
 
 {% block content %}
     <div class="container">
-        <h2 class="header-contacts">Contact information</h2>
+        <h2 class="header-contacts">{% translate 'Contact information' %}</h2>
         <div class="contacts-list">
             <div class="contact-info-emails">
-                <h3>Emails</h3>
+                <h3>{% translate 'Emails' %}</h3>
                 <div>
-                    <span>Info:</span> <a href="mailto:info@onlineshop.com">info@onlineshop.com</a>
+                    <span>{% translate 'Info:' %}</span> <a href="mailto:info@onlineshop.com">info@onlineshop.com</a>
                 </div>
                 <div>
-                    <span>Sales:</span> <a href="mailto:sales@onlineshop.com">sales@onlineshop.com</a>
+                    <span>{% translate 'Sales:' %}</span> <a href="mailto:sales@onlineshop.com">sales@onlineshop.com</a>
                 </div>
                 <div>
-                    <span>Cooperation:</span> <a href="mailto:cooperation@onlineshop.com">cooperation@onlineshop.com</a>
+                    <span>{% translate 'Cooperation:' %} </span> <a href="mailto:cooperation@onlineshop.com">cooperation@onlineshop.com</a>
                 </div>
             </div>
             <div class="contact-info-phones">
-                <h3>Phone Numbers</h3>
+                <h3>{% translate 'Phone Numbers' %}</h3>
                 <div>
-                    <span>Customer Support:</span> <span>+38 (096) 12 345 67</span>
+                    <span>{% translate 'Customer Support:' %}</span> <span>+38 (096) 12 345 67</span>
                 </div>
                 <div>
-                    <span>Sales Inquiries:</span> <span>+38 (099) 123 45 67</span>
+                    <span>{% translate 'Sales Inquiries:' %}</span> <span>+38 (099) 123 45 67</span>
                 </div>
                 <div>
-                    <span>About Cooperation:</span> <span>+38 (093) 123 45 67</span>
+                    <span>{% translate 'About Cooperation:' %}</span> <span>+38 (093) 123 45 67</span>
                 </div>
             </div>
         </div>
         <div class="social-contacts">
             <div>
-                <span>Also you can ask your questions us in our social accounts</span>
+                <span>{% translate 'Also you can ask your questions us in our social accounts' %}</span>
                 <ul>
                     <li>
                         <img src="{% static 'img/Telegram_logo.svg' %}" width="40" height="40">

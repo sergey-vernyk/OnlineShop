@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}My account | OnlineShop{% endblock %}
+{% block title %}{% translate 'My account' %} | OnlineShop{% endblock %}
 {% block styles %}
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="stylesheet" href="{% static 'css/account.css' %}">
@@ -25,7 +26,7 @@
                         <img src="{% static 'img/no_user_photo.jpg' %}" width="80" height="80" alt="user-photo">
                     {% endif %}
                     <span id="customer-full-name">
-                        <!--имя профиля также находится и в request-->
+                        <!--profile's name containse in a request-->
                         <span class="material-symbols-outlined" style="margin-right: 5px;">
                             person</span>{{ request.user.get_full_name }}
                     </span>
@@ -34,15 +35,15 @@
                     <ul>
                         <li>
                             <span class="material-symbols-outlined">shopping_cart</span>
-                            <span>Orders</span>
+                            <span>{% translate 'Orders' %}</span>
                         </li>
                         <li>
                             <span class="material-symbols-outlined">favorite</span>
-                            <span>Favorites</span>
+                            <span>{% translate 'Favorites' %}</span>
                         </li>
                         <li>
                             <span class="material-symbols-outlined">chat_bubble</span>
-                            <span>Comments</span>
+                            <span>{% translate 'Comments' %}</span>
                         </li>
                     </ul>
                     <ul>
@@ -76,36 +77,36 @@
                 <div class="sidebar-customer">
                     <div class="sidebar-item">
                         <span class="material-symbols-outlined">person</span>
-                        <a href="{% url 'customer_detail' username 'about' %}"><span>Personal info</span></a>
+                        <a href="{% url 'customer_detail' username 'about' %}"><span>{% translate 'Personal info' %}</span></a>
                     </div>
                     <div class="sidebar-item">
                         <span class="material-symbols-outlined">shopping_cart</span>
-                        <a href="{% url 'customer_detail' username 'orders' %}"><span>Orders</span></a>
+                        <a href="{% url 'customer_detail' username 'orders' %}"><span>{% translate 'Orders' %}</span></a>
                     </div>
                     <div class="sidebar-item">
                         <span class="material-symbols-outlined">favorite</span>
-                        <a href="{% url 'customer_detail' username 'favorites' %}"><span>Favorites</span></a>
+                        <a href="{% url 'customer_detail' username 'favorites' %}"><span>{% translate 'Favorites' %}</span></a>
                     </div>
                     <div class="sidebar-item">
                         <span class="material-icons">card_giftcard</span>
-                        <a href="{% url 'customer_detail' username 'coupons' %}"><span>Coupons</span></a>
+                        <a href="{% url 'customer_detail' username 'coupons' %}"><span>{% translate 'Coupons' %}</span></a>
                     </div>
                     <div class="sidebar-item">
                         <span class="material-icons">card_giftcard</span>
-                        <a href="{% url 'customer_detail' username 'present_cards' %}"><span>Present cards</span></a>
+                        <a href="{% url 'customer_detail' username 'present_cards' %}"><span>{% translate 'Present cards' %}</span></a>
                     </div>
                     <div class="sidebar-item">
                         <span class="material-symbols-outlined">chat_bubble</span>
-                        <a href="{% url 'customer_detail' username 'comments' %}"><span>Comments</span></a>
+                        <a href="{% url 'customer_detail' username 'comments' %}"><span>{% translate 'Comments' %}</span></a>
                     </div>
                     <div class="sidebar-item">
                         <span class="material-symbols-outlined">visibility</span>
-                        <a href="{% url 'customer_detail' username 'watched' %}"><span>Watched products</span></a>
+                        <a href="{% url 'customer_detail' username 'watched' %}"><span>{% translate 'Watched products' %}</span></a>
                     </div>
                     <div id="logout" class="sidebar-item">
                         <div style="display: flex;justify-content: end;align-items: center;">
                             <span class="material-symbols-outlined">logout</span>
-                            <a href="{% url 'logout' %}">Logout</a>
+                            <a href="{% url 'logout' %}">{% translate 'Logout' %}</a>
                         </div>
                     </div>
                 </div>
@@ -129,11 +130,11 @@
             </div>
         </div>
     </div>
-<script src="{% static 'js/collapse_expand_order_detail.js' %}"></script>
-<script src="{% static 'js/add_remove_favorite.js' %}" type="module"></script>
-<script src="{% static 'js/go_to_choose_order.js' %}"></script>
-<script src="{% static 'js/highlight_order.js' %}"></script>
-<script src="{% static 'js/collapse_expand_comment.js' %}"></script>
-<script src="{% static 'js/collapse_expand_list_orders.js' %}"></script>
-<script src="{% static 'js/toggle_menu_style.js' %}"></script>
+    <script src="{% static 'js/collapse_expand_order_detail.js' %}"></script>
+    <script src="{% static 'js/add_remove_favorite.js' %}" type="module"></script>
+    <script src="{% static 'js/go_to_choose_order.js' %}"></script>
+    <script src="{% static 'js/highlight_order.js' %}"></script>
+    <script src="{% static 'js/collapse_expand_comment.js' %}"></script>
+    <script src="{% static 'js/collapse_expand_list_orders.js' %}"></script>
+    <script src="{% static 'js/toggle_menu_style.js' %}"></script>
 {% endblock %}

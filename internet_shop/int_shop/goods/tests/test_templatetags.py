@@ -139,7 +139,7 @@ class TestTemplatetagsGoods(TestCase):
         client = Client()
         response = client.get(reverse('goods:filter_results_list', args=(self.category_1.slug, 1)),
                               data={'price_min': Decimal('100.00'),
-                                    'price_max': Decimal('1500.50')})
+                                    'price_max': Decimal('1500.50')}, **{'HTTP_ACCEPT_LANGUAGE': 'en'})
 
         request = response.wsgi_request
 
@@ -155,8 +155,8 @@ class TestTemplatetagsGoods(TestCase):
 
         template = Template('{% load split_full_path %}'
                             '{{ data.request|split:0 }}')
-
-        self.assertEqual(template.render(context), '/goods/smart-gadgets/filter')
+        # simulate filter result by cutting `/1/` from the end of the path
+        self.assertEqual(template.render(context), context['data']['request'].path.replace('/1/', ''))
 
     def test_get_elided_page_range_paginator(self):
         """

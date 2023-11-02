@@ -1,7 +1,9 @@
+from celery import shared_task
 from django.conf import settings
 from django.core.mail import EmailMessage
-from celery import shared_task
 from django.template.loader import render_to_string
+from django.utils.translation import gettext_lazy as _, activate
+
 from orders.models import Order
 
 
@@ -9,12 +11,13 @@ from orders.models import Order
 def order_created(data: dict, order_id: int, profile_username: str) -> str:
     """
     Task will send email to the user's email, which made an order,
-    and the order has been created and confirmed successfully
+    and the order has been created and has been successfully confirmed.
     """
     order = Order.objects.get(pk=order_id)
     order_totals = order.get_total_values()
 
-    subject = 'OnlineShop - Order confirmed'
+    activate(data.get('language'))
+    subject = _('Order confirmed')
     body = render_to_string('account/emails/order_created_email.html',
                             {
                                 'order_id': order_id,

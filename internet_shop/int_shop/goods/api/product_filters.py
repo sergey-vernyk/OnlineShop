@@ -1,6 +1,6 @@
+from decimal import Decimal
 from django_filters import rest_framework as filters
 from django.db.models import Q
-from decimal import Decimal
 
 
 class ProductFilter(filters.FilterSet):
@@ -38,8 +38,8 @@ class ProductFilter(filters.FilterSet):
 
     def properties_filter_value(self, queryset, name, value):
         """
-        Returns queryset with products, which have specific property name "property_name" ,
-        and the property name numeric value within "lte" and "gte"
+        Returns queryset with products, which have specific property name `property_name` ,
+        and the property name numeric value within `lte` and `gte`
         """
         lookup = Q()
         if name.endswith('lte'):

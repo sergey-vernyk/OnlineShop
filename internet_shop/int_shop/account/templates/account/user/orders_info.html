@@ -1,7 +1,8 @@
 {% load static %}
+{% load i18n %}
 
 <div class="personal-info">
-    <h3>Orders</h3>
+    <h3>{% translate 'Orders' %}</h3>
     {% for order in orders %}
         {% with items=order.items.all cost_with_discounts=order.get_total_values.total_cost_with_discounts cost_no_discounts=order.get_total_values.total_cost %}
             <div id="min-max-detail-{{ order.pk }}" role="button">
@@ -18,9 +19,9 @@
                         </div>
                         <div id="order-state">
                             {% if order.is_done %}
-                                <div class="done">Done</div>
+                                <div class="done">{% translate 'Done' %}</div>
                             {% else %}
-                                <div class="not-done">Not done</div>
+                                <div class="not-done">{% translate 'Not done' %}</div>
                             {% endif %}
                         </div>
                         <div id="total-cost-{{ order.pk }}">
@@ -30,7 +31,7 @@
                                 $ {{ cost_no_discounts }}
                             {% endif %}
                         </div>
-                        <!--Изображения товаров (не более 2-х)-->
+                        <!--Display products (no more 2 pcs.)-->
                         <div id="items-images-{{ order.pk }}">
                             {% with count_items=items|length %}
                                 <div class="item-image">
@@ -49,7 +50,7 @@
                             <span class="material-symbols-outlined">expand_more</span>
                         </div>
                     </div>
-                    <!--Информация о каждом товаре из заказа-->
+                    <!--Info about an each product in the order-->
                     <div id="order-detail-{{ order.pk }}" style="display: none;">
                         <div class="d-block">
                             {% for item in items %}
@@ -70,7 +71,7 @@
                                         <a target="_blank"
                                            href="{{ item.product.get_absolute_url|add:'#comments' }}">
                                             <span class="material-symbols-outlined">chat</span>
-                                            Add review
+                                            {% translate 'Add review' %}
                                         </a>
                                     </div>
                                     <div class="quantity">
@@ -82,12 +83,12 @@
                                 </div>
                             {% endfor %}
                         </div>
-                        <!--Информация о доставке-->
+                        <!--Info about delivery-->
                         <div class="delivery-info">
-                            <p class="fw-bold fs-5">Delivery</p>
+                            <p class="fw-bold fs-5">{% translate 'Delivery' %}</p>
                             <div class="item">
                                 <div class="name">
-                                    Delivery date
+                                    {% translate 'Delivery date' %}
                                 </div>
                                 <div class="attr">
                                     {{ order.delivery.delivery_date|date:"d.m.Y" }}
@@ -95,7 +96,7 @@
                             </div>
                             <div class="item">
                                 <div class="name">
-                                    Delivery method
+                                    {% translate 'Delivery method' %}
                                 </div>
                                 <div class="attr">
                                     {{ order.delivery.method }}
@@ -105,7 +106,7 @@
                                 {% if order.delivery.method == 'Post office' %}
                                 <div class="item">
                                     <div class="name">
-                                        Post office №
+                                        {% translate 'Post office' %} №
                                     </div>
                                     <div class="attr">
                                         {{ order.delivery.office_number }}
@@ -116,7 +117,7 @@
                             {% if order.delivery.method == 'Apartment' %}
                                 <div class="item">
                                     <div class="name">
-                                        Delivery address
+                                        {% translate 'Delivery address' %}
                                     </div>
                                     <div class="attr">
                                         {{ order.address }}
@@ -125,7 +126,7 @@
                             {% endif %}
                             <div class="item">
                                 <div class="name">
-                                    Recipient
+                                    {% translate 'Recipient' %}
                                 </div>
                                 <div class="attr">
                                     {{ order.first_name }} {{ order.last_name }}
@@ -134,10 +135,10 @@
                             </div>
                         </div>
                         <div class="payment-info">
-                            <p class="fw-bold fs-5">Payment</p>
+                            <p class="fw-bold fs-5">{% translate 'Payment' %}</p>
                             <div class="item">
                                 <div class="name">
-                                    Pay method
+                                    {% translate 'Pay method' %}
                                 </div>
                                 <div class="attr">
                                     {{ order.pay_method }}
@@ -147,7 +148,7 @@
                                 {% if coupon %}
                                     <div class="item">
                                         <div class="name">
-                                            Coupon
+                                            {% translate 'Coupon' %}
                                         </div>
                                         <div class="attr">
                                             "{{ coupon.code }}" (-{{ coupon.discount }}%)
@@ -157,7 +158,7 @@
                                 {% if present_card %}
                                     <div class="item">
                                         <div class="name">
-                                            Present card
+                                            {% translate 'Present card' %}
                                         </div>
                                         <div class="attr">
                                             "{{ present_card.code }}" (-${{ present_card.amount }})
@@ -168,7 +169,7 @@
                             {% if cost_with_discounts %}
                                 <div class="item">
                                     <div class="name">
-                                        Discount
+                                        {% translate 'Discount' %}
                                     </div>
                                     <div class="attr discount">
                                         -$ {{ order.get_total_values.total_discounts }}
@@ -177,7 +178,7 @@
                             {% endif %}
                             <div class="item total">
                                 <div class="name">
-                                    <span style="font-weight: bold;">Total</span>
+                                    <span style="font-weight: bold;">{% translate 'Total' %}</span>
                                 </div>
                                 <div class="attr">
                                     {% if cost_with_discounts %}
@@ -194,11 +195,16 @@
     {% endwith %}
     {% empty %}
         <div class="empty-customer-content">
-            <h4 class="d-inline">There are no orders yet</h4>
+            <h4 class="d-inline">{% translate 'There are no orders yet' %}</h4>
         </div>
     {% endfor %}
     {% if orders.count > 4 %}
-        <div class="show-all-orders">Show another {{ orders.count|add:"-4" }} orders</div>
-        <div class="hide-another-orders">Hide another {{ orders.count|add:"-4" }} orders</div>
+        {% blocktranslate count orders_count=orders.count|add:"-4" %}
+            <div class="show-all-orders">Show another {{orders_count }} order</div>
+            <div class="hide-another-orders">Hide another {{ orders_count }} order</div>
+        {% plural %}
+            <div class="show-all-orders">Show another {{orders_count }} orders</div>
+            <div class="hide-another-orders">Hide another {{ orders_count }} orders</div>
+        {% endblocktranslate %}
     {% endif %}
 </div>

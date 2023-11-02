@@ -1,3 +1,5 @@
+from parler_rest.fields import TranslatedFieldsField
+from parler_rest.serializers import TranslatableModelSerializer
 from rest_framework import serializers
 from rest_framework.serializers import RelatedField
 
@@ -12,8 +14,8 @@ class PropertyField(RelatedField):
         """
         all_properties = value.select_related('category_property')
         category_properties = PropertyCategory.objects.filter(
-            pk__in=[prop.category_property_id for prop in all_properties]).values('id', 'name')
-        category_properties_names_ids = {data['id']: data['name'] for data in category_properties}
+            pk__in=[prop.category_property_id for prop in all_properties]).values('id', 'translations__name')
+        category_properties_names_ids = {data['id']: data['translations__name'] for data in category_properties}
 
         result = []
         for p in all_properties.values():
@@ -78,14 +80,16 @@ class ProductCategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ProductPropertySerializer(serializers.ModelSerializer):
+class ProductPropertySerializer(TranslatableModelSerializer):
     """
-    Serializer for products properties
+    Serializer for products properties.
     """
+
+    translations = TranslatedFieldsField(shared_model=Property)
 
     class Meta:
         model = Property
-        fields = '__all__'
+        fields = ('translations', 'numeric_value', 'category_property', 'product')
 
 
 class ManufacturerSerializer(serializers.ModelSerializer):

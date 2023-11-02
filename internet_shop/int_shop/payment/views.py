@@ -185,7 +185,9 @@ def webhook(request) -> HttpResponse:
             domain = request.site.domain
             is_secure = request.is_secure()
             # sending email about order payment for the order
-            order_paid.delay(data={'domain': domain, 'is_secure': is_secure},
+            order_paid.delay(data={'domain': domain,
+                                   'is_secure': is_secure,
+                                   'language': request.LANGUAGE_CODE},
                              order_id=order.pk,
                              amount_total=total_amount)
 

@@ -1,3 +1,5 @@
+{% load i18n %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -66,15 +68,15 @@
         <div class="block-order-confirmed">
             <div>
                 <img src="https://drive.google.com/uc?export=download&id=1o3PXelqzR8RjNiW5tffmQ1ZAOcG5yjCD" alt="site-logo" border="0" height="80" width="80">
-                <h2>Order has been confirmed</h2>
+                <h2>{% translate 'Order has been confirmed' %}</h2>
             </div>
             <p>
-                Thanks for your order! Your order ID is <span class="order-id">{{ order_id }}</span>.
-                Order amount is <span class="order-amount">${{ order_amount }}</span>.
-                Our manager contact you within 10 minutes.
+                {% translate 'Thanks for your order! Your order ID is' %} <span class="order-id">{{ order_id }}</span>.
+                {% translate 'Order amount is' %} <span class="order-amount">${{ order_amount }}</span>.
+                {% translate 'Our manager contact you within 10 minutes.' %}
             </p>
             <p>
-                You can see your orders follow the <a class="user-orders-link" href="{{ protocol }}://{{ domain }}{% url 'customer_detail' username 'orders' %}">link.</a>
+                {% translate 'You can see your orders follow the' %} <a class="user-orders-link" href="{{ protocol }}://{{ domain }}{% url 'customer_detail' username 'orders' %}">{% translate 'link.' %}</a>
             </p>
         </div>
         <a class="main-page-link" href="{{ protocol }}://{{ domain }}{% url 'goods:product_list' %}">OnlineShop</a>

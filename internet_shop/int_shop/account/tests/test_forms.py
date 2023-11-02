@@ -138,7 +138,7 @@ class TestAccountForms(TestCase):
 
     def test_forgot_password_form(self):
         """
-        Checking whether user can will reset his/her forgotten password
+        Checking whether user will be able to reset his/her forgotten password.
         """
         self.redis.hset(f'captcha:{self.captcha_text}', 'captcha_text', self.captcha_text)
 
@@ -162,7 +162,7 @@ class TestAccountForms(TestCase):
                                     data={'email': 'mail@mail.com', 'captcha': 'AAA111'})
         self.assertEqual(response.status_code, 200)  # must return form with the error about wrong email
         self.assertFormError(response.context['form'], 'email',
-                             ['Current email doesn\'t registered or user not active'])
+                             ['Current email does not registered or user not active'])
 
         # passing the wrong captcha
         response = self.client.post(reverse('password_reset'),

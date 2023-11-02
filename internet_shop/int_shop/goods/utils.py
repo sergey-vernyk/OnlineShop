@@ -29,10 +29,10 @@ def distribute_properties_from_request(properties: list) -> dict:
 
 def get_page_obj(per_pages: int, page: int, queryset: Union[QuerySet, list]) -> Page:
     """
-    Function returns page object
-    per_pages -> number of products per page;
-    page -> current page;
-    queryset -> list of the products, which have to display on all pages
+    Returns page object.
+    `per_pages` -> number of products per page;
+    `page` -> current page;
+    `queryset` -> either list or queryset of the products, which have to display on all pages
     """
     p = Paginator(queryset, per_pages)
 

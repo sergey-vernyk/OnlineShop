@@ -14,16 +14,19 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.conf import settings
+from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.views.generic import TemplateView
+from django.views.i18n import JavaScriptCatalog
 from drf_yasg import openapi
 from drf_yasg.generators import OpenAPISchemaGenerator
 from drf_yasg.views import get_schema_view
 from rest_framework.permissions import AllowAny
 
 from common.utils import create_captcha_image
+from .settings import env
 
 
 class HttpsSchemaGenerator(OpenAPISchemaGenerator):
@@ -43,7 +46,7 @@ swagger_schema_view = get_schema_view(
         default_version='v1',
         description='API allows interact with products, accounts, coupons, present cards, '
                     'cart, orders, payment',
-        contact=openapi.Contact(email='volt.awp@gmail.com'),
+        contact=openapi.Contact(email=env('ADMIN_USERS').split(':')[1]),
         license=openapi.License(name="BSD License"),
     ),
     public=False,
@@ -51,8 +54,12 @@ swagger_schema_view = get_schema_view(
     validators=['ssv'],
     permission_classes=[AllowAny],
 )
-
+# view sets a user’s language preference and redirects to a given URL
 urlpatterns = [
+    path('i18n/', include('django.conf.urls.i18n')),
+]
+
+urlpatterns += i18n_patterns(
     path('admin/', admin.site.urls),
     path('', include('goods.urls')),
     path('account/', include('account.urls')),
@@ -66,6 +73,8 @@ urlpatterns = [
     path('delivery/', TemplateView.as_view(template_name='./delivery.html'), name='delivery_services'),
     path('contacts/', TemplateView.as_view(template_name='./contacts.html'), name='contacts'),
     path('ajax/update_captcha/', create_captcha_image, name='update_captcha'),
+    path('jsi18n/cart/', JavaScriptCatalog.as_view(packages=['cart']), name='javascript-catalog'),
+    path('jsi18n/goods/', JavaScriptCatalog.as_view(packages=['goods']), name='javascript-catalog'),
     re_path(r'^api/(?P<version>(v1|v2))/goods/', include('goods.api.urls')),
     re_path(r'^api/(?P<version>(v1|v2))/account/', include('account.api.urls')),
     re_path(r'^api/(?P<version>(v1|v2))/cart/', include('cart.api.urls')),
@@ -82,7 +91,9 @@ urlpatterns = [
     re_path(r'^api/(?P<version>(v1|v2))/redoc/$',
             swagger_schema_view.with_ui('redoc', cache_timeout=0),
             name='schema-redoc'),
-]
+
+    prefix_default_language=True
+)
 
 if settings.DEBUG:  # save files will be happened to this path only in debug mode
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

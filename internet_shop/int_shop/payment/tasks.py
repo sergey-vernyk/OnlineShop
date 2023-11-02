@@ -1,20 +1,23 @@
+from decimal import Decimal
+
+from celery import shared_task
 from django.conf import settings
 from django.core.mail import EmailMessage
-from celery import shared_task
-from decimal import Decimal
 from django.template.loader import render_to_string
+from django.utils.translation import gettext_lazy as _, activate
+
 from orders.models import Order
 
 
 @shared_task
 def order_paid(data: dict, order_id: int, amount_total: Decimal) -> str:
     """
-    Task will send email to user's email, which has been paid order successfully
+    Task will send email to user's email, which has been paid order successfully.
     """
-
+    activate(data.get('language'))
     to_email = Order.objects.get(pk=order_id).email
 
-    subject = 'OnlineShop - Order paid'
+    subject = _('Order paid')
     body = render_to_string('account/emails/order_paid_email.html',
                             {
                                 'order_id': order_id,

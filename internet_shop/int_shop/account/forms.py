@@ -12,26 +12,28 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
+from django.db.models import Q
+from django.utils.translation import gettext_lazy as _
 
 from common.utils import check_phone_number
 from common.utils import validate_captcha_text
 from .models import Profile
 
 help_messages = (
-    'Your password must contain at least 8 characters and can’t be entirely numeric.',
-    'Enter the same password as before, for verification.'
+    _('Your password must contain at least 8 characters and can not be entirely numeric.'),
+    _('Enter the same password as before, for verification.')
 )
 
 
 class LoginForm(AuthenticationForm):
     """
-    Form for login user
+    Form for login user.
     """
-    username = forms.CharField(max_length=50, label='Username or Email',
+    username = forms.CharField(max_length=50, label=_('Username or Email'),
                                widget=forms.TextInput(attrs={'class': 'auth-field'}))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'auth-field'}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'auth-field'}), label=_('Password'))
     remember = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'check-auth-field'}),
-                                  label='Remember?', required=False)
+                                  label=_('Remember?'), required=False)
 
     def clean_username(self) -> Union[str, ValidationError]:
         """
@@ -49,52 +51,53 @@ class LoginForm(AuthenticationForm):
                     user = User.objects.get(email=username_or_email)
                     # user is not active
                     if not user.is_active:
-                        raise ValidationError('User with this email doesn\'t active', code='inactive_user')
+                        raise ValidationError(_('User with this email doesn\'t active'), code='inactive_user')
                     return user.username
                 except ObjectDoesNotExist:
-                    raise ValidationError('User with this email doesn\'t exists', code='No_exists_user')
+                    raise ValidationError(_('User with this email doesn\'t exists'), code='No_exists_user')
         else:  # if was got not email as username
             user = User.objects.filter(username=username_or_email).exists()
             if not user:
-                raise ValidationError('User with this username doesn\'t exist', code='No_exists_user')
+                raise ValidationError(_('User with this username doesn\'t exist'), code='No_exists_user')
             # user in not active
             elif not User.objects.get(username=username_or_email).is_active:
-                raise ValidationError('User with this username doesn\'t active', code='inactive_user')
+                raise ValidationError(_('User with this username doesn\'t active'), code='inactive_user')
 
             return username_or_email
 
     def clean_password(self):
         """
-        Exception if received password not match with received username
+        Exception if received password not match with received username or email.
         """
         password = self.cleaned_data.get('password')
         username = self.cleaned_data.get('username')
 
-        user_exists = User.objects.filter(username=username).exists()
+        user_exists = User.objects.filter(Q(username=username) | Q(email=username)).exists()
         if user_exists:
-            user = User.objects.get(username=username)
+            user = User.objects.get(Q(username=username) | Q(email=username))
             # conformity checking received password and username
             password_correct = user.check_password(password)
 
             if not password_correct:
-                raise ValidationError('Username with the input password are mismatch', code='wrong_password')
+                raise ValidationError(_('Username or Email with the input password are mismatch'),
+                                      code='wrong_password')
 
         return password
 
 
 class UserPasswordChangeForm(PasswordChangeForm):
     """
-    Form for changing password of user account
+    Form for changing password of user account.
     """
-    old_password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'pass-field',
+    old_password = forms.CharField(label=_('Old password'),
+                                   widget=forms.PasswordInput(attrs={'class': 'pass-field',
                                                                      'autocomplete': 'new-password'}),
-                                   help_text='If you have forgotten old password, click "Forgot password?" below.')
-    new_password1 = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'pass-field', 'autocomplete': 'new-password'}),
-        label='New Password', help_text=help_messages[0]
-    )
+                                   help_text=_('If you have forgotten old password, click "Forgot password?" below.'))
+    new_password1 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'pass-field',
+                                                                      'autocomplete': 'new-password'}),
+                                    label=_('New Password'), help_text=help_messages[0])
     new_password2 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'pass-field'}),
-                                    label='New password confirmation',
+                                    label=_('New password confirmation'),
                                     help_text=help_messages[1])
 
 
@@ -104,27 +107,27 @@ class RegisterUserForm(UserCreationForm):
     """
     username = forms.CharField(required=True, label='Username', widget=forms.TextInput(attrs={'class': 'reg-field'}))
     email = forms.CharField(required=True, label='Email', widget=forms.EmailInput(attrs={'class': 'reg-field'}))
-    phone_number = forms.CharField(required=False, label='Phone',
+    phone_number = forms.CharField(required=False, label=_('Phone'),
                                    widget=forms.TextInput(attrs={'class': 'reg-field',
-                                                                 'placeholder': '+country code ...'}))
-    password1 = forms.CharField(required=True, label='Password', widget=forms.PasswordInput(
+                                                                 'placeholder': _('+country code ...')}))
+    password1 = forms.CharField(required=True, label=_('Password'), widget=forms.PasswordInput(
         attrs={'class': 'reg-field', 'autocomplete': 'new-password'}),
                                 help_text=help_messages[0])
-    password2 = forms.CharField(required=True, label='Confirm password', widget=forms.PasswordInput(
+    password2 = forms.CharField(required=True, label=_('Confirm password'), widget=forms.PasswordInput(
         attrs={'class': 'reg-field', 'autocomplete': 'new-password'}),
                                 help_text=help_messages[1])
 
-    first_name = forms.CharField(required=True, label='First name',
+    first_name = forms.CharField(required=True, label=_('First name'),
                                  widget=forms.TextInput(attrs={'class': 'reg-field'}))
-    last_name = forms.CharField(required=False, label='Last name', widget=forms.TextInput(attrs={'class': 'reg-field'}))
-    date_of_birth = forms.DateField(required=False, label='Date of birth', widget=forms.DateInput(
+    last_name = forms.CharField(required=False, label=_('Last name'), widget=forms.TextInput(attrs={'class': 'reg-field'}))
+    date_of_birth = forms.DateField(required=False, label=_('Date of birth'), widget=forms.DateInput(
         attrs={'class': 'reg-field', 'placeholder': 'dd-mm-yyyy'}))
-    about = forms.CharField(label='About', required=False, widget=forms.Textarea(attrs={'rows': 6, 'cols': 5,
+    about = forms.CharField(label=_('About'), required=False, widget=forms.Textarea(attrs={'rows': 6, 'cols': 5,
                                                                                         'class': 'reg-field'}))
 
-    gender = forms.CharField(required=False, label='Gender', widget=forms.RadioSelect(choices=Profile.GENDER))
+    gender = forms.CharField(required=False, label=_('Gender'), widget=forms.RadioSelect(choices=Profile.GENDER))
 
-    user_photo = forms.ImageField(required=False, label='Photo', widget=forms.FileInput(attrs={'class': 'reg-photo'}))
+    user_photo = forms.ImageField(required=False, label=_('Photo'), widget=forms.FileInput(attrs={'class': 'reg-photo'}))
 
     captcha = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': 'reg-field-captcha'}))
 
@@ -134,7 +137,7 @@ class RegisterUserForm(UserCreationForm):
 
     error_messages = {
         'date_of_birth': {
-            'invalid': 'Incorrect date',
+            'invalid': _('Incorrect date'),
         }
     }
 
@@ -145,7 +148,7 @@ class RegisterUserForm(UserCreationForm):
         username = self.cleaned_data.get('username')
         user = User.objects.filter(username=username).exists()
         if user:
-            raise ValidationError('Username is already exist', code='exists_username')
+            raise ValidationError(_('Username is already exist'), code='exists_username')
 
         return username
 
@@ -157,7 +160,7 @@ class RegisterUserForm(UserCreationForm):
         email = self.cleaned_data.get('email')
         user = User.objects.filter(email=email).exists()
         if user:
-            raise ValidationError('Email is already register', code='exists_email')
+            raise ValidationError(_('Email is already register'), code='exists_email')
 
         return email
 
@@ -167,14 +170,14 @@ class RegisterUserForm(UserCreationForm):
         """
         phone_number_in = self.cleaned_data.get('phone_number')
         if not phone_number_in:
-            self.add_error('phone_number', error='This field must not be empty')
+            self.add_error('phone_number', error=_('This field must not be empty'))
             return
 
         phone_number_output = check_phone_number(phone_number_in)
         if phone_number_output:
             return phone_number_output
         else:
-            self.add_error('phone_number', 'Invalid phone number')
+            self.add_error('phone_number', _('Invalid phone number'))
 
     def clean_captcha(self):
         """
@@ -204,33 +207,33 @@ class ForgotPasswordForm(PasswordResetForm):
         """
         Checking whether user is active in the system or
         whether existing email in the system
-        with received email, otherwise rise an exception
+        with received email, otherwise rise an exception.
         """
         email = self.cleaned_data.get('email')
         user = self.get_users(email)  # getting generator with user
         try:
             received_email = next(user).email  # getting user's email
         except StopIteration:
-            raise ValidationError('Current email doesn\'t registered or user not active', code='No_exists_user')
+            raise ValidationError(_('Current email does not registered or user not active'), code='No_exists_user')
 
         return received_email
 
 
 class SetNewPasswordForm(SetPasswordForm):
     """
-    Form for entering new password after reset the last
+    Form for entering new password after reset the last.
     """
 
     new_password1 = forms.CharField(
-        label='New password',
+        label=_('New password'),
         widget=forms.PasswordInput(attrs={'autocomplete': 'new-password', 'class': 'pass-field'}),
         help_text=help_messages[0]
     )
     new_password2 = forms.CharField(
-        label='Confirm new password',
+        label=_('Confirm new password'),
         widget=forms.PasswordInput(attrs={'autocomplete': 'new-password', 'class': 'pass-field'}),
         help_text=help_messages[1])
 
     error_messages = {
-        'password_mismatch': 'The two password fields didn’t match.',
+        'password_mismatch': _('The two password fields did not match.'),
     }

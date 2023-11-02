@@ -9,8 +9,11 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
+import os
 from pathlib import Path
+
 import environ
+from django.utils.translation import gettext_lazy as _
 
 # init environment variables
 env = environ.Env()
@@ -47,6 +50,7 @@ INSTALLED_APPS = [
     'storages',
     'django_filters',
     'drf_yasg',
+    'parler',
 
     'goods.apps.GoodsConfig',
     'orders.apps.OrdersConfig',
@@ -59,6 +63,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',  # middleware for localization the project
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -115,7 +120,35 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en'
+
+LANGUAGES = (
+    ('en', _('English')),
+    ('uk', _('Ukrainian')),
+)
+
+# path where Django looks for translations files
+LOCALE_PATHS = (
+    os.path.join(BASE_DIR, './locale/'),
+    os.path.join(BASE_DIR, './goods/locale/'),
+    os.path.join(BASE_DIR, './account/locale/'),
+    os.path.join(BASE_DIR, './cart/locale/'),
+    os.path.join(BASE_DIR, './coupon/locale/'),
+    os.path.join(BASE_DIR, './present_cards/locale/'),
+    os.path.join(BASE_DIR, './orders/locale/'),
+    os.path.join(BASE_DIR, './payment/locale/'),
+)
+
+PARLER_LANGUAGES = {
+    SITE_ID: (
+        {'code': 'en'},
+        {'code': 'uk'},
+    ),
+    'default': {
+        'fallbacks': ['en'],  # translation language by default
+        'hide_untranslated': False,  # settings for display no translated content
+    }
+}
 
 TIME_ZONE = 'Europe/Kyiv'
 

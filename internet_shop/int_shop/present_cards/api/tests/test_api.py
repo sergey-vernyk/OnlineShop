@@ -306,12 +306,20 @@ class TestPresentCardAPI(APITestCase):
 
     def test_create_present_card_category_by_only_staff_users(self):
         """
-        Checking create present card category, which can create only by staff users
+        Checking create present card category, which can create only by staff users.
         """
 
         category_data = {
-            'name': 'new_card_category',
-            'slug': 'new-card-category',
+            'translations': {
+                'en': {
+                    'name': 'new_card_category',
+                    'slug': 'new-card-category',
+                },
+                'uk': {
+                    'name': 'нова-категорія',
+                    'slug': 'nova-categoria',
+                }
+            }
         }
 
         # user is not staff and authorized
@@ -329,10 +337,10 @@ class TestPresentCardAPI(APITestCase):
                                     format='json')
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        created_category = PresentCardCategory.objects.filter(name=category_data['name']).exists()
+        created_category = PresentCardCategory.objects.all()[1]
         self.assertTrue(created_category)
 
-        for field, value in PresentCardCategory.objects.get(name=category_data['name']).__dict__.items():
+        for field, value in created_category.__dict__.items():
             if field in category_data:
                 self.assertEqual(value, category_data[field])
 
@@ -359,11 +367,20 @@ class TestPresentCardAPI(APITestCase):
 
     def test_full_update_present_card_category_only_by_staff_users(self):
         """
-        Checking full update present card category info only by staff users
+        Checking full update present card category info only by staff users.
         """
         category_data = {
-            'name': 'Such a new name',
-            'slug': self.product.category.slug
+            'translations': {
+                'en': {
+                    'name': 'Such a new name',
+                    'slug': self.card.category.slug
+                },
+                'uk': {
+                    'name': "Нове ім'я",
+                    'slug': 'nove-imia'
+                }
+            }
+
         }
 
         # user is not staff and authorized

@@ -21,14 +21,13 @@ $(document).ready(function() {
                 var currentProductCost = response['added_prod_cost']; //current product cost after changing quantity
                 var currentProductsInCart = response['cart_len'];
                 var totalPriceDiscounts = response['total_price_discounts'];
-                const isPluralAmount = currentProductsInCart === 1 ? false : true; //plural or singular products quantity
 
                 $('.amount-cart').text(currentProductsInCart); //amount quantity of goods in the cart
-                $('.amount-items > div:nth-child(1) > span:nth-child(2)').text(isPluralAmount ? 'products': 'product');
-                $('.total-price').text(totalPriceDiscounts > 0 ? `$${totalPriceDiscounts}`: 'Free'); //the final cost of goods in header
+                $('.amount-items > div:nth-child(1) > span:nth-child(2)').text(django.gettext('pcs.'));
+                $('.total-price').text(totalPriceDiscounts > 0 ? `$${totalPriceDiscounts}`: django.gettext('Free')); //the final cost of goods in header
                 currentProductCart.text('$' + currentProductCost);
                 $('.amount-items > div:nth-child(1) > span:nth-child(1)').text(response['cart_len']);
-                $('.amount-items > span:nth-child(2)').text(totalPriceDiscounts > 0 ? `$${totalPriceDiscounts}`: 'Free');
+                $('.amount-items > span:nth-child(2)').text(totalPriceDiscounts > 0 ? `$${totalPriceDiscounts}`: django.gettext('Free'));
                 $('.discount-value').text('-$' + response['total_discount']); //total discount amount
                 $('.without-value').text('$' + response['total_price']); //amount cost of goods without discount
             },

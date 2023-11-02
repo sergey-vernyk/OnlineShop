@@ -14,9 +14,9 @@ from .cart import Cart
 
 @ajax_required
 @require_POST
-def cart_add(request):
+def cart_add(request) -> JsonResponse:
     """
-    Add product to cart
+    Add product to the cart.
     """
 
     product_id = request.POST.get('product_id')
@@ -37,9 +37,9 @@ def cart_add(request):
                          'total_discount': cart.get_total_discount()})
 
 
-def cart_detail(request):
+def cart_detail(request)-> JsonResponse:
     """
-    Displaying cart with goods (if they are in cart)
+    Displaying cart with goods if any.
     """
     coupon_code = None
     present_card_code = None
@@ -60,9 +60,9 @@ def cart_detail(request):
 
 @ajax_required
 @require_POST
-def cart_remove(request):
+def cart_remove(request) -> JsonResponse:
     """
-    Deleting product from cart
+    Deleting product from the cart.
     """
     product_id = request.POST.get('product_id')
     cart = Cart(request)
@@ -73,4 +73,5 @@ def cart_remove(request):
                          'cart_len': len(cart),
                          'total_price': cart.get_total_price(),
                          'total_price_discounts': cart.get_total_price_with_discounts(),
-                         'total_discount': cart.get_total_discount()})
+                         'total_discount': cart.get_total_discount(),
+                         'language': request.LANGUAGE_CODE})

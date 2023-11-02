@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 
 {% block title %}OnlineShop{% endblock %}
 {% block styles %}
@@ -9,7 +10,7 @@
 {% endblock %}
 {% block content %}
 <main id="main-list">
-    <h3 class="mainlist-header">Online Shop products</h3>
+    <h3 class="mainlist-header">{% translate 'Online Shop products' %}</h3>
     <div class="container-md">
         <div class="mainlist-row">
             <div class="filter-prod-column">
@@ -29,11 +30,15 @@
                     {% empty %}
                         {% if place == 'mainlist' %}
                             <div class="d-flex justify-content-center">
-                                <h4>There are no results for your query <b>"{{ request.GET.query }}"</b></h4>
+                                <h4>
+                                    {% blocktranslate with query=request.GET.query %}
+                                        There are no results for your query <b>"{{ query }}"</b>...
+                                    {% endblocktranslate %}
+                                </h4>
                             </div>
                         {% elif place == 'filter_list'%}
                             <div class="d-flex justify-content-center">
-                                <h4>There are no results by passed filter parameters</h4>
+                                <h4>{% translate 'There are no results by passed filter parameters...' %}</h4>
                             </div>
                         {% endif %}
                     {% endfor %}
