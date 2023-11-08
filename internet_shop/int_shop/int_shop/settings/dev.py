@@ -2,7 +2,7 @@ import os
 from .base import BASE_DIR, env
 
 DEBUG = True
-ALLOWED_HOSTS = ['onlineshopproj.com', '127.0.0.1', 'localhost', 'web']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'web']
 INTERNAL_IPS = ['127.0.0.1']
 
 STATIC_URL = '/static/'

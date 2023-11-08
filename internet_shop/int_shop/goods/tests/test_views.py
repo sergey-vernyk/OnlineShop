@@ -60,6 +60,8 @@ class TestProductListView(TestCase):
         redis_instance = redis.StrictRedis(host=settings.REDIS_HOST,
                                            port=settings.REDIS_PORT,
                                            db=settings.REDIS_DB_NUM,
+                                           username=settings.REDIS_USER,
+                                           password=settings.REDIS_PASSWORD,
                                            charset='utf-8',
                                            decode_responses=True,
                                            socket_timeout=30)
@@ -294,6 +296,8 @@ class TestProductDetailView(TestCase):
         redis_instance = redis.StrictRedis(host=settings.REDIS_HOST,
                                            port=settings.REDIS_PORT,
                                            db=settings.REDIS_DB_NUM,
+                                           username=settings.REDIS_USER,
+                                           password=settings.REDIS_PASSWORD,
                                            charset='utf-8',
                                            decode_responses=True,
                                            socket_timeout=30)
@@ -810,7 +814,7 @@ class TestFilterResultsView(TestCase):
         setattr(self.instance, 'object_list', [])
 
         context = self.instance.get_context_data()
-        self.assertQuerysetEqual(qs, [self.product3, self.product4])
+        self.assertQuerysetEqual(qs, [self.product3, self.product4], ordered=False)
 
         # checking context values
         for key, value in context.items():
@@ -945,6 +949,8 @@ class TestOtherGoodsViews(TestCase):
         redis_instance = redis.StrictRedis(host=settings.REDIS_HOST,
                                            port=settings.REDIS_PORT,
                                            db=settings.REDIS_DB_NUM,
+                                           username=settings.REDIS_USER,
+                                           password=settings.REDIS_PASSWORD,
                                            charset='utf-8',
                                            decode_responses=True,
                                            socket_timeout=30)

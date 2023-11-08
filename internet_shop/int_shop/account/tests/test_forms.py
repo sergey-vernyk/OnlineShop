@@ -29,6 +29,8 @@ class TestAccountForms(TestCase):
         redis_instance = redis.StrictRedis(host=settings.REDIS_HOST,
                                            port=settings.REDIS_PORT,
                                            db=settings.REDIS_DB_NUM,
+                                           username=settings.REDIS_USER,
+                                           password=settings.REDIS_PASSWORD,
                                            charset='utf-8',
                                            decode_responses=True,
                                            socket_timeout=30)

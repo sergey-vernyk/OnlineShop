@@ -61,6 +61,8 @@ services:
     image: rabbitmq:3.12-alpine
     restart: always
     user: "rabbitmq"
+    ports:
+      - 15692:15692
     container_name: rabbitmq_broker
     volumes:
       - rabbitmq_db:/var/lib/rabbitmq/

@@ -150,9 +150,8 @@ def activate_user_account(request, uidb64, token):
         profile.save(update_fields=['email_confirm'])
         messages.success(request, _('Thank you for your email confirmation. Now you can login your account'))
         return redirect('login')
-    else:
-        messages.error(request, _('Activation link is invalid!'))
-        return redirect('goods:product_list')
+    messages.error(request, _('Activation link is invalid!'))
+    return redirect('goods:product_list')
 
 
 class DetailUserView(DetailView):
