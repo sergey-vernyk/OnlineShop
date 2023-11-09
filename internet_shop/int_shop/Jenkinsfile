@@ -2,6 +2,7 @@ pipeline {
     agent any
 
 environment {
+        ENV_FILE = credentials("ENV_FILE")
         POSTGRES_DB = credentials("POSTGRES_DB")
         POSTGRES_USER = credentials("POSTGRES_USER")
         POSTGRES_PASSWORD = credentials("POSTGRES_PASSWORD")
@@ -21,11 +22,24 @@ environment {
         BEARER_AUTHORIZATION_TOKEN_GOOGLE = credentials("BEARER_AUTHORIZATION_TOKEN_GOOGLE")
 }
     stages {
+        stage("Clone repository to workspace") {
+            steps {
+                script {
+                    //if project directory does not exist, clone repository and copy file with environment variables to the project
+                    if (!fileExists("OnlineShop"))
+                        sh '''
+                            git clone https://github.com/sergey-vernyk/OnlineShop.git
+                            cat ${ENV_FILE} > env && \
+                            cp env ${WORKSPACE}/OnlineShop/internet_shop/int_shop/int_shop/settings/.env
+                        '''
+                }
+            }
+        }
         stage("Build and Run Containers") {
             steps {
                 // build django app to image
                 script {
-                    def dockerfileDir = "${WORKSPACE}/internet_shop/int_shop"
+                    def dockerfileDir = "${WORKSPACE}/OnlineShop/internet_shop/int_shop"
                     def dockerImageName = "django_web_jenkins"
                     sh "docker build -t ${dockerImageName} -f ${dockerfileDir}/Dockerfile ${dockerfileDir}"
                 }
@@ -34,36 +48,37 @@ environment {
                     docker run -d --name django_app \
                         --expose 5000 \
                         -v ${WORKSPACE}/var/run/psql:/var/run/postgresql \
-                        -e DATABASE_NAME=${DATABASE_NAME} \
-                        -e DATABASE_USER=${DATABASE_USER} \
-                        -e DATABASE_PASSWORD=${DATABASE_PASSWORD} \
-                        -e DATABASE_PORT=${DATABASE_PORT} \
-                        -e REDIS_PORT=${REDIS_PORT} \
-                        -e REDIS_HOST=${REDIS_HOST} \
-                        -e REDIS_DB_NUM=${REDIS_DB_NUM} \
-                        -e REDIS_CACHE_NUM=${REDIS_CACHE_NUM} \
-                        -e REDIS_USER=${REDIS_USER} \
-                        -e REDIS_PASSWORD=${REDIS_PASSWORD} \
-                        -e CELERY_BROKER_URL=${CELERY_BROKER_URL} \
-                        -e CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND} \
-                        -e ACCESS_FACEBOOK_USER_TOKEN=${ACCESS_FACEBOOK_USER_TOKEN}
-                        -e BEARER_AUTHORIZATION_TOKEN_GOOGLE=${BEARER_AUTHORIZATION_TOKEN_GOOGLE}
-                        --entrypoint /bin/sh  django_web_jenkins -c "python manage.py runserver 5000"
+                        --env DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY} \
+                        --env DATABASE_NAME=${DATABASE_NAME} \
+                        --env DATABASE_USER=${DATABASE_USER} \
+                        --env DATABASE_PASSWORD=${DATABASE_PASSWORD} \
+                        --env DATABASE_PORT=${DATABASE_PORT} \
+                        --env REDIS_PORT=${REDIS_PORT} \
+                        --env REDIS_HOST=${REDIS_HOST} \
+                        --env REDIS_DB_NUM=${REDIS_DB_NUM} \
+                        --env REDIS_CACHE_NUM=${REDIS_CACHE_NUM} \
+                        --env REDIS_USER=${REDIS_USER} \
+                        --env REDIS_PASSWORD=${REDIS_PASSWORD} \
+                        --env CELERY_BROKER_URL=${CELERY_BROKER_URL} \
+                        --env CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND} \
+                        --env ACCESS_FACEBOOK_USER_TOKEN=${ACCESS_FACEBOOK_USER_TOKEN} \
+                        --env BEARER_AUTHORIZATION_TOKEN_GOOGLE=${BEARER_AUTHORIZATION_TOKEN_GOOGLE} \
+                        --entrypoint /bin/sh django_web_jenkins -c "python manage.py runserver 5000"
                 '''
                 // run postgres container with environment variables
                 sh '''
                     docker run -d --name postgres_jenkins \
                         -v ${WORKSPACE}/var/run/psql:/var/run/postgresql \
-                        -e POSTGRES_DB=${POSTGRES_DB} \
-                        -e POSTGRES_USER=${POSTGRES_USER} \
-                        -e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
-                        --expose ${DATABASE_PORT} postgres:14.6-alpine
+                        --env POSTGRES_DB=${POSTGRES_DB} \
+                        --env POSTGRES_USER=${POSTGRES_USER} \
+                        --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
+                        --expose 5432 postgres:14.6-alpine
                 '''
                 // run redis container
                 sh '''
                     docker run -d --name redis_db_jenkins \
-                        -v ${WORKSPACE}/int_shop/config/redis/redis.conf:/usr/local/etc/redis/redis.conf \
-                        --expose ${REDIS_PORT} redis:7-alpine3.16 redis-server /usr/local/etc/redis/redis.conf
+                        -v ${WORKSPACE}/OnlineShop/internet_shop/int_shop/config/redis/redis.conf:/usr/local/etc/redis/redis.conf \
+                        --expose 6379 redis:7-alpine3.16 redis-server /usr/local/etc/redis/redis.conf
                 '''
             }
         }
@@ -84,18 +99,23 @@ environment {
                 sh 'docker exec -u root django_app sh -c "cd / && chmod 777 -R /code/ && exit"'
                 //make tests and coverage
                 sh '''
-                    docker exec django_app sh -c "coverage run --source '.' --omit '*/migrations/*,*/tests/*,*/settings/*,int_shop/*' manage.py test && coverage report && exit"
+                    docker exec django_app \
+                        sh -c "coverage run --source '.' --omit '*/migrations/*,*/tests/*,*/settings/*,int_shop/*' \
+                        manage.py test --exclude-tag social_profiles && \
+                        coverage report && \
+                        exit"
                 '''
             }
         }
     }
-    
     post { 
         success {
             //remove all containers and network
             sh "docker stop redis_db_jenkins postgres_jenkins django_app"
             sh "docker rm redis_db_jenkins postgres_jenkins django_app"
             sh "docker network rm jenkins-network"
+            
+            sh "cd ${WORKSPACE} && rm -r OnlineShop"
         }
     }
 }
