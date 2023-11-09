@@ -40,7 +40,7 @@ from .utils import get_image_from_url, create_profile_from_social
 
 class LoginUserView(LoginView):
     """
-    Class for login user to the system
+    Class for login user to the system.
     """
 
     form_class = LoginForm
@@ -58,7 +58,7 @@ class LoginUserView(LoginView):
 
 class UserPasswordChangeView(PasswordChangeView):
     """
-    Changing user account password view
+    Change password of user's account.
     """
 
     form_class = UserPasswordChangeForm
@@ -66,7 +66,7 @@ class UserPasswordChangeView(PasswordChangeView):
 
 class UserRegisterView(CreateView):
     """
-    Registration user in the system view
+    Register user in the system.
     """
 
     form_class = RegisterUserForm
@@ -131,8 +131,7 @@ class UserRegisterView(CreateView):
 
 def activate_user_account(request, uidb64, token):
     """
-    Activation registered user account after sending to user
-    email with activation link.
+    Activation registered user's account after sending to user's email activation link.
     """
     try:
         # decoding user id from uidb64
@@ -156,8 +155,8 @@ def activate_user_account(request, uidb64, token):
 
 class DetailUserView(DetailView):
     """
-    Detail information about user: his/her orders, personal info,
-    favorite list etc.
+    Detail information about user: user's orders, personal info,
+    favorites list etc.
     """
 
     model = Profile
@@ -194,14 +193,14 @@ class DetailUserView(DetailView):
 
     def get_object(self, queryset=None):
         """
-        Return profile object by passed name in URL
+        Return profile object by passed name in URL.
         """
         return Profile.objects.get(user__username=self.kwargs.get('customer'))
 
     def _set_orders_for_coupon(self, orders: QuerySet, coupons: QuerySet) -> QuerySet:
         """
-        Method sets order list for each profile's coupon, in which it was applied.
-        Returns updated coupons queryset
+        Compose order list for each profile's coupon, in which the coupon was applied.
+        Returns updated coupons queryset.
         """
         orders_for_coupon = {}  # dictionary type {coupon: [order_1, order_2]}
         for order in orders:
@@ -257,7 +256,8 @@ def save_social_user_to_profile(backend, user, response, *args, **kwargs):
             user_info = requests.get(
                 url=(f'https://people.googleapis.com/v1/people/'
                      f'me?personFields=genders%2Cbirthdays&key={settings.API_KEY_GOOGLE}'),
-                headers=headers)
+                headers=headers,
+                timeout=15)
 
             json_info = user_info.json()
 
@@ -314,7 +314,7 @@ class ForgotPasswordView(PasswordResetView):
 
 class SetNewPasswordView(PasswordResetConfirmView):
     """
-    View for set new password after reset
+    View for set new password after reset.
     """
 
     form_class = SetNewPasswordForm
