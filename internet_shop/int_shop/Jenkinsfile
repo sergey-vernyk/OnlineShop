@@ -3,23 +3,7 @@ pipeline {
 
 environment {
         ENV_FILE = credentials("ENV_FILE")
-        POSTGRES_DB = credentials("POSTGRES_DB")
-        POSTGRES_USER = credentials("POSTGRES_USER")
-        POSTGRES_PASSWORD = credentials("POSTGRES_PASSWORD")
-        DATABASE_NAME = credentials("DATABASE_NAME")
         DATABASE_USER = credentials("DATABASE_USER")
-        DATABASE_PASSWORD = credentials("DATABASE_PASSWORD")
-        DATABASE_PORT = credentials("DATABASE_PORT")
-        REDIS_PORT = credentials("REDIS_PORT")
-        REDIS_HOST = credentials("REDIS_HOST")
-        REDIS_DB_NUM = credentials("REDIS_DB_NUM")
-        REDIS_CACHE_NUM = credentials("REDIS_CACHE_NUM")
-        REDIS_USER = credentials("REDIS_USER")
-        REDIS_PASSWORD = credentials("REDIS_PASSWORD")
-        CELERY_BROKER_URL = credentials("CELERY_BROKER_URL")
-        CELERY_RESULT_BACKEND = credentials("CELERY_RESULT_BACKEND")
-        ACCESS_FACEBOOK_USER_TOKEN = credentials("ACCESS_FACEBOOK_USER_TOKEN")
-        BEARER_AUTHORIZATION_TOKEN_GOOGLE = credentials("BEARER_AUTHORIZATION_TOKEN_GOOGLE")
 }
     stages {
         stage("Clone repository to workspace") {
@@ -48,7 +32,7 @@ environment {
                     cat ${ENV_FILE} > env && \
                     docker run -d --name django_app \
                         --expose 5000 \
-                        -v ${WORKSPACE}/var/run/psql:/var/run/postgresql \
+                        -v ${WORKSPACE}/socket:/var/run/postgresql \
                         --env-file env \
                         --entrypoint /bin/sh django_web_jenkins -c "python manage.py runserver 5000"
                 '''
@@ -56,10 +40,9 @@ environment {
                 sh '''
                     cat ${ENV_FILE} > env && \
                     docker run -d --name postgres_jenkins \
-                        -v ${WORKSPACE}/var/run/psql:/var/run/postgresql \
+                        -v ${WORKSPACE}/socket:/var/run/postgresql \
                         --env-file env \
                         --expose 5432 postgres:14.6-alpine
-                    docker exec postgres_jenkins sh -c "psql -U postgres -p 5432 -c 'CREATE USER ${DATABASE_USER} CREATEDB;'"
                 '''
                 // run redis container
                 sh '''
@@ -85,7 +68,11 @@ environment {
                 //make project's directory available for all users
                 sh 'docker exec -u root django_app sh -c "cd / && chmod 777 -R /code/ && exit"'
                 //make tests and coverage
+                //`sleep` neccessary for waiting postgres db to connect to socket
+                // create user in db for perform tests
                 sh '''
+                    sleep 5
+                    docker exec -u root postgres_jenkins sh -c "psql -U postgres -p 5432 -c 'CREATE USER ${DATABASE_USER} CREATEDB;'"
                     docker exec django_app \
                         sh -c "coverage run --source '.' --omit '*/migrations/*,*/tests/*,*/settings/*,int_shop/*' \
                         manage.py test --exclude-tag social_profiles && \
@@ -97,12 +84,12 @@ environment {
     }
     post { 
         success {
-            //remove all containers and network
+            //remove all containers, network and all files from workspace
             sh "docker stop redis_db_jenkins postgres_jenkins django_app"
             sh "docker rm redis_db_jenkins postgres_jenkins django_app"
             sh "docker network rm jenkins-network"
             
-            sh "cd ${WORKSPACE} && rm -r OnlineShop"
+            sh "cd ${WORKSPACE} && rm -r OnlineShop socket env"
         }
     }
 }
