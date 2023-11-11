@@ -58,8 +58,8 @@ environment {
                     docker run -d --name postgres_jenkins \
                         -v ${WORKSPACE}/var/run/psql:/var/run/postgresql \
                         --env-file env \
-                        --expose 5432 postgres:14.6-alpine && \
-                        docker exec postgres_jenkins sh -c "psql -U postgres -p 5432 -c 'CREATE USER ${DATABASE_USER} CREATEDB;'"
+                        --expose 5432 postgres:14.6-alpine
+                    docker exec postgres_jenkins sh -c "psql -U postgres -p 5432 -c 'CREATE USER ${DATABASE_USER} CREATEDB;'"
                 '''
                 // run redis container
                 sh '''
