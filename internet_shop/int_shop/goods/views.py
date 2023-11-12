@@ -46,8 +46,7 @@ class ProductListView(ListView):
 
     def __init__(self):
         """
-        Overriding the method to add Profile instance, which is necessary
-        for displaying info on the product card about whether product into favorite for this instance or not
+        Add profile instance to display whether each product contains in profile's favorite list.
         """
         super().__init__()
         self.profile = None
@@ -97,7 +96,7 @@ class ProductListView(ListView):
 
     def dispatch(self, request, *args, **kwargs):
         """
-        Set to "profile" attribute guest or authenticated user
+        Set either guest or authenticated user as `profile` attribute.
         """
         if request.user.is_authenticated:
             self.profile = Profile.objects.get(user=request.user)
@@ -107,7 +106,7 @@ class ProductListView(ListView):
 
     def get(self, request, *args, **kwargs):
         """
-        Method is using for the searching and simple loading main page
+        Search products or get product list.
         """
         query = request.GET.get('query')
         category_slug = self.kwargs.get('category_slug')
@@ -122,7 +121,7 @@ class ProductListView(ListView):
     @staticmethod
     def _get_query_results(query: str, category_slug: str = None) -> QuerySet:
         """
-        Method is using for getting search request results
+        Obtain results of search request.
         """
         if category_slug:
             q = Q(category__slug=category_slug, similarity__gte=0.3)
@@ -143,7 +142,7 @@ class ProductListView(ListView):
 
 class ProductDetailView(DetailView, FormMixin):
     """
-    Detail information about product
+    Detail information about product.
     """
     model = Product
     template_name = 'goods/product/detail.html'
@@ -159,14 +158,14 @@ class ProductDetailView(DetailView, FormMixin):
 
     def get_success_url(self):
         """
-        Returns URL for transition after handling valid form
+        Returns URL for transition after handling valid form.
         """
         return reverse('goods:product_detail', kwargs={'product_pk': self.kwargs['product_pk'],
                                                        'product_slug': self.kwargs['product_slug']})
 
     def dispatch(self, request, *args, **kwargs):
         """
-        Set to "profile" attribute guest or authenticated user
+        Set either guest or authenticated user as `profile` attribute.
         """
         if request.user.is_authenticated:
             self.profile = Profile.objects.get(user=request.user)
@@ -198,7 +197,7 @@ class ProductDetailView(DetailView, FormMixin):
 
     def is_in_favorite(self) -> bool:
         """
-        Returns whether current product is in the current profile's favorite
+        Returns whether current product is in the current profile's favorite.
         """
         # getting Favorite instance that linked to current Profile
         fav_obj = Favorite.objects.get(profile=self.profile)
@@ -206,7 +205,7 @@ class ProductDetailView(DetailView, FormMixin):
 
     def get_profile_rated_comments(self) -> dict:
         """
-        Returns ids of comments, under which current profile has set like or dislike
+        Returns ids of comments, under which current profile had set like or dislike.
         """
         liked_comments = self.profile.comments_liked.all()
         unliked_comments = self.profile.comments_unliked.all()
@@ -216,13 +215,12 @@ class ProductDetailView(DetailView, FormMixin):
         # if it's AJAX request
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return self.set_like_dislike_comment(request)
-        else:
-            return self.send_comment_about_product()
+        return self.send_comment_about_product()
 
     def send_comment_about_product(self):
         """
-        Method returns invalid form with errors or redirect to the page
-        with detail product under what that comment has been added successfully
+        Returns invalid form with errors or redirect to the page with detail product
+        under what that comment has been added successfully.
         """
         self.object = self.get_object()
         form = self.get_form(form_class=CommentProductForm)
@@ -235,13 +233,12 @@ class ProductDetailView(DetailView, FormMixin):
             # delete captcha text, when user has posted comment successfully
             redis.hdel(f'captcha:{captcha_text}', 'captcha_text')
             return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
+        return self.form_invalid(form)
 
     @auth_profile_required
     def set_like_dislike_comment(self, request):
         """
-        Method set like or dislike under comment
+        Set either like or dislike to comment.
         """
         comment_id = request.POST.get('comment_id')
         action = request.POST.get('action')  # like/unlike
@@ -273,7 +270,7 @@ class ProductDetailView(DetailView, FormMixin):
 
     def form_invalid(self, form):
         """
-        Overriding the method for adding CommentProductForm instance with errors to the context
+        Add `CommentProductForm` instance with errors to the context.
         """
         context = self.get_context_data()
         context.update(comment_form=form)
@@ -281,8 +278,8 @@ class ProductDetailView(DetailView, FormMixin):
 
     def get(self, request, *args, **kwargs):
         """
-        Method is using for increase number of views of the current product
-        while transition to product detail page
+        Increase number of views of the current product (object)
+        while transition to product detail page.
         """
         object_pk = self.kwargs.get(self.pk_url_kwarg)  # getting product's id from URL kwargs
         # increment number of views by 1 while it's watched
@@ -299,7 +296,7 @@ class ProductDetailView(DetailView, FormMixin):
 @ajax_required
 def add_or_remove_product_favorite(request) -> JsonResponse:
     """
-    Adding or removing product to/from favorite
+    Add or remove product into/from favorite.
     """
     product_id = request.POST.get('product_id')
     action = request.POST.get('action')
@@ -321,7 +318,7 @@ def add_or_remove_product_favorite(request) -> JsonResponse:
 
 class FilterResultsView(ListView):
     """
-    Displaying sample results after filter has been applied
+    Display sample results after filter has been applied.
     """
     model = Product
     template_name = 'goods/product/list.html'
@@ -343,7 +340,7 @@ class FilterResultsView(ListView):
 
     def get(self, request, *args, **kwargs):
         if request.GET:  # if form with filter terms was submitted
-            if 'price_max' and 'price_min' in request.GET:
+            if all(['price_max', 'price_min']) in request.GET:
                 price_min = request.GET.get('price_min')
                 price_max = request.GET.get('price_max')
                 self.kwargs['filter_price'] = (price_min, price_max)
@@ -412,7 +409,6 @@ class FilterResultsView(ListView):
             # updating queryset and marking selected manufacturers
             context['filter_manufacturers'] = FilterByManufacturerForm(initial={
                 'manufacturer': self.kwargs.get('filter_manufacturers')
-
             })
             context['filter_manufacturers'].fields['manufacturer'].queryset = next(manufacturers_info)
             context['manufacturers_prod_qnty'] = next(manufacturers_info)  # products quantity of each manufacturer
@@ -423,7 +419,8 @@ class FilterResultsView(ListView):
 
 def promotion_list(request, category_slug: str = None):
     """
-    Promotions products list
+    Obtain promotions product list.
+    Able to obtain all products or products which belongs to category with `category_slug`.
     """
     category = Category.objects.get(slug=category_slug) if category_slug else ''
     lookup = Q(category__slug=category_slug, promotional=True) if category_slug else Q(promotional=True)
@@ -445,7 +442,8 @@ def promotion_list(request, category_slug: str = None):
 
 def new_list(request, category_slug: str = None):
     """
-    Products list, that were added to the site 2 weeks ago and considered as new
+    Obtain product list, which contains product were added to the site 2 weeks ago and considered as new.
+    Able to obtain all products or products which belongs to category with `category_slug`.
     """
     category = Category.objects.get(slug=category_slug) if category_slug else ''
     now = timezone.now()
@@ -472,7 +470,8 @@ def new_list(request, category_slug: str = None):
 
 def popular_list(request, category_slug: str = None):
     """
-    List of the popular products from certain category or from all categories
+    Obtain list of the popular products.
+    Able to obtain all products or products which belongs to category with `category_slug`.
     """
     view_amount = 5  # displaying number of popular products
     category = None
@@ -606,7 +605,7 @@ def product_ordering(request, place: str, category_slug: str = 'all', page: int 
 @ajax_required
 def set_product_rating(request) -> JsonResponse:
     """
-    Function set product rating using AJAX request
+    Set product's rating using AJAX request.
     """
     star = Decimal(request.POST.get('star'))  # rating, that user has installed (1 - 5)
     product_id = request.POST.get('product_id')
