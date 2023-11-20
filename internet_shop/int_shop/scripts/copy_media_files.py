@@ -13,7 +13,7 @@ environ.Env.read_env(env_file=os.path.join(settings.BASE_DIR, 'settings', '.env'
 
 def update_sha(filepath, sha):
     """
-    Function updates hash after each read file
+    Update hash after each read file.
     """
     with open(filepath, 'rb') as f:
         while True:
@@ -29,9 +29,9 @@ def make_hash() -> Callable:
 
     def wrap(dir_path, *args, **kwargs) -> tuple:
         """
-        Function calculates hash of all available files and their quantity,
-        which are located in directories, started from dir_path.
-        Returns result as tuple (hash, quantity)
+        Calculates hash of all available files and their quantity,
+        which are located in directories, started from `dir_path`.
+        Returns result as tuple (hash, quantity).
         """
         nonlocal sha, files_amount
         for path, dirs, files in os.walk(dir_path):
@@ -46,10 +46,10 @@ def make_hash() -> Callable:
     return wrap
 
 
-def run(file):
+def run(file) -> None:
     """
     If hash doesn't match (i.e. there were updated files or directories in old location),
-    function copies files and directories into new location
+    function copies files and directories into new location.
     """
     # action starts only in production server
     if env('DEV_OR_PROD') == 'prod':

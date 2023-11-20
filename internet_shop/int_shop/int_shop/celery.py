@@ -2,12 +2,12 @@ import os
 from django.conf import settings
 from celery import Celery
 
-# установка модуля настройки по умолчанию
+# set default module's settings
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'int_shop.settings')
-# создание экземпляра celery
+# create celery instance
 app = Celery('int_shop', broker=settings.CELERY_BROKER_URL, backend=settings.CELERY_RESULT_BACKEND)
-# все параметры конфигурации будут начинаться с префикса CELERY
+# all configuration parameters will be starts with CELERY prefix 
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
-# автопоиск задач для выполнения
+# auto search tasks
 app.autodiscover_tasks()

@@ -27,7 +27,7 @@ environment {
                     def dockerImageName = "django_web_jenkins"
                     sh "docker build -t ${dockerImageName} -f ${dockerfileDir}/Dockerfile ${dockerfileDir}"
                 }
-                // run builded django app
+                // run built django app
                 sh '''
                     cat ${ENV_FILE} > env && \
                     docker run -d --name django_app \
