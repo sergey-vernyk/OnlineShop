@@ -41,10 +41,6 @@ msgstr "Англійська"
 msgid "Ukrainian"
 msgstr "Українська"
 
-#: int_shop/settings/base.py:128
-msgid "Russian"
-msgstr "Російська"
-
 #: templates/404.html:5 templates/404.html:16
 msgid "Page Not Found"
 msgstr "Сторінку не знайдено"

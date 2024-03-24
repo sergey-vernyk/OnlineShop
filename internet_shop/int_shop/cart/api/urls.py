@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.urls import path, re_path
 from rest_framework.renderers import CoreJSONRenderer
 from rest_framework.schemas import SchemaGenerator, get_schema_view
@@ -6,7 +7,7 @@ from . import views
 
 # generate schema view for the app
 coreapi_schema_view = get_schema_view(title='Cart API',
-                                      url='/api/cart/',
+                                      url=f'/api/{settings.REST_FRAMEWORK["DEFAULT_VERSION"]}/cart/',
                                       urlconf='cart.api.urls',
                                       generator_class=SchemaGenerator,
                                       renderer_classes=[CoreJSONRenderer],

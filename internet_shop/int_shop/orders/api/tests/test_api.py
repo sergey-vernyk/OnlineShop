@@ -245,7 +245,7 @@ class TestOrdersAPI(APITestCase):
         with self.assertRaises(ObjectDoesNotExist):
             self.order.refresh_from_db()
 
-    def test_get_orders_by_user(self):
+    def test_get_current_user_orders(self):
         """
         Checking get all orders of current authenticated user
         """
@@ -265,19 +265,55 @@ class TestOrdersAPI(APITestCase):
                                       profile=self.profile,
                                       delivery=delivery2)
         # user is not authenticated
-        response = self.client.get(reverse('orders_api:order-orders_by_user', kwargs={'version': 'v1'}))
+        response = self.client.get(reverse('orders_api:order-current_user_orders', kwargs={'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         # authenticate user
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
-        response = self.client.get(reverse('orders_api:order-orders_by_user', kwargs={'version': 'v1'}))
+        response = self.client.get(reverse('orders_api:order-current_user_orders', kwargs={'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         serializer = OrderSerializer(instance=[order2, self.order], many=True)
-        # remove delivery data from response result
-        serializer.data[0].pop('delivery')
-        serializer.data[1].pop('delivery')
         self.assertEqual(response.data, serializer.data)
+
+    def test_get_orders_by_username(self):
+        """
+        Checking get all orders of current authenticated user
+        """
+        new_user = User.objects.create_user(username='new_user')
+        new_profile = Profile.objects.create(user=new_user)
+
+        delivery2 = Delivery.objects.create(first_name='New',
+                                            last_name='User',
+                                            service='Ukrpost',
+                                            method='Post office',
+                                            office_number='5',
+                                            delivery_date=datetime.strftime(
+                                                datetime.now().date() + timezone.timedelta(days=5), '%Y-%m-%d'))
+        # create yet another order for current user
+        order2 = Order.objects.create(first_name='New',
+                                      last_name='User',
+                                      email='another@example.com',
+                                      phone='+38 (095) 123 22 67',
+                                      pay_method='Online',
+                                      profile=new_profile,
+                                      delivery=delivery2)
+
+        # user must be stuff in order to get all orders from another user
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
+        response = self.client.get(reverse('orders_api:order-orders_by_username',
+                                           kwargs={'version': 'v1', 'username': new_user.username}))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # make user as staff
+        self.user.is_staff = True
+        self.user.save()
+        response = self.client.get(reverse('orders_api:order-orders_by_username',
+                                           kwargs={'version': 'v1', 'username': new_user.username}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        serializer = OrderSerializer(instance=order2)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(dict(response.data[0]), serializer.data)
 
     def test_get_deliveries_list_only_by_staff_users(self):
         """
@@ -368,10 +404,13 @@ class TestOrdersAPI(APITestCase):
             if field in new_delivery_data:
                 self.assertEqual(value, new_delivery_data[field])
 
-    def get_deliveries_by_user(self):
+    def test_get_deliveries_by_username(self):
         """
         Checking get all deliveries of current authenticated user
         """
+        new_user = User.objects.create_user(username='new_user')
+        new_profile = Profile.objects.create(user=new_user)
+
         delivery2 = Delivery.objects.create(first_name='Some',
                                             last_name='Person',
                                             service='Ukrpost',
@@ -386,20 +425,25 @@ class TestOrdersAPI(APITestCase):
                              email='another@example.com',
                              phone='+38 (095) 123 22 67',
                              pay_method='Online',
-                             profile=self.profile,
+                             profile=new_profile,
                              delivery=delivery2)
 
-        # user is not authenticated
-        response = self.client.get(reverse('orders_api:delivery-deliveries_by_user', kwargs={'version': 'v1'}))
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-        # authenticate user
+        # user must be stuff in order to get all orders from another user
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
-        response = self.client.get(reverse('orders_api:delivery-deliveries_by_user', kwargs={'version': 'v1'}))
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.client.get(reverse('orders_api:delivery-deliveries_by_username',
+                                           kwargs={'version': 'v1', 'username': new_user.username}))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-        serializer = DeliverySerializer(instance=[self.delivery, delivery2], many=True)
-        self.assertEqual(response.data, serializer.data)
+        # make user as staff
+        self.user.is_staff = True
+        self.user.save()
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
+        response = self.client.get(reverse('orders_api:delivery-deliveries_by_username',
+                                           kwargs={'version': 'v1', 'username': new_user.username}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        serializer = DeliverySerializer(instance=delivery2)
+        self.assertEqual(dict(response.data[0]), serializer.data)
 
     def tearDown(self):
         shutil.rmtree(os.path.join(settings.MEDIA_ROOT, f'products/product_{self.product1}'))

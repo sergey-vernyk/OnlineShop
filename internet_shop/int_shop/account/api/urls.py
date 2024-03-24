@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.urls import path, re_path
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import routers
@@ -9,7 +10,7 @@ from . import views
 
 # generate schema view for the app
 coreapi_schema_view = get_schema_view(title='Account API',
-                                      url='/api/account/',
+                                      url=f'/api/{settings.REST_FRAMEWORK["DEFAULT_VERSION"]}/account/',
                                       urlconf='account.api.urls',
                                       generator_class=SchemaGenerator,
                                       renderer_classes=[CoreJSONRenderer],

@@ -3,8 +3,8 @@ from rest_framework.permissions import BasePermission
 
 class UserPermission(BasePermission):
     """
-    Permission allows to obtain, destroy, and update only staff users.
-    Create objects can only authenticate user
+    Permission allows to obtain, destroy, and update only by staff users.
+    Only authenticated users can create objects.
     """
 
     def has_permission(self, request, view):

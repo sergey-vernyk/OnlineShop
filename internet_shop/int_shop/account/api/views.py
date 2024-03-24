@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from drf_yasg.openapi import Schema, TYPE_OBJECT
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, permissions, status, views, parsers
 from rest_framework.decorators import api_view, action
@@ -17,10 +18,9 @@ from account.models import Profile
 from common.moduls_init import redis
 from goods.api.serializers import ProductSerializer
 from goods.models import Product
-from . import serializers
 from .permissions import ActionsWithOwnProfilePermission, IsNotAuthenticated
 from .schemas import FavoriteActionsSchema
-from .serializers import PhotoUploadSerializer, ResetPasswordSerializer
+from .serializers import PhotoUploadSerializer, ResetPasswordSerializer, ProfileSerializer
 from .tasks import send_email_for_set_new_account_password
 
 
@@ -46,7 +46,7 @@ class AccountViewSet(viewsets.ModelViewSet):
     * delete/{id} - delete profile with `id`
     """
     queryset = Profile.objects.prefetch_related('coupons').select_related('user')
-    serializer_class = serializers.ProfileSerializer
+    serializer_class = ProfileSerializer
     permission_classes = [ActionsWithOwnProfilePermission]
     remove_fields_list_for_get_request = ['password1', 'password2', 'date_of_birth',
                                           'gender', 'about', 'photo', 'phone_number',
@@ -81,6 +81,7 @@ class AccountViewSet(viewsets.ModelViewSet):
         current_profile = get_object_or_404(Profile, user_id=request.user.pk)
         products = current_profile.profile_favorite.product.prefetch_related('comments')
         serializer = ProductSerializer(instance=[product for product in products], many=True)
+        serializer.child.remove_fields(['properties'])
         return Response(serializer.data, status.HTTP_200_OK)
 
     @swagger_auto_schema(method='get', operation_summary='Get list of all watched products')
@@ -98,10 +99,12 @@ class AccountViewSet(viewsets.ModelViewSet):
         products_ids = (int(pk) for pk in redis.smembers(f'profile_id:{current_profile.pk}'))
         products = Product.available_objects.prefetch_related('comments').filter(id__in=products_ids)
         serializer = ProductSerializer(instance=[product for product in products], many=True)
+        serializer.child.remove_fields(['properties'])
         return Response(serializer.data, status.HTTP_200_OK)
 
     @swagger_auto_schema(method='post',
-                         operation_summary='{Add | remove} product with {product_pk} to own list of favorite products')
+                         operation_summary='{Add | remove} product with {product_pk} to own list of favorite products',
+                         request_body=Schema(type=TYPE_OBJECT))
     @action(methods=['POST'],
             detail=False,
             url_path=r'favorite/me/(?P<product_pk>[0-9]+)?/(?P<act>(add|remove))?',
@@ -160,8 +163,8 @@ class AccountViewSet(viewsets.ModelViewSet):
                     data_for_response.update(**value)
             serializer.update(profile_to_update, serializer.validated_data)
             return Response(data_for_response, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def list(self, request, *args, **kwargs):
         page = self.paginate_queryset(self.queryset)
@@ -240,24 +243,23 @@ class ResetUserAccountPasswordView(views.APIView):
                 user.set_password(new_password)
                 user.save()
                 return Response({'success': 'Password has been successfully changed'})
-            else:
-                raise ValidationError('Token has expired or has been already used', code='wrong_token')
-        else:
-            is_exist = User.objects.filter(email=email).exists()
-            if is_exist:
-                user = User.objects.get(email=email)
-                token = default_token_generator.make_token(user)
-                uidb64 = urlsafe_base64_encode(force_bytes(user.username))
-                # send email with instructions about set new password
-                send_email_for_set_new_account_password.delay(token=token,
-                                                              uidb64=uidb64,
-                                                              email=email,
-                                                              username=user.username,
-                                                              is_secure=request.stream.scheme,
-                                                              domain=request.stream.site.domain)
-                return Response({'message': 'Please, check your email. '
-                                            'You have to receive email with instruction for reset password'},
-                                status=status.HTTP_200_OK)
+            raise ValidationError('Token has expired or has been already used', code='wrong_token')
+
+        if User.objects.filter(email=email).exists():
+            user = User.objects.get(email=email)
+            token = default_token_generator.make_token(user)
+            uidb64 = urlsafe_base64_encode(force_bytes(user.username))
+            # send email with instructions about set new password
+            send_email_for_set_new_account_password.delay(token=token,
+                                                          uidb64=uidb64,
+                                                          email=email,
+                                                          username=user.username,
+                                                          is_secure=request.stream.scheme,
+                                                          domain=request.stream.site.domain)
+            return Response({'message': 'Please, check your email. '
+                                        'You have to receive email with instruction for reset password'},
+                            status=status.HTTP_200_OK)
+        return Response({'error': f'User with passed email `{email}` does not exists'})
 
 
 @swagger_auto_schema(method='get',
@@ -289,4 +291,4 @@ class PhotoUploadView(views.APIView):
         photo_obj = request.data['photo']
         profile = Profile.objects.get(user=request.user)
         profile.photo.save(photo_name, photo_obj)  # save photo to DB
-        return Response(status=status.HTTP_200_OK)
+        return Response({'detail': 'Photo has been uploaded successfully'}, status=status.HTTP_200_OK)

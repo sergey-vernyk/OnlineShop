@@ -8,7 +8,7 @@ class ActionsWithOwnProfilePermission(BasePermission):
     """
 
     def has_permission(self, request, view):
-        if view.action in 'create' and not request.user.is_authenticated:
+        if view.action == 'create' and not request.user.is_authenticated:
             return True
         if view.action in ('partial_update', 'update') and request.user.is_authenticated:
             return True

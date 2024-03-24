@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.urls import path
 from rest_framework import routers
 from rest_framework.renderers import CoreJSONRenderer
@@ -7,7 +8,7 @@ from . import views
 
 # generate schema view for app
 coreapi_schema_view = get_schema_view(title='Goods API',
-                                      url='/api/goods/',
+                                      url=f'/api/{settings.REST_FRAMEWORK["DEFAULT_VERSION"]}/goods/',
                                       urlconf='goods.api.urls',
                                       generator_class=SchemaGenerator,
                                       renderer_classes=[CoreJSONRenderer],

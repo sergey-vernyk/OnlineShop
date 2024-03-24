@@ -77,7 +77,7 @@ urlpatterns += i18n_patterns(
             swagger_schema_view.with_ui('redoc', cache_timeout=0),
             name='schema-redoc'),
 
-    prefix_default_language=True
+    prefix_default_language=False
 )
 
 if settings.DEBUG:  # save files will be happened to this path only in debug mode

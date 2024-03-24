@@ -51,8 +51,7 @@ class OrderViewSet(viewsets.ModelViewSet):
                 redis.hget('session_cart', f'user_id:{self.request.user.pk}') or b'{}')
             self.request.session.save()
         cart = Cart(self.request)
-        cart_items = [item for item in cart]
-        context.update({'cart_items': cart_items})
+        context.update({'cart_items': list(cart)})
         return context
 
     @swagger_auto_schema(operation_summary='Update one or more order\'s field(s) with {id}')
@@ -62,21 +61,32 @@ class OrderViewSet(viewsets.ModelViewSet):
 
         return super().partial_update(request, *args, **kwargs)
 
-    @swagger_auto_schema(method='get', operation_summary='Get all user\'s orders')
+    @swagger_auto_schema(method='get', operation_summary='Get all current user\'s orders')
     @action(methods=['GET'],
             detail=False,
             url_path='me',
-            url_name='orders_by_user',
-            permission_classes=[IsAuthenticated],
-            schema=get_orders_by_user_schema)
-    def get_orders_by_user(self, request, version: str = 'v1'):
+            url_name='current_user_orders',
+            permission_classes=[IsAuthenticated])
+    def get_current_user_orders(self, request, version: str = 'v1'):
         """
-        Returns orders o current profile
+        Returns orders of current profile.
         """
         current_profile = Profile.objects.get(user=request.user)
         profile_orders = Order.objects.prefetch_related('items', 'items__product').filter(profile=current_profile)
         serializer = self.get_serializer(instance=profile_orders, many=True)
-        serializer.child.remove_fields(['delivery'])  # remove delivery info from response
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(method='get', operation_summary='Get all orders of user with {username}')
+    @action(methods=['GET'],
+            detail=False,
+            url_path=r'(?P<username>[a-zA-z-_]+)',
+            url_name='orders_by_username',
+            permission_classes=[IsAdminUser],
+            schema=get_orders_by_user_schema)
+    def get_orders_by_username(self, request, username: str, version: str = 'v1'):
+        profile = Profile.objects.get(user__username=username)
+        profile_orders = Order.objects.prefetch_related('items', 'items__product').filter(profile=profile)
+        serializer = self.get_serializer(instance=profile_orders, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -102,19 +112,19 @@ class DeliveryViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.DeliverySerializer
     http_method_names = ['get', 'head', 'patch', 'delete']
 
-    @swagger_auto_schema(method='get', operation_summary='Get all user\'s deliveries')
+    @swagger_auto_schema(method='get', operation_summary='Get all deliveries of user with {username}')
     @action(methods=['GET'],
             detail=False,
-            url_path='me',
-            url_name='deliveries_by_user',
+            url_path='(?P<username>[a-zA-z-_]+)',
+            url_name='deliveries_by_username',
             schema=get_deliveries_by_user_schema,
-            permission_classes=[IsAuthenticated])
-    def get_deliveries_by_user(self, request, version: str = 'v1'):
+            permission_classes=[IsAdminUser])
+    def get_deliveries_by_username(self, request, username: str, version: str = 'v1'):
         """
         Returns deliveries of current profile
         """
-        current_profile = Profile.objects.get(user=request.user)
-        profile_orders = Order.objects.select_related('delivery').filter(profile=current_profile)
+        profile = Profile.objects.get(user__username=username)
+        profile_orders = Order.objects.select_related('delivery').filter(profile=profile)
         delivery_info = Delivery.objects.filter(order__id__in=[order.pk for order in profile_orders])
         serializer = self.get_serializer(instance=delivery_info, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

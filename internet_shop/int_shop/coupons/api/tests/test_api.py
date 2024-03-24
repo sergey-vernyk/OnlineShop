@@ -73,7 +73,7 @@ class TestCouponsAPI(APITestCase):
         """
         # user is not staff and authorized
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
-        response = self.client.get(reverse('coupons_api:coupon-list', kwargs={'version': 'v1'}))
+        response = self.client.get('/uk' + reverse('coupons_api:coupon-list', kwargs={'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         # user is staff
@@ -143,9 +143,6 @@ class TestCouponsAPI(APITestCase):
                                            kwargs={'pk': self.coupon.pk, 'version': 'v1'}),
                                    format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # set current language of coupon's category,
-        # since category was initialized in `uk` language
-        self.coupon.category.set_current_language('en')
         self.coupon.category.save()
         serializer = CouponSerializer(instance=self.coupon)
         self.assertDictEqual(response.data, serializer.data)
@@ -362,7 +359,6 @@ class TestCouponsAPI(APITestCase):
                                            kwargs={'pk': self.coupon.category.pk, 'version': 'v1'}),
                                    format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.coupon.category.set_current_language('en')
         self.coupon.category.save()
         serializer = CouponCategorySerializer(instance=self.coupon.category)
         self.assertDictEqual(response.data, serializer.data)

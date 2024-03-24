@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.urls import path
 from rest_framework.renderers import CoreJSONRenderer
 from rest_framework.routers import DefaultRouter
@@ -6,7 +7,7 @@ from rest_framework.schemas import SchemaGenerator, get_schema_view
 from . import views
 
 coreapi_view_schema = get_schema_view(title='Coupons API',
-                                      url='/api/coupons/',
+                                      url=f'/api/{settings.REST_FRAMEWORK["DEFAULT_VERSION"]}/coupons/',
                                       urlconf='coupons.api.urls',
                                       renderer_classes=[CoreJSONRenderer],
                                       generator_class=SchemaGenerator,

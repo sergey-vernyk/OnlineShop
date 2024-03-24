@@ -1,6 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
-from drf_yasg.openapi import Parameter
+from drf_yasg.openapi import Parameter, Schema, TYPE_OBJECT
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
@@ -9,9 +9,8 @@ from rest_framework.response import Response
 from account.models import Profile
 from common.filters import ExtraSearchTerms
 from common.moduls_init import redis
-from . import serializers
 from .schemas import CouponActionsSchema
-from .serializers import CouponSerializer
+from .serializers import CouponSerializer, CouponCategorySerializer
 from ..models import Coupon, Category
 
 
@@ -40,17 +39,18 @@ class CouponViewSet(viewsets.ModelViewSet):
     * put/{id} - update all fields of coupon with `id`
     * delete/{id} - delete coupon with `id`
     """
-    serializer_class = serializers.CouponSerializer
+    serializer_class = CouponSerializer
     queryset = Coupon.objects.select_related('category').prefetch_related('profile_coupons')
     permission_classes = [permissions.IsAdminUser]
     filter_backends = [ExtraSearchTerms]
-    search_fields = ['discount', 'is_valid']
-    remove_fields_list_for_get_request = ['valid_from', 'valid_to', 'category_name', 'category', 'profile_coupons']
+    search_fields = ['discount', 'is_valid', 'code']
+    remove_fields_list_for_get_request = ['valid_from', 'valid_to', 'profile_coupons']
 
     @swagger_auto_schema(method='post',
                          operation_summary='Apply coupon to cart or cancel applied coupon'
                                            ' in cart with {act} and {code}',
-                         responses={'200': CouponSerializer(), '404': "Coupon with code '{code}' was not found"})
+                         responses={'200': CouponSerializer(), '404': "Coupon with code '{code}' was not found"},
+                         request_body=Schema(type=TYPE_OBJECT))
     @action(methods=['POST'],
             detail=False,
             url_path=r'(?P<act>(apply|cancel))?/(?P<code>[A-Za-z _0-9]+)?',
@@ -68,12 +68,19 @@ class CouponViewSet(viewsets.ModelViewSet):
         except ObjectDoesNotExist:
             return Response({'error': f"Coupon with code '{code}' was not found"}, status=status.HTTP_404_NOT_FOUND)
 
+        if not coupon.is_valid:
+            return Response({'detail': 'Coupon is already invalid'})
+
         session = request.session
         profile = Profile.objects.get(user=request.user)
-        if 'cart' in session and session['cart'] or redis.hget('session_cart', f'user_id:{request.user.pk}'):
+        if 'cart' in session and session['cart'] or \
+                redis.hget('session_cart', f'user_id:{request.user.pk}') is not None:
             if act == 'apply':
-                session.update({'coupon_id': coupon.pk}) if request.headers.get(
-                    'User-Agent') != 'coreapi' else redis.hset('coupon_id', f'user_id:{request.user.pk}', coupon.pk)
+                (
+                    session.update({'coupon_id': coupon.pk})
+                    if request.headers.get('User-Agent') != 'coreapi'
+                    else redis.hset('coupon_id', f'user_id:{request.user.pk}', coupon.pk)
+                )
                 profile.coupons.add(coupon)
             elif act == 'cancel':
                 if request.headers.get('User-Agent') == 'coreapi':
@@ -123,7 +130,7 @@ class CouponCategoryViewSet(viewsets.ModelViewSet):
     * put/{id} - update all fields of coupon category with `id`
     * delete/{id} - delete coupon category with `id`
     """
-    serializer_class = serializers.CouponCategorySerializer
+    serializer_class = CouponCategorySerializer
     queryset = Category.objects.prefetch_related('coupons')
     permission_classes = [permissions.IsAdminUser]
     remove_fields_list_for_get_request = ['coupons']

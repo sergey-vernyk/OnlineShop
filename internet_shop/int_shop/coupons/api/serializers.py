@@ -7,7 +7,7 @@ from coupons.models import Coupon, Category
 
 class CouponSerializer(serializers.ModelSerializer):
     """
-    Serializer for coupon
+    Serializer for coupon.
     """
 
     category = serializers.PrimaryKeyRelatedField(read_only=False, queryset=Category.objects.all())
@@ -25,7 +25,7 @@ class CouponSerializer(serializers.ModelSerializer):
 
     def remove_fields(self, fields: list):
         """
-        Remove serializer's fields from response, which names in passed list
+        Remove serializer's fields from response, which names are in passed list.
         """
         for field_name in fields:
             self.fields.pop(field_name)
@@ -35,16 +35,17 @@ class CouponCategorySerializer(TranslatableModelSerializer):
     """
     Serializer for coupon's category.
     """
+    id = serializers.PrimaryKeyRelatedField(read_only=True)
     translations = TranslatedFieldsField(shared_model=Category)
     coupons = serializers.StringRelatedField(read_only=True, many=True)
 
     class Meta:
         model = Category
-        fields = ('name', 'slug', 'coupons', 'translations')
+        fields = ('id', 'name', 'slug', 'coupons', 'translations')
 
     def remove_fields(self, fields: list):
         """
-        Remove serializer's fields from response, which names in passed list
+        Remove serializer's fields from response, which names are in passed list.
         """
         for field_name in fields:
             self.fields.pop(field_name)

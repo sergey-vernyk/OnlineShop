@@ -3,8 +3,8 @@ from rest_framework.permissions import BasePermission
 
 class ObjectEditPermission(BasePermission):
     """
-    Permission, that allows to create, update, partial update or delete object only
-    staff users, but get list of objects, retrieve single object can anyone user
+    Permission, that allows to create, update, partial update or delete object only by
+    staff users, but anyone user can get list of objects or retrieve single object.
     """
 
     def has_permission(self, request, view):

@@ -25,7 +25,7 @@ from ..utils import get_products_sorted_by_views
 @method_decorator(name='retrieve', decorator=swagger_auto_schema(operation_summary='Get product with {id}'))
 @method_decorator(name='create', decorator=swagger_auto_schema(operation_summary='Create product'))
 @method_decorator(name='partial_update',
-                  decorator=swagger_auto_schema(operation_summary='Update one or several product\'s fied(s) with {id}'))
+                  decorator=swagger_auto_schema(operation_summary='Update one or several product\'s field(s) with {id}'))
 @method_decorator(name='update', decorator=swagger_auto_schema(operation_summary='Full update product with {id}'))
 @method_decorator(name='destroy', decorator=swagger_auto_schema(operation_summary='Delete product with {id}'))
 class ProductViewSet(viewsets.ModelViewSet):

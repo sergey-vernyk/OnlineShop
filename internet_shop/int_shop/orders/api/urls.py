@@ -3,12 +3,13 @@ from rest_framework.authentication import BasicAuthentication, TokenAuthenticati
 from rest_framework.renderers import CoreJSONRenderer
 from rest_framework.routers import DefaultRouter
 from rest_framework.schemas import get_schema_view, SchemaGenerator
+from django.conf import settings
 
 from . import views
 
 # generate schema view for the app
 coreapi_schema_view = get_schema_view(title='Orders API',
-                                      url='/api/orders/',
+                                      url=f'/api/{settings.REST_FRAMEWORK["DEFAULT_VERSION"]}/orders/',
                                       urlconf='orders.api.urls',
                                       generator_class=SchemaGenerator,
                                       renderer_classes=[CoreJSONRenderer],

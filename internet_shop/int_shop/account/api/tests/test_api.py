@@ -304,6 +304,7 @@ class TestAccountAPI(APITestCase):
         response = self.client.get(reverse('account_api:profile-favorite_products_list', kwargs={'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         serializer = ProductSerializer(instance=self.product)
+        serializer.remove_fields(['properties'])
         actual_result = response.data
         expected_result = serializer.data
         self.assertEqual(len(actual_result), 1)
@@ -322,6 +323,7 @@ class TestAccountAPI(APITestCase):
         response = self.client.get(reverse('account_api:profile-watched_products_list', kwargs={'version': 'v1'}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         serializer = ProductSerializer(instance=self.product)
+        serializer.remove_fields(['properties'])
         actual_result = response.data
         expected_result = serializer.data
         self.assertEqual(len(actual_result), 1)

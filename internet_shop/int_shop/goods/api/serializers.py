@@ -1,33 +1,22 @@
 from parler_rest.fields import TranslatedFieldsField
 from parler_rest.serializers import TranslatableModelSerializer
 from rest_framework import serializers
-from rest_framework.serializers import RelatedField
 
-from goods.models import Product, Category, Property, Manufacturer, PropertyCategory
+from goods.models import Product, Category, Property, Manufacturer
 
 
-class PropertyField(RelatedField):
+class ProductPropertySerializer(TranslatableModelSerializer):
+    """
+    Serializer for products properties.
+    """
 
-    def to_representation(self, value) -> list:
-        """
-        Returns list of properties.
-        """
-        all_properties = value.select_related('category_property')
-        category_properties = PropertyCategory.objects.filter(
-            pk__in=[prop.category_property_id for prop in all_properties]).values('id', 'translations__name')
-        category_properties_names_ids = {data['id']: data['translations__name'] for data in category_properties}
+    translations = TranslatedFieldsField(shared_model=Property)
+    product_name = serializers.StringRelatedField(read_only=True, source='product.name')
+    product = serializers.PrimaryKeyRelatedField(read_only=False, queryset=Product.available_objects.all())
 
-        result = []
-        for p in all_properties.values():
-            p['property_category'] = category_properties_names_ids[p['category_property_id']]
-            del p['product_id']
-            del p['category_property_id']
-            del p['id']
-            result.append(p)
-        return result
-
-    def get_queryset(self):
-        return Property.objects.all()
+    class Meta:
+        model = Property
+        fields = ('translations', 'numeric_value', 'category_property', 'product_name', 'product')
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -38,7 +27,7 @@ class ProductSerializer(serializers.ModelSerializer):
     category = serializers.PrimaryKeyRelatedField(read_only=False, queryset=Category.objects.all())
     manufacturer = serializers.PrimaryKeyRelatedField(read_only=False, queryset=Manufacturer.objects.all())
     comments = serializers.StringRelatedField(many=True, required=False)
-    properties = PropertyField(required=False)
+    properties = ProductPropertySerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
@@ -78,18 +67,6 @@ class ProductCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
-
-
-class ProductPropertySerializer(TranslatableModelSerializer):
-    """
-    Serializer for products properties.
-    """
-
-    translations = TranslatedFieldsField(shared_model=Property)
-
-    class Meta:
-        model = Property
-        fields = ('translations', 'numeric_value', 'category_property', 'product')
 
 
 class ManufacturerSerializer(serializers.ModelSerializer):
